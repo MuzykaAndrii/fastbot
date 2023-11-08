@@ -10,11 +10,14 @@ from app.config import settings
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # on startup
-    BotWebhookService.set_webhook(
+
+    bot_webhook_service = BotWebhookService(
         bot_token=settings.BOT_TOKEN,
-        webhook_url=settings.WEBHOOK_URL
+        webhook_url=settings.WEBHOOK_URL,
+        webhook_prefix=bot_router.prefix,
     )
-    
+    bot_webhook_service.set_webhook_if_current_unmatched()
+
     yield
 
     # on shutdown

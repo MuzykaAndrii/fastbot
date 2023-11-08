@@ -25,7 +25,7 @@ class Message(BaseModel):
     chat: MessageChat
     date: int
     text: str
-    entities: list[MessageEntity]
+    entities: list[MessageEntity] = []
 
 class TgBotResponse(BaseModel):
     update_id: int
