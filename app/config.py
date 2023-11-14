@@ -8,6 +8,7 @@ from pydantic import computed_field
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+BOT_PREFIX = "bot"
 
 env_file_path = BASE_DIR / ".env"
 
@@ -18,16 +19,16 @@ class Settings(BaseSettings):
     DEBUG: bool
     BOT_TOKEN: str
 
-    NGROK_URL: str
     HOST_URL: str
 
     @computed_field
     @property
+    def WEBHOOK_PATH(self) -> str:
+        return f"/{BOT_PREFIX}/{self.BOT_TOKEN}"
+    
+    @computed_field
+    @property
     def WEBHOOK_URL(self) -> str:
-        if self.DEBUG:
-            return self.NGROK_URL
-        else:
-            return self.HOST_URL
-
+        return f"{self.HOST_URL}/{self.WEBHOOK_PATH}"
 
 settings = Settings()
