@@ -2,6 +2,7 @@ import logging
 from contextlib import asynccontextmanager
 
 from aiogram import Bot, Dispatcher, types
+from aiogram.enums import ParseMode
 from fastapi import FastAPI
 
 from app.bot.middlewares.config import ConfigMiddleware
@@ -15,7 +16,7 @@ logging.basicConfig(
     format=u'%(filename)s:%(lineno)d #%(levelname)-8s [%(asctime)s] - %(name)s - %(message)s',
 )
 
-bot = Bot(token=settings.BOT_TOKEN, parse_mode="HTML")
+bot = Bot(token=settings.BOT_TOKEN, parse_mode=ParseMode.HTML)
 dp = Dispatcher()
 
 @asynccontextmanager

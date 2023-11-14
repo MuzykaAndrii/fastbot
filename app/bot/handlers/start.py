@@ -1,11 +1,11 @@
 from aiogram import types, Router
-from aiogram.filters import Command
+from aiogram.filters import CommandStart
 
 
 router = Router()
 
 
-@router.message(Command('start'))
+@router.message(CommandStart())
 async def start_handler(message: types.Message):
     await message.answer(f"Hey {message.from_user.first_name}")
 
