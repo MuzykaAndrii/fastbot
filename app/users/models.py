@@ -13,7 +13,8 @@ class User(Base):
     __tablename__ = "users"
 
     id: Mapped[int] = mc(Integer, primary_key=True)
-    username: Mapped[str] = mc(String(length=50), unique=True, nullable=True)
+    tg_id: Mapped[int] = mc(Integer, unique=True, index=True, nullable=False)
+    username: Mapped[str] = mc(String(length=50), nullable=True)
     email: Mapped[str] = mc(String, unique=True, nullable=True)
     password_hash: Mapped[str] = mc(String, nullable=True)
 
