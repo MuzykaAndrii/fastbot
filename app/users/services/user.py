@@ -1,5 +1,3 @@
-
-
 from app.users.dal import UserDAL
 from app.users.models import User
 
