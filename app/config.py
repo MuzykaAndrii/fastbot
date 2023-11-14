@@ -9,6 +9,7 @@ from pydantic import computed_field
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 BOT_PREFIX = "bot"
+DB_URL_PATTERN="postgresql+asyncpg://{user}:{password}@{host}:{port}/{name}"
 
 env_file_path = BASE_DIR / ".env"
 
@@ -21,6 +22,19 @@ class Settings(BaseSettings):
 
     HOST_URL: str
 
+    DB_HOST: str
+    DB_PORT: int
+    DB_NAME: str
+    DB_USER: str
+    DB_PASS: str
+
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_DB: str
+
+    PGADMIN_DEFAULT_EMAIL: str
+    PGADMIN_DEFAULT_PASSWORD: str
+
     @computed_field
     @property
     def WEBHOOK_PATH(self) -> str:
@@ -30,5 +44,16 @@ class Settings(BaseSettings):
     @property
     def WEBHOOK_URL(self) -> str:
         return f"{self.HOST_URL}{self.WEBHOOK_PATH}"
+    
+    @computed_field
+    @property
+    def DATABASE_URL(self) -> str:
+        return DB_URL_PATTERN.format(
+            user=self.DB_USER,
+            password=self.DB_PASS,
+            host=self.DB_HOST,
+            port=self.DB_PORT,
+            name=self.DB_NAME,
+        )
 
 settings = Settings()
