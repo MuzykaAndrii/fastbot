@@ -40,6 +40,5 @@ app = FastAPI(
 )
 
 @app.post(settings.WEBHOOK_PATH)
-async def bot_webhook(update: dict):
-    telegram_update = types.Update(**update)
-    await dp.feed_update(bot=bot, update=telegram_update)
+async def handle_tg_response(update: types.Update):
+    await dp.feed_update(bot=bot, update=update)
