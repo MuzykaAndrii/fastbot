@@ -59,3 +59,21 @@ class BaseDAL:
 
             filter_result = await session.scalars(stmt)
             return filter_result.all()
+    
+    @classmethod
+    async def get_one(cls, **filter_criteria: Mapping) -> Any | None:
+        # TODO: refactor with previous method to reduce duplication
+        async with async_session_maker() as session:
+            stmt = select(cls.model).filter_by(**filter_criteria)
+            
+            filter_result = await session.scalars(stmt)
+            return filter_result.one_or_none()
+    
+    @classmethod
+    async def get_or_create(cls, **filter_criteria: Mapping) -> Any:
+        instance = await cls.get_one(**filter_criteria)
+
+        if not instance:
+            instance = await cls.create(**filter_criteria)
+        
+        return instance
