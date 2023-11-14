@@ -24,11 +24,11 @@ class Settings(BaseSettings):
     @computed_field
     @property
     def WEBHOOK_PATH(self) -> str:
-        return f"/{BOT_PREFIX}/{self.BOT_TOKEN}"
+        return f"/{BOT_PREFIX}{self.BOT_TOKEN}"
     
     @computed_field
     @property
     def WEBHOOK_URL(self) -> str:
-        return f"{self.HOST_URL}/{self.WEBHOOK_PATH}"
+        return f"{self.HOST_URL}{self.WEBHOOK_PATH}"
 
 settings = Settings()
