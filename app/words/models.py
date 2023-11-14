@@ -1,4 +1,4 @@
-from sqlalchemy import ForeignKey, Integer, String
+from sqlalchemy import Boolean, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.orm import mapped_column as mc
 
@@ -18,7 +18,7 @@ class VocabularyBundle(Base):
     )
 
     name: Mapped[str] = mc(String(50), nullable=False)
-    is_active: Mapped[bool] = mc(bool, nullable=False, default=False)
+    is_active: Mapped[bool] = mc(Boolean, nullable=False, default=False)
 
     word_pairs: Mapped[list["WordPair"]] = relationship(
         back_populates="bundle",
