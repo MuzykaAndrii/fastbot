@@ -6,6 +6,7 @@ from aiogram import F
 from app.bot.handlers.words.keyboards import get_select_strategy_keyboard
 
 from app.users.services.user import UserService
+from app.words.services import VocabularyService
 
 router = Router()
 
@@ -20,9 +21,6 @@ class CreateBundleForm(StatesGroup):
 
 @router.message(Command("create"))
 async def command_create_bundle(message: types.Message, state: FSMContext):
-    # current_user_tg_id = message.from_user.id
-    # user = UserService.get_by_tg_id(current_user_tg_id)
-
     await state.set_state(CreateBundleForm.name)
     await message.answer(f"Hey {message.from_user.first_name}, to create words bundle, specify the bundle name")
 
@@ -64,9 +62,14 @@ async def handle_bulk_words_strategy(message: types.Message, state: FSMContext):
     )
 
 
-@router.message(CreateBundleForm.bulk_strategy, F.text.regexp(r"^[^- ]{2,} *- *[^- ]{2,}(?:\n[^- ]{2,} *- *[^- ]{2,})*\n*$"))
+@router.message(CreateBundleForm.bulk_strategy, F.text.regexp(r"^[^-]+ - [^-]+(?:\n[^-]+ - [^-]+)*\n?$"))
 async def handle_bulk_words_input(message: types.Message, state: FSMContext):
-    await message.answer("success!")
+    await state.update_data(bulk_vocabulary=message.text)
+    vocabulary_data = await state.get_data()
+
+    await VocabularyService.save_bulk_vocabulary(vocabulary_data, message.from_user.id)
+    await state.clear()
+    await message.answer("Vocabulary saved successfully! Check it out")
 
 
 @router.message(CreateBundleForm.bulk_strategy)

@@ -35,6 +35,15 @@ class BaseDAL:
             await session.refresh(instance)
 
             return instance
+    
+    @classmethod
+    async def bulk_create(cls, instances: list[dict[Any, Any]]) -> None:
+        async with async_session_maker() as session:
+            for fields in instances:
+                instance = cls.model(**fields)
+                session.add(instance)
+            
+            await session.commit()
 
     @classmethod
     async def delete_by_id(cls, id: int) -> Any | NoResultFound:
