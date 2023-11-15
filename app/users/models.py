@@ -9,8 +9,7 @@ from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.orm import mapped_column as mc
 
 from app.db.base import Base
-if TYPE_CHECKING:
-    from app.words.models import VocabularyBundle
+from app.words.models import VocabularyBundle
 
 
 class User(Base):
@@ -24,6 +23,7 @@ class User(Base):
 
     vocabulary_bundles: Mapped[list["VocabularyBundle"]] = relationship(
         back_populates="owner",
+        cascade="all, delete-orphan",
         lazy="joined",
     )
 

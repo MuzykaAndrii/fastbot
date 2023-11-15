@@ -1,9 +1,12 @@
+from typing import TYPE_CHECKING
+
 from sqlalchemy import Boolean, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.orm import mapped_column as mc
 
 from app.db.base import Base
-from app.users.models import User
+if TYPE_CHECKING:
+    from app.users.models import User
 
 
 class VocabularyBundle(Base):
@@ -14,7 +17,6 @@ class VocabularyBundle(Base):
     owner: Mapped["User"] = relationship(
         back_populates="vocabulary_bundles",
         lazy="selectin",
-        cascade="all, delete-orphan",
     )
 
     name: Mapped[str] = mc(String(50), nullable=False)
@@ -32,8 +34,7 @@ class WordPair(Base):
     
     bundle_id: Mapped[int] = mc(ForeignKey("vocabulary_bundles.id"), nullable=False)
     bundle: Mapped[VocabularyBundle] = relationship(
-        back_populates="vocabulary_bundles",
-        cascade="all, delete-orphan",
+        back_populates="word_pairs",
         lazy="selectin",
     )
 
