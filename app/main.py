@@ -3,10 +3,12 @@ from contextlib import asynccontextmanager
 
 from aiogram import Bot, Dispatcher, types
 from aiogram.enums import ParseMode
+from aiogram.fsm.storage.memory import MemoryStorage
 from fastapi import FastAPI
 
 from app.bot.middlewares.config import ConfigMiddleware
 from app.bot.handlers.main.start import router as start_router
+from app.bot.handlers.words.words import router as words_router
 from app.config import settings
 
 
@@ -17,7 +19,8 @@ logging.basicConfig(
 )
 
 bot = Bot(token=settings.BOT_TOKEN, parse_mode=ParseMode.HTML)
-dp = Dispatcher()
+fsm_storage = MemoryStorage()
+dp = Dispatcher(storage=fsm_storage)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -28,6 +31,7 @@ async def lifespan(app: FastAPI):
     dp.update.outer_middleware(ConfigMiddleware(settings))
 
     dp.include_router(start_router)
+    dp.include_router(words_router)
 
     yield
     # on shutdown
