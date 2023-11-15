@@ -6,7 +6,7 @@ from aiogram.enums import ParseMode
 from fastapi import FastAPI
 
 from app.bot.middlewares.config import ConfigMiddleware
-from app.bot.handlers.start import router as start_router
+from app.bot.handlers.main.start import router as start_router
 from app.config import settings
 
 
