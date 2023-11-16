@@ -9,7 +9,7 @@ from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.orm import mapped_column as mc
 
 from app.db.base import Base
-from app.words.models import VocabularyBundle
+from app.words.models import VocabularySet
 
 
 class User(Base):
@@ -21,7 +21,7 @@ class User(Base):
     email: Mapped[str] = mc(String, unique=True, nullable=True)
     password_hash: Mapped[str] = mc(String, nullable=True)
 
-    vocabulary_bundles: Mapped[list["VocabularyBundle"]] = relationship(
+    vocabulary_sets: Mapped[list["VocabularySet"]] = relationship(
         back_populates="owner",
         cascade="all, delete-orphan",
         lazy="joined",

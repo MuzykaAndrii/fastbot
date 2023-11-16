@@ -1,10 +1,10 @@
 from app.db.dal import BaseDAL
-from app.words.models import VocabularyBundle, WordPair
+from app.words.models import VocabularySet, LanguagePair
 
 
-class VocabularyBundleDAL(BaseDAL):
-    model = VocabularyBundle
+class VocabularySetDAL(BaseDAL):
+    model = VocabularySet
 
 
-class WordPairDAL(BaseDAL):
-    model = WordPair
+class LanguagePairDAL(BaseDAL):
+    model = LanguagePair

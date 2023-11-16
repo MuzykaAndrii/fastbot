@@ -9,32 +9,32 @@ if TYPE_CHECKING:
     from app.users.models import User
 
 
-class VocabularyBundle(Base):
-    __tablename__ = 'vocabulary_bundles'
+class VocabularySet(Base):
+    __tablename__ = 'vocabulary_sets'
     id: Mapped[int] = mc(Integer, primary_key=True)
 
     owner_id: Mapped[int] = mc(ForeignKey("users.id"), nullable=False)
     owner: Mapped["User"] = relationship(
-        back_populates="vocabulary_bundles",
+        back_populates="vocabulary_sets",
         lazy="selectin",
     )
 
     name: Mapped[str] = mc(String(50), nullable=False)
     is_active: Mapped[bool] = mc(Boolean, nullable=False, default=False)
 
-    word_pairs: Mapped[list["WordPair"]] = relationship(
-        back_populates="bundle",
+    language_pairs: Mapped[list["LanguagePair"]] = relationship(
+        back_populates="vocabulary",
         cascade="all, delete-orphan",
     )
 
 
-class WordPair(Base):
-    __tablename__ = 'word_pairs'
+class LanguagePair(Base):
+    __tablename__ = 'language_pairs'
     id: Mapped[int] = mc(Integer, primary_key=True)
     
-    bundle_id: Mapped[int] = mc(ForeignKey("vocabulary_bundles.id"), nullable=False)
-    bundle: Mapped[VocabularyBundle] = relationship(
-        back_populates="word_pairs",
+    vocabulary_id: Mapped[int] = mc(ForeignKey("vocabulary_sets.id"), nullable=False)
+    vocabulary: Mapped[VocabularySet] = relationship(
+        back_populates="language_pairs",
         lazy="selectin",
     )
 

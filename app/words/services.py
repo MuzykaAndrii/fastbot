@@ -1,6 +1,6 @@
 import re
 from app.users.dal import UserDAL
-from app.words.dal import VocabularyBundleDAL, WordPairDAL
+from app.words.dal import VocabularySetDAL, LanguagePairDAL
 
 from app.words.schemas import LanguagePairSchema
 
@@ -26,7 +26,7 @@ class VocabularyParser:
         return LanguagePairSchema(
             word=word.strip(),
             translation=translation.strip(),
-            bundle_id=self.vocabulary_id,
+            vocabulary_id=self.vocabulary_id,
         )
 
 
@@ -37,9 +37,9 @@ class VocabularyService:
         vocabulary_name = vocabulary_data.get("name")
 
         user = await UserDAL.get_or_create(tg_id=user_tg_id)
-        vocabulary_bundle = await VocabularyBundleDAL.create(name=vocabulary_name, owner_id=user.id)
+        vocabulary_set = await VocabularySetDAL.create(name=vocabulary_name, owner_id=user.id)
 
-        vocabulary_parser = VocabularyParser(vocabulary_id=vocabulary_bundle.id)
-        parsed_vocabulary = await vocabulary_parser.parse_bulk_vocabulary(raw_vocabulary)
+        vocabulary_parser = VocabularyParser(vocabulary_id=vocabulary_set.id)
+        parsed_vocabulary = vocabulary_parser.parse_bulk_vocabulary(raw_vocabulary)
 
-        await WordPairDAL.bulk_create(parsed_vocabulary)
+        await LanguagePairDAL.bulk_create([word_pair.model_dump() for word_pair in parsed_vocabulary])
