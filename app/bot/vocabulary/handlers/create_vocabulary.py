@@ -3,8 +3,8 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram import F
-from app.bot.vocabulary.keyboards import get_select_strategy_keyboard
 
+from app.bot.vocabulary.keyboards import get_select_strategy_keyboard
 from app.vocabulary.services import VocabularyService
 
 router = Router()

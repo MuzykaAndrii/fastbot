@@ -67,7 +67,7 @@ class BaseDAL:
             stmt = select(cls.model).filter_by(**filter_criteria)
 
             filter_result = await session.scalars(stmt)
-            return filter_result.all()
+            return filter_result.unique().all()
     
     @classmethod
     async def get_one(cls, **filter_criteria: Mapping) -> Any | None:

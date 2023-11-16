@@ -22,7 +22,6 @@ class User(Base):
     vocabulary_sets: Mapped[list["VocabularySet"]] = relationship(
         back_populates="owner",
         cascade="all, delete-orphan",
-        lazy="joined",
     )
 
     is_superuser: Mapped[bool] = mc(Boolean, default=False, nullable=False)
