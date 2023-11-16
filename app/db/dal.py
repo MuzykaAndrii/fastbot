@@ -37,7 +37,7 @@ class BaseDAL:
             return instance
     
     @classmethod
-    async def bulk_create(cls, instances: list[dict[Any, Any]]) -> None:
+    async def bulk_create(cls, instances: list[Mapping[str, Any]]) -> None:
         async with async_session_maker() as session:
             for fields in instances:
                 instance = cls.model(**fields)
