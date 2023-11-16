@@ -5,7 +5,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram import F
 from app.bot.vocabulary.keyboards import get_select_strategy_keyboard
 
-from app.words.services import VocabularyService
+from app.vocabulary.services import VocabularyService
 
 router = Router()
 

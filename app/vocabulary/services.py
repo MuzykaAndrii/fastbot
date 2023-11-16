@@ -1,8 +1,8 @@
 import re
 
 from app.users.dal import UserDAL
-from app.words.dal import VocabularySetDAL, LanguagePairDAL
-from app.words.schemas import LanguagePairSchema
+from app.vocabulary.dal import VocabularySetDAL, LanguagePairDAL
+from app.vocabulary.schemas import LanguagePairSchema
 
 
 class VocabularyParser:

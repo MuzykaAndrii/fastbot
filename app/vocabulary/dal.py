@@ -1,5 +1,5 @@
 from app.db.dal import BaseDAL
-from app.words.models import VocabularySet, LanguagePair
+from app.vocabulary.models import VocabularySet, LanguagePair
 
 
 class VocabularySetDAL(BaseDAL):
