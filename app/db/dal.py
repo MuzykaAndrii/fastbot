@@ -76,7 +76,7 @@ class BaseDAL:
             stmt = select(cls.model).filter_by(**filter_criteria)
             
             filter_result = await session.execute(stmt)
-            return filter_result.unique().scalar_one()
+            return filter_result.unique().scalar_one_or_none()
     
     @classmethod
     async def get_or_create(cls, **filter_criteria: Mapping) -> Any:
