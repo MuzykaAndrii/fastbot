@@ -1,7 +1,7 @@
 import re
+
 from app.users.dal import UserDAL
 from app.words.dal import VocabularySetDAL, LanguagePairDAL
-
 from app.words.schemas import LanguagePairSchema
 
 
