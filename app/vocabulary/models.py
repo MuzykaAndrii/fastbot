@@ -25,7 +25,14 @@ class VocabularySet(Base):
     language_pairs: Mapped[list["LanguagePair"]] = relationship(
         back_populates="vocabulary",
         cascade="all, delete-orphan",
+        lazy="joined",
     )
+
+    def __str__(self) -> str:
+        return f"Vocabulary set: {self.name} with: {self.language_pairs}"
+    
+    def __repr__(self) -> str:
+        return str(self)
 
 
 class LanguagePair(Base):
@@ -40,3 +47,9 @@ class LanguagePair(Base):
 
     word: Mapped[str] = mc(String(100), nullable=False)
     translation: Mapped[str] = mc(String(100), nullable=False)
+
+    def __str__(self) -> str:
+        return f"Lang pair: {self.word} - {self.translation}"
+    
+    def __repr__(self) -> str:
+        return str(self)
