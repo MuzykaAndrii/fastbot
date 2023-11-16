@@ -7,7 +7,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from fastapi import FastAPI
 
 from app.bot.main.handlers.start import router as start_router
-from app.bot.vocabulary.handlers.create_vocabulary import router as vocabulary_router
+from app.bot.vocabulary.router import vocabulary_router
 from app.config import settings
 
 

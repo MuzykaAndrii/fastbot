@@ -5,7 +5,6 @@ from aiogram.fsm.context import FSMContext
 from aiogram import F
 from app.bot.vocabulary.keyboards import get_select_strategy_keyboard
 
-from app.users.services.user import UserService
 from app.words.services import VocabularyService
 
 router = Router()
@@ -16,7 +15,6 @@ class CreateBundleForm(StatesGroup):
     words_strategy = State()
     bulk_strategy = State()
     line_by_line_strategy = State()
-
 
 
 @router.message(Command("create"))
