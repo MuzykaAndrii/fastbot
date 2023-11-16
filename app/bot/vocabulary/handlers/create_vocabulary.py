@@ -3,7 +3,7 @@ from aiogram.fsm.state import State, StatesGroup
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram import F
-from app.bot.handlers.words.keyboards import get_select_strategy_keyboard
+from app.bot.vocabulary.keyboards import get_select_strategy_keyboard
 
 from app.users.services.user import UserService
 from app.words.services import VocabularyService

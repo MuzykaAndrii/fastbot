@@ -6,9 +6,8 @@ from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 from fastapi import FastAPI
 
-from app.bot.middlewares.config import ConfigMiddleware
-from app.bot.handlers.main.start import router as start_router
-from app.bot.handlers.words.words import router as words_router
+from app.bot.main.handlers.start import router as start_router
+from app.bot.vocabulary.handlers.create_vocabulary import router as vocabulary_router
 from app.config import settings
 
 
@@ -28,10 +27,8 @@ async def lifespan(app: FastAPI):
     await bot.set_webhook(url=settings.WEBHOOK_URL)
     logger.info("App started")
 
-    dp.update.outer_middleware(ConfigMiddleware(settings))
-
     dp.include_router(start_router)
-    dp.include_router(words_router)
+    dp.include_router(vocabulary_router)
 
     yield
     # on shutdown
