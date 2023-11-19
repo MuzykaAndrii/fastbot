@@ -5,7 +5,7 @@ from aiogram.types import (
     InlineKeyboardMarkup,
 )
 
-from app.bot.vocabulary.callback_patterns import VocabularyAction, VocabularyCallbackButtonData
+from app.bot.vocabulary.callback_patterns import VocabularyAction, VocabularyCallbackData
 
 
 def get_select_strategy_keyboard():
@@ -25,22 +25,22 @@ def get_select_strategy_keyboard():
 
 
 def get_vocabulary_actions_keyboard(vocabulary_id: int):
-    delete_btn_callback_data = VocabularyCallbackButtonData(
+    delete_btn_callback_data = VocabularyCallbackData(
         action=VocabularyAction.delete,
         vocabulary_id=vocabulary_id,
     )
     btn_delete = InlineKeyboardButton(
         text="❌ Delete",
-        callback_data=delete_btn_callback_data.model_dump_json()
+        callback_data=delete_btn_callback_data.pack(),
     )
 
-    set_notification_btn_callback_data = VocabularyCallbackButtonData(
+    set_notification_btn_callback_data = VocabularyCallbackData(
         action=VocabularyAction.set_notification,
         vocabulary_id=vocabulary_id,
     )
     btn_set_notification = InlineKeyboardButton(
         text="🕝 Set notification",
-        callback_data=set_notification_btn_callback_data.model_dump_json(),
+        callback_data=set_notification_btn_callback_data.pack(),
     )
 
     vocabulary_action_keyboard = InlineKeyboardMarkup(inline_keyboard=[

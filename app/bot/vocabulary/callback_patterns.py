@@ -1,6 +1,6 @@
 from enum import Enum
 
-from pydantic import BaseModel
+from aiogram.filters.callback_data import CallbackData
 
 
 class VocabularyAction(str, Enum):
@@ -8,6 +8,6 @@ class VocabularyAction(str, Enum):
     set_notification = "notification"
 
 
-class VocabularyCallbackButtonData(BaseModel):
+class VocabularyCallbackData(CallbackData, prefix="vocabulary_action"):
     action: VocabularyAction
     vocabulary_id: int
