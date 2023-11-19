@@ -1,7 +1,7 @@
 from aiogram.filters import Command
 from aiogram import Router, types
-from app.bot.vocabulary.keyboards import get_vocabulary_actions_keyboard
 
+from app.bot.vocabulary.keyboards import get_vocabulary_actions_keyboard
 from app.bot.vocabulary.messages import VocabularyMessages
 from app.vocabulary.services import VocabularyService
 

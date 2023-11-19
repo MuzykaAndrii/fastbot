@@ -1,5 +1,3 @@
-
-
 from app.bot.vocabulary.schemas import VocabularySetSchema
 
 
