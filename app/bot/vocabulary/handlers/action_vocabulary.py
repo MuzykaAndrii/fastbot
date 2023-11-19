@@ -14,9 +14,14 @@ async def handle_delete_vocabulary_action(query: types.CallbackQuery, callback_d
     user = await UserService.get_by_tg_id(query.from_user.id)
     vocabulary = await VocabularySetDAL.get_by_id(callback_data.vocabulary_id)
 
+    if not vocabulary:
+        await query.answer(text=VocabularyMessages.vocabulary_dont_exists)
+        return
+
     if user.id != vocabulary.owner_id:
         await query.answer(text=VocabularyMessages.user_is_not_owner_of_vocabulary)
         return
     
     await VocabularySetDAL.delete_by_id(vocabulary.id)
+    await query.bot.delete_message(query.message.chat.id, query.message.message_id)
     await query.answer(text=VocabularyMessages.vocabulary_deleted_successfully)
