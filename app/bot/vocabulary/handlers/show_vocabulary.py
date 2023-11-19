@@ -17,12 +17,8 @@ async def show_vocabularies(message: types.Message):
         await message.answer(VocabularyMessages.user_havent_any_vocabularies)
         return
 
-    for vocabulary_set in vocabulary_sets:
-        vocabulary_set_msg = VocabularyMessages.get_vocabulary_entity_msg(
-            vocabulary_set.name,
-            vocabulary_set.language_pairs,
-            vocabulary_set.is_active,
-        )
+    for vocabulary_set in vocabulary_sets:  # type: VocabularySetSchema
+        vocabulary_set_msg = VocabularyMessages.get_vocabulary_entity_msg(vocabulary_set)
 
         vocabulary_actions_keyboard = get_vocabulary_actions_keyboard(vocabulary_set.id)
         await message.answer(vocabulary_set_msg, reply_markup=vocabulary_actions_keyboard)
