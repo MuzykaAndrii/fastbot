@@ -1,5 +1,6 @@
 from aiogram.filters import Command
 from aiogram import Router, types
+from app.bot.vocabulary.keyboards import get_vocabulary_actions_keyboard
 
 from app.bot.vocabulary.messages import VocabularyMessages
 from app.vocabulary.services import VocabularyService
@@ -21,4 +22,6 @@ async def show_vocabularies(message: types.Message):
             vocabulary_set.name,
             vocabulary_set.language_pairs,
         )
-        await message.answer(vocabulary_set_msg)
+        
+        vocabulary_actions_keyboard = get_vocabulary_actions_keyboard(vocabulary_set.id)
+        await message.answer(vocabulary_set_msg, reply_markup=vocabulary_actions_keyboard)
