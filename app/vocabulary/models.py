@@ -39,7 +39,7 @@ class LanguagePair(Base):
     __tablename__ = 'language_pairs'
     id: Mapped[int] = mc(Integer, primary_key=True)
     
-    vocabulary_id: Mapped[int] = mc(ForeignKey("vocabulary_sets.id"), nullable=False)
+    vocabulary_id: Mapped[int] = mc(ForeignKey("vocabulary_sets.id", ondelete="CASCADE"), nullable=False)
     vocabulary: Mapped[VocabularySet] = relationship(
         back_populates="language_pairs",
         lazy="selectin",

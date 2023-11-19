@@ -51,7 +51,8 @@ class BaseDAL:
             stmt = delete(cls.model).where(cls.model.id == id).returning(cls.model)
 
             deleted_instance = await session.execute(stmt)
-            return deleted_instance.scalar_one()
+            await session.commit()
+            return deleted_instance.unique().scalar_one()
 
     @classmethod
     async def get_all(cls, offset: int = 0, limit: int = 50) -> Iterable[Any] | None:
