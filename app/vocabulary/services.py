@@ -1,7 +1,9 @@
 import re
 
 from app.users.dal import UserDAL
+from app.users.services.user import UserService
 from app.vocabulary.dal import VocabularySetDAL, LanguagePairDAL
+from app.vocabulary.models import VocabularySet
 from app.vocabulary.schemas import LanguagePairSchema
 
 
@@ -43,3 +45,12 @@ class VocabularyService:
         parsed_vocabulary = vocabulary_parser.parse_bulk_vocabulary(raw_vocabulary)
 
         await LanguagePairDAL.bulk_create([word_pair.model_dump() for word_pair in parsed_vocabulary])
+    
+    @classmethod
+    async def get_user_vocabularies(cls, user_tg_id: int) -> list[VocabularySet]:
+        user = await UserService.get_or_create_by_tg_id(user_tg_id)
+        vocabulary_sets = await VocabularySetDAL.filter_by(owner_id=user.id)
+
+        if vocabulary_sets:
+            return vocabulary_sets
+        return None
