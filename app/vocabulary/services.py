@@ -59,6 +59,12 @@ class VocabularyService:
     
 
     @classmethod
+    async def get_active_vocabularies(cls) -> list[VocabularySet]:
+        active_vocabularies = await VocabularySetDAL.filter_by(is_active=True)
+        return active_vocabularies
+    
+
+    @classmethod
     async def delete_vocabulary(cls, user_tg_id: int, vocabulary_id: int) -> VocabularySet:
         user = await UserService.get_by_tg_id(user_tg_id)
         vocabulary = await VocabularySetDAL.get_by_id(vocabulary_id)
@@ -89,7 +95,7 @@ class VocabularyService:
     
 
     @classmethod
-    async def _validate_user_vocabulary(cls, user, vocabulary, check_active=False):
+    def _validate_user_vocabulary(cls, user, vocabulary, check_active=False):
         if not vocabulary:
             raise VocabularyDoesNotExist
 

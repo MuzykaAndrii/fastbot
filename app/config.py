@@ -35,6 +35,8 @@ class Settings(BaseSettings):
     PGADMIN_DEFAULT_EMAIL: str
     PGADMIN_DEFAULT_PASSWORD: str
 
+    API_KEY: str
+
     @computed_field
     @property
     def WEBHOOK_PATH(self) -> str:

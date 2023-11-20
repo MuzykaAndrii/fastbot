@@ -7,3 +7,7 @@ class LanguagePairSchema(BaseModel):
     vocabulary_id: int
     word: str
     translation: str
+
+
+class AuthorizationSchema(BaseModel):
+    api_key: str
