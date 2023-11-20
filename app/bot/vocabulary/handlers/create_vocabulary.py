@@ -60,7 +60,7 @@ async def handle_bulk_words_strategy(message: types.Message, state: FSMContext):
     )
 
 
-@router.message(CreateBundleForm.bulk_strategy, F.text.regexp(r"^[^-]+ - [^-]+(?:\n[^-]+ - [^-]+)*\n?$"))
+@router.message(CreateBundleForm.bulk_strategy, F.text.regexp(r"^(\b\w.*\w\b\s*-\s*\b\w.*\w\b\s*[\n\r]+){1,}\b\w.*\w\b\s*-\s*\b\w.*\w\b\s*$"))
 async def handle_bulk_words_input(message: types.Message, state: FSMContext):
     await state.update_data(bulk_vocabulary=message.text)
     vocabulary_data = await state.get_data()
