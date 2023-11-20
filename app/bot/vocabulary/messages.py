@@ -21,7 +21,7 @@ class VocabularyMessages:
     vocabulary_already_active = "Notifications for this vocabulary already active 😉"
     vocabulary_entity_header = "<i>{vocabulary_name}</i>"
     active_vocabulary = "✅ Notifications active for: <b>{vocabulary_name}</b>"
-    no_active_vocabulary = "📵 Notifications os off"
+    no_active_vocabulary = "📵 Notifications is turned off"
     vocabulary_entity_item = "<u>{number}.</u> <b>{word}</b> - {translation}"
     
     @classmethod

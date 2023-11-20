@@ -80,6 +80,12 @@ class VocabularyService:
         await VocabularySetDAL.make_active(vocabulary.id)
 
         return vocabulary
+
+    
+    @classmethod
+    async def disable_user_vocabulary(cls, user_tg_id: int):
+        user = await UserService.get_by_tg_id(user_tg_id)
+        await VocabularySetDAL.disable_user_active_vocabulary(user.id)
     
 
     @classmethod

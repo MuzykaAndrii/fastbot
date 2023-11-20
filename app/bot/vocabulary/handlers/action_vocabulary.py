@@ -1,4 +1,5 @@
 from aiogram import types, Router
+from aiogram.filters import Command
 from aiogram import F
 
 from app.bot.vocabulary.callback_patterns import VocabularyCallbackData, VocabularyAction
@@ -49,3 +50,11 @@ async def handle_enable_notification_vocabulary_action(query: types.CallbackQuer
             text=VocabularyMessages.active_vocabulary.format(vocabulary_name=vocabulary.name)
         )
         await vocabulary_is_active_msg.pin(disable_notification=True)
+
+
+@router.message(Command("disable"))
+async def handle_disable_notifications_command(message: types.Message):
+    await VocabularyService.disable_user_vocabulary(message.from_user.id)
+
+    vocabulary_disabled_message = await message.answer(text=VocabularyMessages.no_active_vocabulary)
+    await vocabulary_disabled_message.pin(disable_notification=True)
