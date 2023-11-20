@@ -15,10 +15,11 @@ from app.db.session import async_session_maker
 
 class BaseDAL:
     model = None
+    make_session = async_session_maker
 
     @classmethod
     async def get_by_id(cls, id: int) -> Any | None:
-        async with async_session_maker() as session:
+        async with cls.make_session() as session:
             result = await session.get(cls.model, id)
 
             if not result:
@@ -27,7 +28,7 @@ class BaseDAL:
 
     @classmethod
     async def create(cls, **fields: Mapping):
-        async with async_session_maker() as session:
+        async with cls.make_session() as session:
             instance = cls.model(**fields)
 
             session.add(instance)
@@ -38,7 +39,7 @@ class BaseDAL:
     
     @classmethod
     async def bulk_create(cls, instances: list[Mapping[str, Any]]) -> None:
-        async with async_session_maker() as session:
+        async with cls.make_session() as session:
             for fields in instances:
                 instance = cls.model(**fields)
                 session.add(instance)
@@ -47,7 +48,7 @@ class BaseDAL:
 
     @classmethod
     async def delete_by_id(cls, id: int) -> Any | NoResultFound:
-        async with async_session_maker() as session:
+        async with cls.make_session() as session:
             stmt = delete(cls.model).where(cls.model.id == id).returning(cls.model)
 
             deleted_instance = await session.execute(stmt)
@@ -56,7 +57,7 @@ class BaseDAL:
 
     @classmethod
     async def get_all(cls, offset: int = 0, limit: int = 50) -> Iterable[Any] | None:
-        async with async_session_maker() as session:
+        async with cls.make_session() as session:
             stmt = select(cls.model).offset(offset).limit(limit)
 
             instances = await session.execute(stmt)
@@ -64,7 +65,7 @@ class BaseDAL:
 
     @classmethod
     async def filter_by(cls, **filter_criteria: Mapping) -> Iterable[Any] | None:
-        async with async_session_maker() as session:
+        async with cls.make_session() as session:
             stmt = select(cls.model).filter_by(**filter_criteria)
 
             filter_result = await session.scalars(stmt)
@@ -73,7 +74,7 @@ class BaseDAL:
     @classmethod
     async def get_one(cls, **filter_criteria: Mapping) -> Any | None:
         # TODO: refactor with previous method to reduce duplication
-        async with async_session_maker() as session:
+        async with cls.make_session() as session:
             stmt = select(cls.model).filter_by(**filter_criteria)
             
             filter_result = await session.execute(stmt)

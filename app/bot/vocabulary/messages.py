@@ -18,7 +18,7 @@ class VocabularyMessages:
 🌟 <b>Multiple Translations:</b> Use commas for multiple translations, like "Word - Translation, Another."
 🎉 <b>Have Fun!</b> Enjoy expanding your vocabulary with the bot! 🚀
     """
-
+    vocabulary_already_active = "Notifications for this vocabulary already active 😉"
     vocabulary_entity_header = "<i>{vocabulary_name}</i>"
     active_vocabulary = "✅ Notifications active for: <b>{vocabulary_name}</b>"
     no_active_vocabulary = "📵 Notifications os off"
