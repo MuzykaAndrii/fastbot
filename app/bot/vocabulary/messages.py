@@ -7,6 +7,18 @@ class VocabularyMessages:
     vocabulary_deleted_successfully = "🗑️ Vocabulary deleted successfully 🫡"
     vocabulary_dont_exists = "Vocabulary does not exist 🤷🏻‍♂️"
 
+    bulk_vocabulary_creation_rules = """
+    <b>There are several rules to create bulk vocabulary:</b>
+
+📝 <b>Format:</b> Enter word pairs with a hyphen "-" on each line.
+🚫 <b>Minimum Pairs:</b> Include at least two pairs. Less won't cut it!
+🔄 <b>Case Insensitive:</b> Cases don't matter; "Word - Translation" = "word - translation."
+✨ <b>Special Characters:</b> Go ahead, use emojis, punctuation, or anything fancy!
+➖ <b>Hyphen in Words:</b> Totally allowed, but only as a separator.
+🌟 <b>Multiple Translations:</b> Use commas for multiple translations, like "Word - Translation, Another."
+🎉 <b>Have Fun!</b> Enjoy expanding your vocabulary with the bot! 🚀
+    """
+
     vocabulary_entity_header = "<i>{vocabulary_name}</i>"
     vocabulary_entity_active = " - ✅ Notifications active ✅"
     vocabulary_entity_item = "<u>{number}.</u> <b>{word}</b> - {translation}"

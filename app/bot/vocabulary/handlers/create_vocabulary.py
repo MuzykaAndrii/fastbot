@@ -5,6 +5,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram import F
 
 from app.bot.vocabulary.keyboards import get_select_strategy_keyboard
+from app.bot.vocabulary.messages import VocabularyMessages
 from app.vocabulary.services import VocabularyService
 
 router = Router()
@@ -55,7 +56,7 @@ async def set_bundle_name(message: types.Message, state: FSMContext):
 async def handle_bulk_words_strategy(message: types.Message, state: FSMContext):
     await state.set_state(CreateBundleForm.bulk_strategy)
     await message.answer(
-        "Okay, send me words in following format: 'foreign word - translation', separate this pairs by new line, min pairs count: 2",
+        VocabularyMessages.bulk_vocabulary_creation_rules,
         reply_markup=types.ReplyKeyboardRemove(),
     )
 
