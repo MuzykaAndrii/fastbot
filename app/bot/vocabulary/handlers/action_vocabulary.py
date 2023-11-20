@@ -27,8 +27,8 @@ async def handle_delete_vocabulary_action(query: types.CallbackQuery, callback_d
         await query.answer(text=VocabularyMessages.vocabulary_deleted_successfully)
 
 
-@router.callback_query(VocabularyCallbackData.filter(F.action == VocabularyAction.set_notification))
-async def handle_set_notification_vocabulary_action(query: types.CallbackQuery, callback_data: VocabularyCallbackData):
+@router.callback_query(VocabularyCallbackData.filter(F.action == VocabularyAction.enable_notification))
+async def handle_enable_notification_vocabulary_action(query: types.CallbackQuery, callback_data: VocabularyCallbackData):
     try:
         vocabulary = await VocabularyService.disable_active_vocabulary_and_enable_given(
             query.from_user.id,

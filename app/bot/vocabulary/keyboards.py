@@ -34,17 +34,17 @@ def get_vocabulary_actions_keyboard(vocabulary_id: int):
         callback_data=delete_btn_callback_data.pack(),
     )
 
-    set_notification_btn_callback_data = VocabularyCallbackData(
-        action=VocabularyAction.set_notification,
+    enable_notification_btn_callback_data = VocabularyCallbackData(
+        action=VocabularyAction.enable_notification,
         vocabulary_id=vocabulary_id,
     )
-    btn_set_notification = InlineKeyboardButton(
+    btn_enable_notification = InlineKeyboardButton(
         text="🕝 Set notification",
-        callback_data=set_notification_btn_callback_data.pack(),
+        callback_data=enable_notification_btn_callback_data.pack(),
     )
 
     vocabulary_action_keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [btn_delete, btn_set_notification],
+        [btn_delete, btn_enable_notification],
     ])
 
     return vocabulary_action_keyboard
