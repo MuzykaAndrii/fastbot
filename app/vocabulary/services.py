@@ -1,4 +1,5 @@
 import re
+from app.shared.exceptions import UserIsNotOwnerOfVocabulary, VocabularyDoesNotExist
 
 from app.users.dal import UserDAL
 from app.users.services.user import UserService
@@ -54,3 +55,17 @@ class VocabularyService:
         if vocabulary_sets:
             return vocabulary_sets
         return None
+    
+    @classmethod
+    async def delete_vocabulary(cls, user_tg_id: int, vocabulary_id: int) -> VocabularySet:
+        user = await UserService.get_by_tg_id(user_tg_id)
+        vocabulary = await VocabularySetDAL.get_by_id(vocabulary_id)
+
+        if not vocabulary:
+            raise VocabularyDoesNotExist
+
+        if user.id != vocabulary.owner_id:
+            raise UserIsNotOwnerOfVocabulary
+        
+        deleted_vocabulary = await VocabularySetDAL.delete_by_id(vocabulary.id)
+        return deleted_vocabulary

@@ -20,16 +20,14 @@ class VocabularyMessages:
     """
 
     vocabulary_entity_header = "<i>{vocabulary_name}</i>"
-    vocabulary_entity_active = " - ✅ Notifications active ✅"
+    active_vocabulary = "✅ Notifications active for: <b>{vocabulary_name}</b>"
+    no_active_vocabulary = "📵 Notifications os off"
     vocabulary_entity_item = "<u>{number}.</u> <b>{word}</b> - {translation}"
     
     @classmethod
     def get_vocabulary_entity_msg(cls, vocabulary_set: VocabularySetSchema) -> str:
         full_msg: list[str] = []
         header = cls.vocabulary_entity_header.format(vocabulary_name=vocabulary_set.name)
-
-        if vocabulary_set.is_active:
-            header += cls.vocabulary_entity_active
 
         full_msg.append(header)
 
