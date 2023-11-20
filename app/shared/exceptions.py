@@ -14,3 +14,7 @@ class VocabularyDoesNotExist(VocabularyError):
 
 class UserIsNotOwnerOfVocabulary(VocabularyError):
     pass
+
+
+class VocabularyIsAlreadyActive(VocabularyError):
+    pass

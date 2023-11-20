@@ -1,5 +1,5 @@
 import re
-from app.shared.exceptions import UserIsNotOwnerOfVocabulary, VocabularyDoesNotExist
+from app.shared.exceptions import UserIsNotOwnerOfVocabulary, VocabularyDoesNotExist, VocabularyIsAlreadyActive
 
 from app.users.dal import UserDAL
 from app.users.services.user import UserService
@@ -47,6 +47,7 @@ class VocabularyService:
 
         await LanguagePairDAL.bulk_create([word_pair.model_dump() for word_pair in parsed_vocabulary])
     
+
     @classmethod
     async def get_user_vocabularies(cls, user_tg_id: int) -> list[VocabularySet]:
         user = await UserService.get_or_create_by_tg_id(user_tg_id)
@@ -56,16 +57,38 @@ class VocabularyService:
             return vocabulary_sets
         return None
     
+
     @classmethod
     async def delete_vocabulary(cls, user_tg_id: int, vocabulary_id: int) -> VocabularySet:
         user = await UserService.get_by_tg_id(user_tg_id)
         vocabulary = await VocabularySetDAL.get_by_id(vocabulary_id)
 
+        cls._validate_user_vocabulary(user, vocabulary)
+        
+        deleted_vocabulary = await VocabularySetDAL.delete_by_id(vocabulary.id)
+        return deleted_vocabulary
+    
+
+    @classmethod
+    async def disable_active_vocabulary_and_enable_given(cls, user_tg_id: int, vocabulary_id: int):
+        user = await UserService.get_by_tg_id(user_tg_id)
+        vocabulary = await VocabularySetDAL.get_by_id(vocabulary_id)
+
+        cls._validate_user_vocabulary(user, vocabulary, check_active=True)            
+        
+        await VocabularySetDAL.disable_user_active_vocabulary(user.id)
+        await VocabularySetDAL.make_active(vocabulary.id)
+
+        return vocabulary
+    
+
+    @classmethod
+    async def _validate_user_vocabulary(cls, user, vocabulary, check_active=False):
         if not vocabulary:
             raise VocabularyDoesNotExist
 
         if user.id != vocabulary.owner_id:
             raise UserIsNotOwnerOfVocabulary
         
-        deleted_vocabulary = await VocabularySetDAL.delete_by_id(vocabulary.id)
-        return deleted_vocabulary
+        if check_active and vocabulary.is_active:
+            raise VocabularyIsAlreadyActive
