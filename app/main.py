@@ -2,17 +2,14 @@ import logging
 from contextlib import asynccontextmanager
 import random
 
-from aiogram import Bot, Dispatcher, types
-from aiogram.enums import ParseMode
-from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram import types
 from fastapi import FastAPI, HTTPException
 
-from app.bot.main.handlers.start import router as start_router
 from app.bot.vocabulary.messages import VocabularyMessages
-from app.bot.vocabulary.router import vocabulary_router
 from app.config import settings
 from app.vocabulary.schemas import AuthorizationSchema
 from app.vocabulary.services import VocabularyService
+from app.bot.main import bot
 
 
 logger = logging.getLogger(__name__)
@@ -21,22 +18,16 @@ logging.basicConfig(
     format=u'%(filename)s:%(lineno)d #%(levelname)-8s [%(asctime)s] - %(name)s - %(message)s',
 )
 
-bot = Bot(token=settings.BOT_TOKEN, parse_mode=ParseMode.HTML)
-fsm_storage = MemoryStorage()
-dp = Dispatcher(storage=fsm_storage)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # on startup
-    await bot.set_webhook(url=settings.WEBHOOK_URL)
+    await bot.start_bot()
     logger.info("App started")
-
-    dp.include_router(start_router)
-    dp.include_router(vocabulary_router)
 
     yield
     # on shutdown
-    await bot.session.close()
+    await bot.stop_bot()
     logger.info("App stopped")
 
 app = FastAPI(
@@ -48,7 +39,7 @@ app = FastAPI(
 
 @app.post(settings.WEBHOOK_PATH)
 async def handle_tg_response(update: types.Update):
-    await dp.feed_update(bot=bot, update=update)
+    await bot.handle_update(update)
 
 
 @app.post("/send_notifications", status_code=200)
