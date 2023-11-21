@@ -1,15 +1,12 @@
 import logging
 from contextlib import asynccontextmanager
-import random
 
 from aiogram import types
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 
-from app.bot.vocabulary.messages import VocabularyMessages
 from app.config import settings
-from app.vocabulary.schemas import AuthorizationSchema
-from app.vocabulary.services import VocabularyService
 from app.bot.main import bot
+from app.vocabulary.routes import router as vocabulary_router
 
 
 logger = logging.getLogger(__name__)
@@ -41,25 +38,4 @@ app = FastAPI(
 async def handle_tg_response(update: types.Update):
     await bot.handle_update(update)
 
-
-@app.post("/send_notifications", status_code=200)
-async def send_notifications(auth: AuthorizationSchema):
-    if auth.api_key != settings.API_KEY:
-        raise HTTPException(403, detail="Invalid API key")
-    
-    active_vocabularies = await VocabularyService.get_active_vocabularies()
-
-    if not active_vocabularies:
-        raise HTTPException(204, detail="No active vocabularies")
-
-    for vocabulary in active_vocabularies:
-        random_lang_pair = random.choice(vocabulary.language_pairs)
-        await bot.send_message(
-            vocabulary.owner.tg_id,
-            VocabularyMessages.language_pair_notification.format(
-                word=random_lang_pair.word,
-                translation=random_lang_pair.translation
-            ),
-        )
-    
-    return {"detail": "success"}
+app.include_router(vocabulary_router)
