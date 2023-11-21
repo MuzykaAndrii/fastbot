@@ -6,6 +6,7 @@ from aiogram import F
 
 from app.bot.vocabulary.keyboards import get_select_strategy_keyboard
 from app.bot.vocabulary.messages import VocabularyMessages
+from app.bot.vocabulary.validators import VocabularyValidator
 from app.vocabulary.services import VocabularyService
 
 router = Router()
@@ -61,7 +62,7 @@ async def handle_bulk_words_strategy(message: types.Message, state: FSMContext):
     )
 
 
-@router.message(CreateBundleForm.bulk_strategy, F.text.regexp(r"^(\b\w.*\w\b\s*-\s*\b\w.*\w\b\s*[\n\r]+){1,}\b\w.*\w\b\s*-\s*\b\w.*\w\b\s*$"))
+@router.message(CreateBundleForm.bulk_strategy, F.text.func(VocabularyValidator.validate_bulk))
 async def handle_bulk_words_input(message: types.Message, state: FSMContext):
     await state.update_data(bulk_vocabulary=message.text)
     vocabulary_data = await state.get_data()
