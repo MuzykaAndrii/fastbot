@@ -34,7 +34,7 @@ app = FastAPI(
 )
 
 
-@app.post(settings.WEBHOOK_PATH)
+@app.post(settings.WEBHOOK_PATH, include_in_schema=settings.DEBUG)
 async def handle_tg_response(update: types.Update):
     await bot.handle_update(update)
 
