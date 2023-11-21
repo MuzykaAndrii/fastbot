@@ -16,6 +16,7 @@ sqlalchemy = "^2.0.23"
 asyncpg = "^0.29.0"
 alembic = "^1.12.1"
 magic-filter = "^1.0.12"
+gunicorn = "^21.2.0"
 
 
 [build-system]
