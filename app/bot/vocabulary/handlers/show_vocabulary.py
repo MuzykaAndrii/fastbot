@@ -1,5 +1,6 @@
 from aiogram.filters import Command
 from aiogram import Router, types
+from aiogram.enums import ChatAction
 
 from app.bot.vocabulary.keyboards import get_vocabulary_actions_keyboard
 from app.bot.vocabulary.messages import VocabularyMessages
@@ -11,6 +12,11 @@ router = Router()
 
 @router.message(Command("my"))
 async def show_vocabularies(message: types.Message):
+    await message.bot.send_chat_action(
+        chat_id=message.chat.id,
+        action=ChatAction.TYPING,
+    )
+
     vocabulary_sets = await VocabularyService.get_user_vocabularies(message.from_user.id)
 
     if not vocabulary_sets:
