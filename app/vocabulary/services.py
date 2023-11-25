@@ -1,6 +1,6 @@
 import re
-from app.shared.exceptions import UserIsNotOwnerOfVocabulary, VocabularyDoesNotExist, VocabularyIsAlreadyActive
 
+from app.shared.exceptions import UserIsNotOwnerOfVocabulary, VocabularyDoesNotExist, VocabularyIsAlreadyActive
 from app.users.dal import UserDAL
 from app.users.services.user import UserService
 from app.vocabulary.dal import VocabularySetDAL, LanguagePairDAL

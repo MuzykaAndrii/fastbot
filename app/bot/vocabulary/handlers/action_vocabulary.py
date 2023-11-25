@@ -5,8 +5,6 @@ from aiogram import F
 from app.bot.vocabulary.callback_patterns import VocabularyCallbackData, VocabularyAction
 from app.bot.vocabulary.messages import VocabularyMessages
 from app.shared.exceptions import UserIsNotOwnerOfVocabulary, VocabularyDoesNotExist, VocabularyIsAlreadyActive
-from app.users.services.user import UserService
-from app.vocabulary.dal import VocabularySetDAL
 from app.vocabulary.services import VocabularyService
 
 router = Router()
