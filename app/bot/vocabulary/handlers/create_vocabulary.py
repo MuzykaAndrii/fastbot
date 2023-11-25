@@ -12,7 +12,7 @@ from app.vocabulary.services import VocabularyService
 router = Router()
 
 
-class CreateBundleForm(StatesGroup):
+class CreateBundleState(StatesGroup):
     name = State()
     words_strategy = State()
     bulk_strategy = State()
@@ -21,7 +21,7 @@ class CreateBundleForm(StatesGroup):
 
 @router.message(Command("create"))
 async def command_create_bundle(message: types.Message, state: FSMContext):
-    await state.set_state(CreateBundleForm.name)
+    await state.set_state(CreateBundleState.name)
     await message.answer(f"Hey {message.from_user.first_name}, to create words bundle, specify the bundle name")
 
 
@@ -39,30 +39,30 @@ async def cancel_handler(message: types.Message, state: FSMContext):
     )
 
 
-@router.message(CreateBundleForm.name, ~F.text)
+@router.message(CreateBundleState.name, ~F.text)
 async def handle_incorrect_bundle_name(message: types.Message, state: FSMContext):
     await message.reply("Invalid bundle name, please try again")
 
 
-@router.message(CreateBundleForm.name)
+@router.message(CreateBundleState.name)
 async def set_bundle_name(message: types.Message, state: FSMContext):
     await state.update_data(name=message.text)
-    await state.set_state(CreateBundleForm.words_strategy)
+    await state.set_state(CreateBundleState.words_strategy)
 
     select_strategy_keyboard = get_select_strategy_keyboard()
     await message.answer("Great name! Lets select words strategy now.", reply_markup=select_strategy_keyboard)
 
 
-@router.message(CreateBundleForm.words_strategy, F.text.casefold() == "bulk")
+@router.message(CreateBundleState.words_strategy, F.text.casefold() == "bulk")
 async def handle_bulk_words_strategy(message: types.Message, state: FSMContext):
-    await state.set_state(CreateBundleForm.bulk_strategy)
+    await state.set_state(CreateBundleState.bulk_strategy)
     await message.answer(
         VocabularyMessages.bulk_vocabulary_creation_rules,
         reply_markup=types.ReplyKeyboardRemove(),
     )
 
 
-@router.message(CreateBundleForm.bulk_strategy, F.text.func(VocabularyValidator.validate_bulk))
+@router.message(CreateBundleState.bulk_strategy, F.text.func(VocabularyValidator.validate_bulk))
 async def handle_bulk_words_input(message: types.Message, state: FSMContext):
     await state.update_data(bulk_vocabulary=message.text)
     vocabulary_data = await state.get_data()
@@ -72,16 +72,16 @@ async def handle_bulk_words_input(message: types.Message, state: FSMContext):
     await message.answer("Vocabulary saved successfully! Check it out")
 
 
-@router.message(CreateBundleForm.bulk_strategy)
+@router.message(CreateBundleState.bulk_strategy)
 async def handle_bulk_words_invalid_input(message: types.Message, state: FSMContext):
     await message.answer("Invalid vocabulary, please follow the correct format")
 
 
-@router.message(CreateBundleForm.words_strategy, F.text.casefold() == "line by line")
+@router.message(CreateBundleState.words_strategy, F.text.casefold() == "line by line")
 async def handle_line_by_line_words_strategy(message: types.Message, state: FSMContext):
     pass
 
 
-@router.message(CreateBundleForm.words_strategy)
+@router.message(CreateBundleState.words_strategy)
 async def handle_invalid_words_strategy(message: types.Message, state: FSMContext):
     await message.reply("Invalid words strategy, please use the buttons in keyboard")
