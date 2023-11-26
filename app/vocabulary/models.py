@@ -1,8 +1,10 @@
 from typing import TYPE_CHECKING
+from datetime import datetime
 
-from sqlalchemy import Boolean, ForeignKey, Integer, String
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.orm import mapped_column as mc
+from sqlalchemy.sql import func
 
 from app.db.base import Base
 if TYPE_CHECKING:
@@ -20,6 +22,7 @@ class VocabularySet(Base):
     )
 
     name: Mapped[str] = mc(String(50), nullable=False)
+    created_at: Mapped[datetime] = mc(DateTime(timezone=True), server_default=func.now())
     is_active: Mapped[bool] = mc(Boolean, nullable=False, default=False)
 
     language_pairs: Mapped[list["LanguagePair"]] = relationship(
