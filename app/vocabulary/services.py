@@ -49,7 +49,7 @@ class VocabularyService:
     
 
     @classmethod
-    async def get_user_vocabularies(cls, user_tg_id: int) -> list[VocabularySet]:
+    async def get_all_user_vocabularies(cls, user_tg_id: int) -> list[VocabularySet]:
         user = await UserService.get_or_create_by_tg_id(user_tg_id)
         vocabulary_sets = await VocabularySetDAL.filter_by(owner_id=user.id)
 

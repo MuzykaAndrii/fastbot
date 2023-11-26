@@ -4,6 +4,9 @@ from aiogram.filters.callback_data import CallbackData
 
 
 class VocabularyAction(str, Enum):
+    move_forward = "forward"
+    move_backward = "backward"
+    quiz = "quiz"
     delete = "delete"
     enable_notification = "notification"
 
