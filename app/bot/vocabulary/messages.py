@@ -24,9 +24,10 @@ class VocabularyMessages:
     no_active_vocabulary = "📵 Notifications is turned off"
     vocabulary_entity_item = "<u>{number}.</u> <b>{word}</b> - {translation}"
     language_pair_notification = "<b>{word}</b> - {translation}"
+    short_vocabulary_entity_msg = "📃 <b>{vocabulary_name}</b>"
     
     @classmethod
-    def get_vocabulary_entity_msg(cls, vocabulary_set: VocabularySetSchema) -> str:
+    def get_full_vocabulary_entity_msg(cls, vocabulary_set: VocabularySetSchema) -> str:
         full_msg: list[str] = []
         header = cls.vocabulary_entity_header.format(vocabulary_name=vocabulary_set.name)
 
