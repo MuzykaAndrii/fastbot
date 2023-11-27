@@ -68,7 +68,7 @@ class ActionsKeyboard:
     @property
     def enable_notification_btn(self):
         return InlineKeyboardButton(
-            text="🕝 Set notification",
+            text="🕝 Turn on alerts",
             callback_data=self._make_callback_data(VocabularyAction.enable_notification),
         )
     

@@ -19,10 +19,10 @@ class VocabularyMessages:
 🎉 <b>Have Fun!</b> Enjoy expanding your vocabulary with the bot! 🚀
     """
     vocabulary_already_active = "Notifications for this vocabulary already active 😉"
-    notification_active = "notifications is on ✅"
+    notification_active = "alerts is on ✅"
     vocabulary_entity_header = "📃 <i>{vocabulary_name}</i>        {notification_status}\n"
-    active_vocabulary = "✅ Notifications active for: <b>{vocabulary_name}</b>"
-    no_active_vocabulary = "📵 Notifications is turned off"
+    active_vocabulary = "✅ Alerts active for: <b>{vocabulary_name}</b>"
+    no_active_vocabulary = "📵 Alerts is turned off"
     vocabulary_entity_item = "{number}. <b>{word}</b> - {translation}"
     language_pair_notification = "<b>{word}</b> - {translation}"
     
