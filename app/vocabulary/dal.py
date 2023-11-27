@@ -43,7 +43,7 @@ class VocabularySetDAL(BaseDAL):
             return latest_vocabulary.unique().scalar_one_or_none()
     
     @classmethod
-    async def get_vocabulary_that_latest_than_given(cls, vocabulary_id: int) -> VocabularySet | None:
+    async def _get_vocabulary_by_condition(cls, vocabulary_id: int, order_by: str, comparison_op: callable) -> VocabularySet | None:
         async with cls.make_session() as session:
             given_vocabulary_stmt = (
                 select(VocabularySet)
@@ -54,31 +54,23 @@ class VocabularySetDAL(BaseDAL):
 
             stmt = (
                 select(VocabularySet)
-                .order_by(VocabularySet.created_at)
+                .order_by(order_by)
                 .limit(1)
-                .where(VocabularySet.owner_id == given_vocabulary.owner_id, VocabularySet.created_at < given_vocabulary.created_at)
+                .where(
+                    VocabularySet.owner_id == given_vocabulary.owner_id,
+                    comparison_op(VocabularySet.created_at, given_vocabulary.created_at)
+                )
             )
             result_vocabulary = await session.execute(stmt)
             return result_vocabulary.unique().scalar_one_or_none()
-    
+
+    @classmethod
+    async def get_vocabulary_that_latest_than_given(cls, vocabulary_id: int) -> VocabularySet | None:
+        return await cls._get_vocabulary_by_condition(vocabulary_id, VocabularySet.created_at.desc(), lambda x, y: x < y)
+
     @classmethod
     async def get_vocabulary_that_earliest_than_given(cls, vocabulary_id: int) -> VocabularySet | None:
-        async with cls.make_session() as session:
-            given_vocabulary_stmt = (
-                select(VocabularySet)
-                .where(VocabularySet.id == vocabulary_id)
-            )
-            given_vocabulary = await session.execute(given_vocabulary_stmt)
-            given_vocabulary = given_vocabulary.unique().scalar_one_or_none()
-
-            stmt = (
-                select(VocabularySet)
-                .order_by(VocabularySet.created_at)
-                .limit(1)
-                .where(VocabularySet.owner_id == given_vocabulary.owner_id, VocabularySet.created_at > given_vocabulary.created_at)
-            )
-            result_vocabulary = await session.execute(stmt)
-            return result_vocabulary.unique().scalar_one_or_none()
+        return await cls._get_vocabulary_by_condition(vocabulary_id, VocabularySet.created_at, lambda x, y: x > y)
 
 
 
