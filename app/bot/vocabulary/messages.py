@@ -19,7 +19,8 @@ class VocabularyMessages:
 🎉 <b>Have Fun!</b> Enjoy expanding your vocabulary with the bot! 🚀
     """
     vocabulary_already_active = "Notifications for this vocabulary already active 😉"
-    vocabulary_entity_header = "📃 <i>{vocabulary_name}</i>\n"
+    notification_active = "notifications is on ✅"
+    vocabulary_entity_header = "📃 <i>{vocabulary_name}</i>        {notification_status}\n"
     active_vocabulary = "✅ Notifications active for: <b>{vocabulary_name}</b>"
     no_active_vocabulary = "📵 Notifications is turned off"
     vocabulary_entity_item = "{number}. <b>{word}</b> - {translation}"
@@ -28,7 +29,12 @@ class VocabularyMessages:
     @classmethod
     def get_full_vocabulary_entity_msg(cls, vocabulary_set: VocabularySetSchema) -> str:
         full_msg: list[str] = []
-        header = cls.vocabulary_entity_header.format(vocabulary_name=vocabulary_set.name)
+        if vocabulary_set.is_active:
+            notification_status = cls.notification_active
+        else:
+            notification_status = ""
+
+        header = cls.vocabulary_entity_header.format(vocabulary_name=vocabulary_set.name, notification_status=notification_status)
 
         full_msg.append(header)
 

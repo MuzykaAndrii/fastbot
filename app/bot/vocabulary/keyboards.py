@@ -25,20 +25,14 @@ def get_select_strategy_keyboard():
 
 
 class ActionsKeyboard:
-    def __init__(self, vocabulary_id) -> None:
-        self.vocabulary_id = vocabulary_id
+    def __init__(self, vocabulary) -> None:
+        self.vocabulary = vocabulary
     
-    def get_markup(self, has_prev=True, has_next=True):
-        if has_prev and has_next:
-            move_btns = [self.move_backward_btn, self.move_forward_btn]
-        elif not has_prev:
-            move_btns = [self.move_forward_btn]
-        elif not has_next:
-            move_btns = [self.move_backward_btn]
-
+    def get_markup(self):
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [self.delete_btn, self.quiz_btn, self.enable_notification_btn],
-            move_btns,
+            [self.delete_btn, self.quiz_btn],
+            [self.enable_notification_btn],
+            [self.move_backward_btn, self.move_forward_btn],
         ])
 
         return keyboard
@@ -81,7 +75,7 @@ class ActionsKeyboard:
     def _make_callback_data(self, action: VocabularyAction):
         callback_data = VocabularyCallbackData(
             action=action,
-            vocabulary_id=self.vocabulary_id,
+            vocabulary_id=self.vocabulary.id,
         )
         return callback_data.pack()
 

@@ -22,7 +22,7 @@ async def handle_show_vocabularies(message: types.Message):
 
         else:
             vocabulary_set_msg = VocabularyMessages.get_full_vocabulary_entity_msg(latest_vocabulary)
-            vocabulary_actions_keyboard = ActionsKeyboard(latest_vocabulary.id).get_markup()
+            vocabulary_actions_keyboard = ActionsKeyboard(latest_vocabulary).get_markup()
 
             await message.answer(vocabulary_set_msg, reply_markup=vocabulary_actions_keyboard)
 
@@ -40,7 +40,7 @@ async def handle_show_next_vocabulary(query: types.CallbackQuery, callback_data:
     
     else:
         vocabulary_set_msg = VocabularyMessages.get_full_vocabulary_entity_msg(next_vocabulary)
-        vocabulary_actions_keyboard = ActionsKeyboard(next_vocabulary.id).get_markup()
+        vocabulary_actions_keyboard = ActionsKeyboard(next_vocabulary).get_markup()
 
         await query.message.edit_text(vocabulary_set_msg)
         await query.message.edit_reply_markup(reply_markup=vocabulary_actions_keyboard)
@@ -59,7 +59,7 @@ async def handle_show_previous_vocabulary(query: types.CallbackQuery, callback_d
     
     else:
         vocabulary_set_msg = VocabularyMessages.get_full_vocabulary_entity_msg(previous_vocabulary)
-        vocabulary_actions_keyboard = ActionsKeyboard(previous_vocabulary.id).get_markup()
+        vocabulary_actions_keyboard = ActionsKeyboard(previous_vocabulary).get_markup()
 
         await query.message.edit_text(vocabulary_set_msg)
         await query.message.edit_reply_markup(reply_markup=vocabulary_actions_keyboard)

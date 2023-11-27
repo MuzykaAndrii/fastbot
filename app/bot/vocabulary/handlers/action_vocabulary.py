@@ -31,7 +31,7 @@ async def handle_delete_vocabulary_action(query: types.CallbackQuery, callback_d
         await query.answer(text=VocabularyMessages.vocabulary_deleted_successfully)
         
         vocabulary_set_msg = VocabularyMessages.get_full_vocabulary_entity_msg(latest_vocabulary)
-        vocabulary_actions_keyboard = ActionsKeyboard(latest_vocabulary.id).get_markup()
+        vocabulary_actions_keyboard = ActionsKeyboard(latest_vocabulary).get_markup()
 
         await query.message.edit_text(vocabulary_set_msg)
         await query.message.edit_reply_markup(reply_markup=vocabulary_actions_keyboard)
