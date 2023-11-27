@@ -5,27 +5,26 @@ from app.bot.vocabulary.callback_patterns import VocabularyAction, VocabularyCal
 
 from app.bot.vocabulary.keyboards import ActionsKeyboard
 from app.bot.vocabulary.messages import VocabularyMessages
-from app.bot.vocabulary.schemas import VocabularySetSchema
-from app.shared.exceptions import UserIsNotOwnerOfVocabulary, VocabularyDoesNotExist, VocabularyIsAlreadyActive
+from app.shared.exceptions import NoVocabulariesFound, UserIsNotOwnerOfVocabulary, VocabularyDoesNotExist, VocabularyIsAlreadyActive
 from app.vocabulary.services import VocabularyService
 
 
 router = Router()
 
-
 @router.message(Command("my"))
 async def handle_show_vocabularies(message: types.Message):
     async with ChatActionSender.typing(chat_id=message.chat.id, bot=message.bot):
-        latest_vocabulary = await VocabularyService.get_recent_user_vocabulary(message.from_user.id)
-
-        if not latest_vocabulary:
-            await message.answer(VocabularyMessages.user_havent_any_vocabularies)
-            return
+        try:
+            latest_vocabulary = await VocabularyService.get_recent_user_vocabulary(message.from_user.id)
         
-        vocabulary_set_msg = VocabularyMessages.get_full_vocabulary_entity_msg(latest_vocabulary)
-        vocabulary_actions_keyboard = ActionsKeyboard(latest_vocabulary.id).get_markup()
+        except NoVocabulariesFound:
+            await message.answer(VocabularyMessages.user_havent_any_vocabularies)
 
-        await message.answer(vocabulary_set_msg, reply_markup=vocabulary_actions_keyboard)
+        else:
+            vocabulary_set_msg = VocabularyMessages.get_full_vocabulary_entity_msg(latest_vocabulary)
+            vocabulary_actions_keyboard = ActionsKeyboard(latest_vocabulary.id).get_markup()
+
+            await message.answer(vocabulary_set_msg, reply_markup=vocabulary_actions_keyboard)
 
 
 @router.callback_query(VocabularyCallbackData.filter(F.action == VocabularyAction.move_forward))

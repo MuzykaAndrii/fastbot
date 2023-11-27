@@ -1,6 +1,6 @@
 import re
 
-from app.shared.exceptions import UserIsNotOwnerOfVocabulary, VocabularyDoesNotExist, VocabularyIsAlreadyActive
+from app.shared.exceptions import NoVocabulariesFound, UserIsNotOwnerOfVocabulary, VocabularyDoesNotExist, VocabularyIsAlreadyActive
 from app.users.dal import UserDAL
 from app.users.services.user import UserService
 from app.vocabulary.dal import VocabularySetDAL, LanguagePairDAL
@@ -49,9 +49,13 @@ class VocabularyService:
     
 
     @classmethod
-    async def get_recent_user_vocabulary(cls, user_tg_id: int) -> VocabularySet | None:
+    async def get_recent_user_vocabulary(cls, user_tg_id: int) -> VocabularySet:
         user = await UserService.get_by_tg_id(user_tg_id)
         latest_vocabulary = await VocabularySetDAL.get_latest_user_vocabulary(user.id)
+
+        if not latest_vocabulary:
+            raise NoVocabulariesFound
+        
         return latest_vocabulary
     
     
