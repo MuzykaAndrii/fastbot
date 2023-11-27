@@ -27,10 +27,13 @@ async def handle_show_vocabularies(message: types.Message):
             await message.answer(vocabulary_set_msg, reply_markup=vocabulary_actions_keyboard)
 
 
-@router.callback_query(VocabularyCallbackData.filter(F.action == VocabularyAction.move_forward))
-async def handle_show_next_vocabulary(query: types.CallbackQuery, callback_data: VocabularyCallbackData):
+async def _show_vocabulary(
+    query: types.CallbackQuery,
+    vocabulary_id: int,
+    get_vocabulary_func: callable,
+):
     try:
-        next_vocabulary = await VocabularyService.get_next_vocabulary(query.from_user.id, callback_data.vocabulary_id)
+        vocabulary = await get_vocabulary_func(query.from_user.id, vocabulary_id)
 
     except VocabularyDoesNotExist:
         await query.answer(text=VocabularyMessages.vocabulary_dont_exists)
@@ -39,27 +42,26 @@ async def handle_show_next_vocabulary(query: types.CallbackQuery, callback_data:
         await query.answer(text=VocabularyMessages.user_is_not_owner_of_vocabulary)
     
     else:
-        vocabulary_set_msg = VocabularyMessages.get_full_vocabulary_entity_msg(next_vocabulary)
-        vocabulary_actions_keyboard = ActionsKeyboard(next_vocabulary).get_markup()
+        vocabulary_set_msg = VocabularyMessages.get_full_vocabulary_entity_msg(vocabulary)
+        vocabulary_actions_keyboard = ActionsKeyboard(vocabulary).get_markup()
 
         await query.message.edit_text(vocabulary_set_msg)
         await query.message.edit_reply_markup(reply_markup=vocabulary_actions_keyboard)
+
+
+@router.callback_query(VocabularyCallbackData.filter(F.action == VocabularyAction.move_forward))
+async def handle_show_next_vocabulary(query: types.CallbackQuery, callback_data: VocabularyCallbackData):
+    await _show_vocabulary(
+        query,
+        callback_data.vocabulary_id,
+        VocabularyService.get_next_vocabulary,
+    )
 
 
 @router.callback_query(VocabularyCallbackData.filter(F.action == VocabularyAction.move_backward))
 async def handle_show_previous_vocabulary(query: types.CallbackQuery, callback_data: VocabularyCallbackData):
-    try:
-        previous_vocabulary = await VocabularyService.get_previous_vocabulary(query.from_user.id, callback_data.vocabulary_id)
-
-    except VocabularyDoesNotExist:
-        await query.answer(text=VocabularyMessages.vocabulary_dont_exists)
-
-    except UserIsNotOwnerOfVocabulary:
-        await query.answer(text=VocabularyMessages.user_is_not_owner_of_vocabulary)
-    
-    else:
-        vocabulary_set_msg = VocabularyMessages.get_full_vocabulary_entity_msg(previous_vocabulary)
-        vocabulary_actions_keyboard = ActionsKeyboard(previous_vocabulary).get_markup()
-
-        await query.message.edit_text(vocabulary_set_msg)
-        await query.message.edit_reply_markup(reply_markup=vocabulary_actions_keyboard)
+    await _show_vocabulary(
+        query,
+        callback_data.vocabulary_id,
+        VocabularyService.get_previous_vocabulary,
+    )
