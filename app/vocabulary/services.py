@@ -107,16 +107,16 @@ class VocabularyService:
     
 
     @classmethod
-    async def disable_active_vocabulary_and_enable_given(cls, user_tg_id: int, vocabulary_id: int):
+    async def disable_active_vocabulary_and_enable_given(cls, user_tg_id: int, vocabulary_id: int) -> VocabularySet:
         user = await UserService.get_by_tg_id(user_tg_id)
-        vocabulary = await VocabularySetDAL.get_by_id(vocabulary_id)
+        vocabulary_to_activate = await VocabularySetDAL.get_by_id(vocabulary_id)
 
-        cls._validate_user_vocabulary(user, vocabulary, check_active=True)            
+        cls._validate_user_vocabulary(user, vocabulary_to_activate, check_active=True)            
         
         await VocabularySetDAL.disable_user_active_vocabulary(user.id)
-        await VocabularySetDAL.make_active(vocabulary.id)
+        activated_vocabulary = await VocabularySetDAL.make_active(vocabulary_to_activate.id)
 
-        return vocabulary
+        return activated_vocabulary
 
     
     @classmethod

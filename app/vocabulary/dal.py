@@ -28,6 +28,8 @@ class VocabularySetDAL(BaseDAL):
             )
             await session.execute(query)
             await session.commit()
+            return await session.get(VocabularySet, vocabulary_id)
+
     
     @classmethod
     async def get_latest_user_vocabulary(cls, user_id: int) -> VocabularySet | None:

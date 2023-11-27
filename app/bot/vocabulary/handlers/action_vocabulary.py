@@ -60,6 +60,29 @@ async def handle_enable_notification_vocabulary_action(query: types.CallbackQuer
         )
         await vocabulary_is_active_msg.pin(disable_notification=True)
 
+        vocabulary_set_msg = VocabularyMessages.get_full_vocabulary_entity_msg(vocabulary)
+        vocabulary_actions_keyboard = ActionsKeyboard(vocabulary).get_markup()
+
+        await query.message.edit_text(vocabulary_set_msg)
+        await query.message.edit_reply_markup(reply_markup=vocabulary_actions_keyboard)
+
+
+@router.callback_query(VocabularyCallbackData.filter(F.action == VocabularyAction.disable_notification))
+async def handle_disable_notification_btn(query: types.CallbackQuery):
+    await VocabularyService.disable_user_vocabulary(query.from_user.id)
+
+    vocabulary_disabled_message = await query.message.answer(text=VocabularyMessages.no_active_vocabulary)
+    await vocabulary_disabled_message.pin(disable_notification=True)
+
+    latest_vocabulary = await VocabularyService.get_recent_user_vocabulary(query.from_user.id)
+    
+    vocabulary_set_msg = VocabularyMessages.get_full_vocabulary_entity_msg(latest_vocabulary)
+    vocabulary_actions_keyboard = ActionsKeyboard(latest_vocabulary).get_markup()
+
+    await query.message.edit_text(vocabulary_set_msg)
+    await query.message.edit_reply_markup(reply_markup=vocabulary_actions_keyboard)
+    
+
 
 @router.message(Command("disable"))
 async def handle_disable_notifications_command(message: types.Message):

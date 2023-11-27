@@ -6,6 +6,7 @@ from aiogram.types import (
 )
 
 from app.bot.vocabulary.callback_patterns import VocabularyAction, VocabularyCallbackData
+from app.bot.vocabulary.schemas import VocabularySetSchema
 
 
 def get_select_strategy_keyboard():
@@ -25,13 +26,18 @@ def get_select_strategy_keyboard():
 
 
 class ActionsKeyboard:
-    def __init__(self, vocabulary) -> None:
+    def __init__(self, vocabulary: VocabularySetSchema) -> None:
         self.vocabulary = vocabulary
     
     def get_markup(self):
+        if self.vocabulary.is_active:
+            notification_btn = self.disable_notification_btn
+        else:
+            notification_btn = self.enable_notification_btn
+
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [self.delete_btn, self.quiz_btn],
-            [self.enable_notification_btn],
+            [notification_btn],
             [self.move_backward_btn, self.move_forward_btn],
         ])
 
@@ -70,6 +76,13 @@ class ActionsKeyboard:
         return InlineKeyboardButton(
             text="🕝 Turn on alerts",
             callback_data=self._make_callback_data(VocabularyAction.enable_notification),
+        )
+
+    @property
+    def disable_notification_btn(self):
+        return InlineKeyboardButton(
+            text="🚫 Turn off alerts",
+            callback_data=self._make_callback_data(VocabularyAction.disable_notification),
         )
     
     def _make_callback_data(self, action: VocabularyAction):
