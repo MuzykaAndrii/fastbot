@@ -49,6 +49,33 @@ class VocabularyService:
     
 
     @classmethod
+    async def get_recent_user_vocabulary(cls, user_tg_id: int) -> VocabularySet | None:
+        user = await UserService.get_by_tg_id(user_tg_id)
+        latest_vocabulary = await VocabularySetDAL.get_latest_user_vocabulary(user.id)
+        return latest_vocabulary
+    
+    
+    @classmethod
+    async def get_next_vocabulary(cls, user_tg_id: int, vocabulary_id: int) -> VocabularySet:
+        user = await UserService.get_by_tg_id(user_tg_id)
+        next_vocabulary = await VocabularySetDAL.get_vocabulary_that_latest_than_given(vocabulary_id)
+
+        cls._validate_user_vocabulary(user, next_vocabulary)
+
+        return next_vocabulary
+    
+
+    @classmethod
+    async def get_previous_vocabulary(cls, user_tg_id: int, vocabulary_id: int) -> VocabularySet:
+        user = await UserService.get_by_tg_id(user_tg_id)
+        previous_vocabulary = await VocabularySetDAL.get_vocabulary_that_earliest_than_given(vocabulary_id)
+
+        cls._validate_user_vocabulary(user, previous_vocabulary)
+
+        return previous_vocabulary
+
+
+    @classmethod
     async def get_all_user_vocabularies(cls, user_tg_id: int) -> list[VocabularySet]:
         user = await UserService.get_or_create_by_tg_id(user_tg_id)
         vocabulary_sets = await VocabularySetDAL.filter_by(owner_id=user.id)

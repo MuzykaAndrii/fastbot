@@ -24,55 +24,117 @@ def get_select_strategy_keyboard():
     return select_strategy_keyboard
 
 
-def get_vocabulary_actions_keyboard(vocabulary_id: int):
-    quiz_btn_callback_data = VocabularyCallbackData(
-        action=VocabularyAction.quiz,
-        vocabulary_id=vocabulary_id,
-    )
-    btn_quiz = InlineKeyboardButton(
-        text="📝 Start quiz",
-        callback_data=quiz_btn_callback_data.pack(),
-    )
+class ActionsKeyboard:
+    def __init__(self, vocabulary_id) -> None:
+        self.vocabulary_id = vocabulary_id
+    
+    def get_markup(self, has_prev=True, has_next=True):
+        if has_prev and has_next:
+            move_btns = [self.move_backward_btn, self.move_forward_btn]
+        elif not has_prev:
+            move_btns = [self.move_forward_btn]
+        elif not has_next:
+            move_btns = [self.move_backward_btn]
 
-    move_forward_btn_callback_data = VocabularyCallbackData(
-        action=VocabularyAction.move_forward,
-        vocabulary_id=vocabulary_id,
-    )
-    btn_move_forward = InlineKeyboardButton(
-        text="Next ⏩",
-        callback_data=move_forward_btn_callback_data.pack(),
-    )
+        keyboard = InlineKeyboardMarkup(inline_keyboard=[
+            [self.delete_btn, self.quiz_btn, self.enable_notification_btn],
+            move_btns,
+        ])
 
-    move_backward_btn_callback_data = VocabularyCallbackData(
-        action=VocabularyAction.move_backward,
-        vocabulary_id=vocabulary_id,
-    )
-    btn_move_backward = InlineKeyboardButton(
-        text="⏪ Prev",
-        callback_data=move_backward_btn_callback_data.pack(),
-    )
+        return keyboard
 
-    delete_btn_callback_data = VocabularyCallbackData(
-        action=VocabularyAction.delete,
-        vocabulary_id=vocabulary_id,
-    )
-    btn_delete = InlineKeyboardButton(
-        text="❌ Delete",
-        callback_data=delete_btn_callback_data.pack(),
-    )
+    @property
+    def quiz_btn(self):
+        return InlineKeyboardButton(
+            text="📝 Start quiz",
+            callback_data=self._make_callback_data(VocabularyAction.quiz)
+        )
+    
+    @property
+    def move_forward_btn(self):
+        return InlineKeyboardButton(
+            text="Next ⏩",
+            callback_data=self._make_callback_data(VocabularyAction.move_forward),
+        )
+    
+    @property
+    def move_backward_btn(self):
+        return InlineKeyboardButton(
+            text="⏪ Prev",
+            callback_data=self._make_callback_data(VocabularyAction.move_backward),
+        )
+    
+    @property
+    def delete_btn(self):
+        return InlineKeyboardButton(
+            text="❌ Delete",
+            callback_data=self._make_callback_data(VocabularyAction.delete),
+        )
+    
+    @property
+    def enable_notification_btn(self):
+        return InlineKeyboardButton(
+            text="🕝 Set notification",
+            callback_data=self._make_callback_data(VocabularyAction.enable_notification),
+        )
+    
+    def _make_callback_data(self, action: VocabularyAction):
+        callback_data = VocabularyCallbackData(
+            action=action,
+            vocabulary_id=self.vocabulary_id,
+        )
+        return callback_data.pack()
 
-    enable_notification_btn_callback_data = VocabularyCallbackData(
-        action=VocabularyAction.enable_notification,
-        vocabulary_id=vocabulary_id,
-    )
-    btn_enable_notification = InlineKeyboardButton(
-        text="🕝 Set notification",
-        callback_data=enable_notification_btn_callback_data.pack(),
-    )
 
-    vocabulary_action_keyboard = InlineKeyboardMarkup(inline_keyboard=[
-        [btn_delete, btn_quiz, btn_enable_notification],
-        [btn_move_backward, btn_move_forward],
-    ])
+# def get_vocabulary_actions_keyboard(vocabulary_id: int):
+#     quiz_btn_callback_data = VocabularyCallbackData(
+#         action=VocabularyAction.quiz,
+#         vocabulary_id=vocabulary_id,
+#     )
+#     btn_quiz = InlineKeyboardButton(
+#         text="📝 Start quiz",
+#         callback_data=quiz_btn_callback_data.pack(),
+#     )
 
-    return vocabulary_action_keyboard
+#     move_forward_btn_callback_data = VocabularyCallbackData(
+#         action=VocabularyAction.move_forward,
+#         vocabulary_id=vocabulary_id,
+#     )
+#     btn_move_forward = InlineKeyboardButton(
+#         text="Next ⏩",
+#         callback_data=move_forward_btn_callback_data.pack(),
+#     )
+
+#     move_backward_btn_callback_data = VocabularyCallbackData(
+#         action=VocabularyAction.move_backward,
+#         vocabulary_id=vocabulary_id,
+#     )
+#     btn_move_backward = InlineKeyboardButton(
+#         text="⏪ Prev",
+#         callback_data=move_backward_btn_callback_data.pack(),
+#     )
+
+#     delete_btn_callback_data = VocabularyCallbackData(
+#         action=VocabularyAction.delete,
+#         vocabulary_id=vocabulary_id,
+#     )
+#     btn_delete = InlineKeyboardButton(
+#         text="❌ Delete",
+#         callback_data=delete_btn_callback_data.pack(),
+#     )
+
+#     enable_notification_btn_callback_data = VocabularyCallbackData(
+#         action=VocabularyAction.enable_notification,
+#         vocabulary_id=vocabulary_id,
+#     )
+#     btn_enable_notification = InlineKeyboardButton(
+#         text="🕝 Set notification",
+#         callback_data=enable_notification_btn_callback_data.pack(),
+#     )
+
+#     vocabulary_action_keyboard = InlineKeyboardMarkup(inline_keyboard=[
+#         [btn_delete, btn_quiz, btn_enable_notification],
+#         [btn_move_backward, btn_move_forward],
+#     ])
+
+#     return vocabulary_action_keyboard
