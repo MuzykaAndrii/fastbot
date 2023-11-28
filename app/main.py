@@ -38,4 +38,10 @@ app = FastAPI(
 async def handle_tg_response(update: types.Update):
     await bot.handle_update(update)
 
+
+@app.get("/ping", status_code=200)
+async def ping():
+    return {"detail": "pong"}
+
+
 app.include_router(vocabulary_router)
