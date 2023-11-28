@@ -5,7 +5,6 @@ from app.bot.vocabulary.callback_patterns import VocabularyAction, VocabularyCal
 from app.bot.vocabulary.handlers.utils import update_vocabulary_msg
 from app.bot.vocabulary.keyboards import ActionsKeyboard
 from app.bot.vocabulary.messages import VocabularyMessages
-from app.shared.exceptions import NoVocabulariesFound
 from app.vocabulary.services import VocabularyService
 
 
@@ -15,17 +14,12 @@ router = Router()
 @router.message(Command("my"))
 @flags.chat_action("typing")
 async def handle_show_vocabularies(message: types.Message):
-    try:
-        latest_vocabulary = await VocabularyService.get_recent_user_vocabulary(message.from_user.id)
+    latest_vocabulary = await VocabularyService.get_recent_user_vocabulary(message.from_user.id)
     
-    except NoVocabulariesFound:
-        await message.answer(VocabularyMessages.user_havent_any_vocabularies)
+    vocabulary_set_msg = VocabularyMessages.get_full_vocabulary_entity_msg(latest_vocabulary)
+    vocabulary_actions_keyboard = ActionsKeyboard(latest_vocabulary).get_markup()
 
-    else:
-        vocabulary_set_msg = VocabularyMessages.get_full_vocabulary_entity_msg(latest_vocabulary)
-        vocabulary_actions_keyboard = ActionsKeyboard(latest_vocabulary).get_markup()
-
-        await message.answer(vocabulary_set_msg, reply_markup=vocabulary_actions_keyboard)
+    await message.answer(vocabulary_set_msg, reply_markup=vocabulary_actions_keyboard)
 
 
 @router.callback_query(VocabularyCallbackData.filter(F.action == VocabularyAction.move_forward))
