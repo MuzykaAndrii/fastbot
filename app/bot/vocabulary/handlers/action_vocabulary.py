@@ -3,7 +3,7 @@ from aiogram.filters import Command
 from aiogram import F
 
 from app.bot.vocabulary.callback_patterns import VocabularyCallbackData, VocabularyAction
-from app.bot.vocabulary.keyboards import ActionsKeyboard
+from app.bot.vocabulary.handlers.utils import update_vocabulary_msg
 from app.bot.vocabulary.messages import VocabularyMessages
 from app.shared.exceptions import NoVocabulariesFound, UserIsNotOwnerOfVocabulary, VocabularyDoesNotExist, VocabularyIsAlreadyActive
 from app.vocabulary.services import VocabularyService
@@ -29,18 +29,13 @@ async def handle_delete_vocabulary_action(query: types.CallbackQuery, callback_d
 
     else:
         await query.answer(text=VocabularyMessages.vocabulary_deleted_successfully)
-        
-        vocabulary_set_msg = VocabularyMessages.get_full_vocabulary_entity_msg(latest_vocabulary)
-        vocabulary_actions_keyboard = ActionsKeyboard(latest_vocabulary).get_markup()
-
-        await query.message.edit_text(vocabulary_set_msg)
-        await query.message.edit_reply_markup(reply_markup=vocabulary_actions_keyboard)
+        await update_vocabulary_msg(query, latest_vocabulary)
 
 
 @router.callback_query(VocabularyCallbackData.filter(F.action == VocabularyAction.enable_notification))
 async def handle_enable_notification_vocabulary_action(query: types.CallbackQuery, callback_data: VocabularyCallbackData):
     try:
-        vocabulary = await VocabularyService.disable_active_vocabulary_and_enable_given(
+        enabled_vocabulary = await VocabularyService.disable_active_vocabulary_and_enable_given(
             query.from_user.id,
             callback_data.vocabulary_id
         )
@@ -56,15 +51,10 @@ async def handle_enable_notification_vocabulary_action(query: types.CallbackQuer
 
     else:
         vocabulary_is_active_msg = await query.message.answer(
-            text=VocabularyMessages.active_vocabulary.format(vocabulary_name=vocabulary.name)
+            text=VocabularyMessages.active_vocabulary.format(vocabulary_name=enabled_vocabulary.name)
         )
         await vocabulary_is_active_msg.pin(disable_notification=True)
-
-        vocabulary_set_msg = VocabularyMessages.get_full_vocabulary_entity_msg(vocabulary)
-        vocabulary_actions_keyboard = ActionsKeyboard(vocabulary).get_markup()
-
-        await query.message.edit_text(vocabulary_set_msg)
-        await query.message.edit_reply_markup(reply_markup=vocabulary_actions_keyboard)
+        await update_vocabulary_msg(query, enabled_vocabulary)
 
 
 @router.callback_query(VocabularyCallbackData.filter(F.action == VocabularyAction.disable_notification))
@@ -76,11 +66,8 @@ async def handle_disable_notification_btn(query: types.CallbackQuery):
 
     latest_vocabulary = await VocabularyService.get_recent_user_vocabulary(query.from_user.id)
     
-    vocabulary_set_msg = VocabularyMessages.get_full_vocabulary_entity_msg(latest_vocabulary)
-    vocabulary_actions_keyboard = ActionsKeyboard(latest_vocabulary).get_markup()
+    await update_vocabulary_msg(query, latest_vocabulary)
 
-    await query.message.edit_text(vocabulary_set_msg)
-    await query.message.edit_reply_markup(reply_markup=vocabulary_actions_keyboard)
     
 
 

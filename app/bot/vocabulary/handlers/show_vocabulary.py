@@ -2,6 +2,7 @@ from aiogram.filters import Command
 from aiogram import F, Router, types
 from aiogram.utils.chat_action import ChatActionSender
 from app.bot.vocabulary.callback_patterns import VocabularyAction, VocabularyCallbackData
+from app.bot.vocabulary.handlers.utils import update_vocabulary_msg
 
 from app.bot.vocabulary.keyboards import ActionsKeyboard
 from app.bot.vocabulary.messages import VocabularyMessages
@@ -42,11 +43,7 @@ async def _show_vocabulary(
         await query.answer(text=VocabularyMessages.user_is_not_owner_of_vocabulary)
     
     else:
-        vocabulary_set_msg = VocabularyMessages.get_full_vocabulary_entity_msg(vocabulary)
-        vocabulary_actions_keyboard = ActionsKeyboard(vocabulary).get_markup()
-
-        await query.message.edit_text(vocabulary_set_msg)
-        await query.message.edit_reply_markup(reply_markup=vocabulary_actions_keyboard)
+        await update_vocabulary_msg(query, vocabulary)
 
 
 @router.callback_query(VocabularyCallbackData.filter(F.action == VocabularyAction.move_forward))

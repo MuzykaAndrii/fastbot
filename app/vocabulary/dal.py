@@ -19,7 +19,7 @@ class VocabularySetDAL(BaseDAL):
             await session.commit()
 
     @classmethod
-    async def make_active(cls, vocabulary_id: int):
+    async def make_active(cls, vocabulary_id: int) -> VocabularySet:
         async with cls.make_session() as session:
             query = (
                 update(VocabularySet)
