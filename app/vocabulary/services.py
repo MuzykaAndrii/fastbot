@@ -87,6 +87,15 @@ class VocabularyService:
         if vocabulary_sets:
             return vocabulary_sets
         return None
+
+
+    @classmethod
+    async def get_vocabulary(cls, user_tg_id: int, vocabulary_id: int) -> VocabularySet:
+        user = await UserService.get_by_tg_id(user_tg_id)
+        vocabulary = await VocabularySetDAL.get_by_id(vocabulary_id)
+
+        cls._validate_user_vocabulary(user, vocabulary)
+        return vocabulary
     
 
     @classmethod
