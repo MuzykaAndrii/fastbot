@@ -15,6 +15,6 @@ async def start_handler(message: types.Message):
     await message.answer(BaseMessages.start_msg.format(username=message.from_user.username))
 
 
-@router.message()
-async def unknown_command_handler(message: types.Message):
-    await message.answer(BaseMessages.unknown_command_msg)
+# @router.message()
+# async def unknown_command_handler(message: types.Message):
+#     await message.answer(BaseMessages.unknown_command_msg)

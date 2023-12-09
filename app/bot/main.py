@@ -58,8 +58,8 @@ bot.dispatcher.message.middleware(ChatActionMiddleware())
 bot.dispatcher.callback_query.middleware(ChatActionMiddleware())
 
 bot.include_routes([
-    start_router,
     vocabulary_router,
+    start_router,
 ])
 
 bot.register_scenes(
