@@ -2,6 +2,9 @@ from aiogram import Bot, Dispatcher, Router, types
 from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.utils.chat_action import ChatActionMiddleware
+from aiogram.fsm.storage.memory import SimpleEventIsolation
+from aiogram.fsm.scene import SceneRegistry
+from app.bot.vocabulary.handlers.quiz_vocabulary import QuizScene
 
 from app.config import settings
 from app.bot.base.handlers.start import router as start_router
@@ -17,8 +20,16 @@ class TelegramBot:
     
     def _init_dispatcher(self) -> None:
         fsm_storage = MemoryStorage()
-        self._dp = Dispatcher(storage=fsm_storage)
+        self._dp = Dispatcher(
+            storage=fsm_storage,
+            events_isolation=SimpleEventIsolation(),
+        )
+        self._scene_registry = SceneRegistry(self._dp)
     
+    def register_scenes(self, *scenes) -> None:
+        for scene in scenes:
+            self._scene_registry.add(scene)
+
     @property
     def bot(self) -> Bot:
         return self._bot
@@ -50,3 +61,7 @@ bot.include_routes([
     start_router,
     vocabulary_router,
 ])
+
+bot.register_scenes(
+    QuizScene,
+)
