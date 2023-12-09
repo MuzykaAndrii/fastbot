@@ -10,29 +10,35 @@ from app.vocabulary.services import VocabularyService
 
 
 class QuizScene(Scene, state="quiz"):
+    @on.message.enter()
+    async def on_enter_msg(self, message: Message, state: FSMContext):
+        await self.ask(message, state)
+
+
     @on.callback_query.enter(VocabularyCallbackData.filter(F.action == VocabularyAction.quiz))
-    async def on_enter(self, query: CallbackQuery, state: FSMContext, step: int | None = 0):
-        print("entered "*5)
-        if not step:
-            await query.message.answer("Welcome to the quiz!")
-            callback_data = VocabularyCallbackData.unpack(query.data)
-            vocabulary = await VocabularyService.get_vocabulary(query.from_user.id, callback_data.vocabulary_id)
-            random.shuffle(vocabulary.language_pairs)
-            await state.update_data(step=step, language_pairs=vocabulary.language_pairs)
-        
+    async def on_enter_btn(self, query: CallbackQuery, state: FSMContext):
+        await query.message.answer("Welcome to the quiz!")
+        callback_data = VocabularyCallbackData.unpack(query.data)
+        vocabulary = await VocabularyService.get_vocabulary(query.from_user.id, callback_data.vocabulary_id)
+        random.shuffle(vocabulary.language_pairs)
+        await state.update_data(step=0, language_pairs=vocabulary.language_pairs)
+
+        await self.ask(query.message, state)
+    
+
+    async def ask(self, message: Message, state: FSMContext):
         state_data = await state.get_data()
-        
+        step = state_data.get("step")
+        language_pairs = state_data.get("language_pairs")
+
         try:
-            question_item = state_data.get("language_pairs")[step]
-        except IndexError:
+            question_item = language_pairs[step]
+        except (IndexError, TypeError):
             return await self.wizard.exit()
 
         await state.update_data(step=step)
-        await query.message.answer(question_item.translation)
-    
-    @on.message.enter()
-    async def on_enter_msg(self, message: Message, state: FSMContext, step: int | None = 0):
-        print("retaked "*10)
+        await message.answer(question_item.translation)
+        
     
     @on.message(F.text)
     async def answer(self, message: Message, state: FSMContext) -> None:
@@ -45,12 +51,18 @@ class QuizScene(Scene, state="quiz"):
         else:
             await message.answer("Youre damn right!")
         
-        await self.wizard.retake(step=step+1)
+        await state.update_data(step=step+1)
+        await self.wizard.retake()
 
 
     @on.message()
     async def unknown_message(self, message: Message) -> None:
         await message.answer("Please select an answer.")
+    
+    @on.message.exit()
+    async def on_exit(self, message: Message, state: FSMContext) -> None:
+        await message.answer("Bye bye!")
+
 
 router = Router()
 router.callback_query.register(QuizScene.as_handler())
