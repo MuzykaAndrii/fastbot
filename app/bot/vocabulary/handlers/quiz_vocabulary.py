@@ -6,6 +6,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.scene import Scene, on
 
 from app.bot.vocabulary.callback_patterns import VocabularyAction, VocabularyCallbackData
+from app.bot.vocabulary.messages import VocabularyMessages
 from app.vocabulary.services import VocabularyService
 
 
@@ -17,7 +18,7 @@ class QuizScene(Scene, state="quiz"):
 
     @on.callback_query.enter(VocabularyCallbackData.filter(F.action == VocabularyAction.quiz))
     async def on_enter_btn(self, query: CallbackQuery, state: FSMContext):
-        await query.message.answer("Welcome to the quiz!")
+        await query.message.answer(VocabularyMessages.start_quiz_msg)
         callback_data = VocabularyCallbackData.unpack(query.data)
         vocabulary = await VocabularyService.get_vocabulary(query.from_user.id, callback_data.vocabulary_id)
         random.shuffle(vocabulary.language_pairs)

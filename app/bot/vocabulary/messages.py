@@ -2,11 +2,6 @@ from app.bot.vocabulary.schemas import VocabularySetSchema
 
 
 class VocabularyMessages:
-    user_havent_any_vocabularies = "You're haven't any vocabularies yet("
-    user_is_not_owner_of_vocabulary = "☢️ You're not owner of this vocabulary! ☢️"
-    vocabulary_deleted_successfully = "🗑️ Vocabulary deleted successfully 🫡"
-    vocabulary_dont_exists = "Vocabulary does not exist 🤷🏻‍♂️"
-
     bulk_vocabulary_creation_rules = """
     <b>There are several rules to create bulk vocabulary:</b>
 
@@ -18,6 +13,38 @@ class VocabularyMessages:
 🌟 <b>Multiple Translations:</b> Use commas for multiple translations, like "Word - Translation, Another."
 🎉 <b>Have Fun!</b> Enjoy expanding your vocabulary with the bot! 🚀
     """
+
+    start_quiz_msg = """
+🌟 <strong>Welcome to Vocabulary Quiz!</strong> 🌟
+
+📚 <strong>How to Play:</strong>
+1. 🤖 The bot will send you a word.
+2. 📝 Respond with the translation of that word.
+3. ✅ The bot will check if your answer is correct.
+
+🔍 <strong>Correctness Check:</strong>
+- 🧐 <strong>Full translation:</strong>
+  - U can send all variants of translating separated y comma. (Then u should send all variants, in the correct order)
+
+- 🕵️ <strong>One variant translation:</strong>
+  - U also can send one variant of translation, if it will match with at least one correct variant, answer will be correct.
+
+🤔 <strong>Tips:</strong>
+- 🚫 Avoid using extra symbols or unnecessary details in your response.
+
+🔇 <strong>Alerts during the Quiz:</strong>
+- 🚨 All alerts will be disabled during the quiz.
+- 🔚 They will be re-enabled when you press the "End Quiz" button or answer all the questions.
+
+🚀 <strong>Let's Start the Quiz!</strong> 🚀
+Simply respond to the bot's prompts with your translations, and let's see how well you know your vocabulary! 🌐💬
+"""
+
+    user_havent_any_vocabularies = "You're haven't any vocabularies yet("
+    user_is_not_owner_of_vocabulary = "☢️ You're not owner of this vocabulary! ☢️"
+    vocabulary_deleted_successfully = "🗑️ Vocabulary deleted successfully 🫡"
+    vocabulary_dont_exists = "Vocabulary does not exist 🤷🏻‍♂️"
+
     vocabulary_already_active = "Notifications for this vocabulary already active 😉"
     notification_active = " "*20 + "alerts is on ✅"
     notification_unactive = " "*19 + "alerts is off 📴"
