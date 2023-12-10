@@ -12,10 +12,8 @@ class VocabularyValidator:
         if len(raw_language_pairs) < 2:
             return False
         
-        if all(cls.validate_line(lang_pair) for lang_pair in raw_language_pairs):
-            return True
-        
-        return False
+        is_all_lines_valid = all(cls.validate_line(lang_pair) for lang_pair in raw_language_pairs)
+        return is_all_lines_valid
     
     @classmethod
     def validate_line(cls, raw_lang_pair: str):
