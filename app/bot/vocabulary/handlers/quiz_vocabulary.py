@@ -52,26 +52,19 @@ class QuizScene(Scene, state="quiz"):
 
         answer_checker = QuizAnswerChecker(message.text, current_pair.word)
         if answer_checker.check_correctness():
-            await message.bot.edit_message_text(
-                VocabularyMessages.quiz_success_answer.format(
-                    word=message.text,
-                    translation=current_pair.translation,
-                ),
-                last_question_msg.chat.id,
-                last_question_msg.message_id,
+            answer_response_msg = VocabularyMessages.quiz_success_answer.format(
+                word=message.text,
+                translation=current_pair.translation,
             )
         else:
-            await message.bot.edit_message_text(
-                VocabularyMessages.quiz_wrong_answer.format(
-                    word=current_pair.word,
-                    translation=current_pair.translation,
-                    suggestion=message.text
-                ),
-                last_question_msg.chat.id,
-                last_question_msg.message_id,
+            answer_response_msg = VocabularyMessages.quiz_wrong_answer.format(
+                word=current_pair.word,
+                translation=current_pair.translation,
+                suggestion=message.text
             )
         
         await message.delete()
+        await last_question_msg.edit_text(answer_response_msg)
         await state.update_data(step=step+1)
         await self.wizard.retake()
 
