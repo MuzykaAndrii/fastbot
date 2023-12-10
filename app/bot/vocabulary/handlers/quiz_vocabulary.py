@@ -7,6 +7,7 @@ from aiogram.fsm.scene import Scene, on
 
 from app.bot.vocabulary.callback_patterns import VocabularyAction, VocabularyCallbackData
 from app.bot.vocabulary.messages import VocabularyMessages
+from app.bot.vocabulary.schemas import LanguagePairSchema
 from app.bot.vocabulary.validators import QuizAnswerChecker
 from app.vocabulary.services import VocabularyService
 
@@ -38,29 +39,46 @@ class QuizScene(Scene, state="quiz"):
         except (IndexError, TypeError):
             return await self.wizard.exit()
 
-        await state.update_data(step=step)
-        await message.answer(question_item.translation)
+        last_question_msg = await message.answer(VocabularyMessages.quiz_question.format(word=question_item.translation))
+        await state.update_data(step=step, last_question_msg=last_question_msg)
         
     
     @on.message(F.text)
     async def answer(self, message: Message, state: FSMContext) -> None:
         state_data = await state.get_data()
         step = state_data.get("step")
-        current_pair = state_data.get("language_pairs")[step]
+        last_question_msg: Message = state_data.get("last_question_msg")
+        current_pair: LanguagePairSchema = state_data.get("language_pairs")[step]
 
         answer_checker = QuizAnswerChecker(message.text, current_pair.word)
         if answer_checker.check_correctness():
-            await message.answer("Youre damn right!")
+            await message.bot.edit_message_text(
+                VocabularyMessages.quiz_success_answer.format(
+                    word=message.text,
+                    translation=current_pair.translation,
+                ),
+                last_question_msg.chat.id,
+                last_question_msg.message_id,
+            )
         else:
-            await message.answer(f"Wrong! Correct is: \"{current_pair.word}\"")
+            await message.bot.edit_message_text(
+                VocabularyMessages.quiz_wrong_answer.format(
+                    word=current_pair.word,
+                    translation=current_pair.translation,
+                    suggestion=message.text
+                ),
+                last_question_msg.chat.id,
+                last_question_msg.message_id,
+            )
         
+        await message.delete()
         await state.update_data(step=step+1)
         await self.wizard.retake()
 
 
     @on.message()
     async def unknown_message(self, message: Message) -> None:
-        await message.answer("Please select an answer.")
+        await message.answer("Please send an answer.")
     
     @on.message.exit()
     async def on_exit(self, message: Message, state: FSMContext) -> None:
