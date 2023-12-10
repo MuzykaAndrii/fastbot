@@ -78,7 +78,7 @@ class QuizScene(Scene, state="quiz"):
 
     @on.message()
     async def unknown_message(self, message: Message) -> None:
-        await message.answer("Please send an answer.")
+        await message.answer("I dont get what u mean 🤯. Please send an answer ⬇️.")
     
     @on.message.exit()
     async def on_exit(self, message: Message, state: FSMContext) -> None:
