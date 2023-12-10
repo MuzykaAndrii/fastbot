@@ -24,7 +24,12 @@ class QuizScene(Scene, state="quiz"):
         callback_data = VocabularyCallbackData.unpack(query.data)
         vocabulary = await VocabularyService.get_vocabulary(query.from_user.id, callback_data.vocabulary_id)
         random.shuffle(vocabulary.language_pairs)
-        await state.update_data(step=0, language_pairs=vocabulary.language_pairs)
+        await state.update_data(
+            step=0,
+            language_pairs=vocabulary.language_pairs,
+            correct_answers_count=0,
+            wrong_answers_count=0
+        )
 
         await self.ask(query.message, state)
     
@@ -47,6 +52,8 @@ class QuizScene(Scene, state="quiz"):
     async def answer(self, message: Message, state: FSMContext) -> None:
         state_data = await state.get_data()
         step = state_data.get("step")
+        correct_answers_count = state_data.get("correct_answers_count")
+        wrong_answers_count = state_data.get("wrong_answers_count")
         last_question_msg: Message = state_data.get("last_question_msg")
         current_pair: LanguagePairSchema = state_data.get("language_pairs")[step]
 
@@ -56,16 +63,22 @@ class QuizScene(Scene, state="quiz"):
                 word=message.text,
                 translation=current_pair.translation,
             )
+            correct_answers_count += 1
         else:
             answer_response_msg = VocabularyMessages.quiz_wrong_answer.format(
                 word=current_pair.word,
                 translation=current_pair.translation,
                 suggestion=message.text
             )
+            wrong_answers_count += 1
         
         await message.delete()
         await last_question_msg.edit_text(answer_response_msg)
-        await state.update_data(step=step+1)
+        await state.update_data(
+            step=step+1,
+            correct_answers_count=correct_answers_count,
+            wrong_answers_count=wrong_answers_count
+        )
         await self.wizard.retake()
 
 
@@ -75,7 +88,21 @@ class QuizScene(Scene, state="quiz"):
     
     @on.message.exit()
     async def on_exit(self, message: Message, state: FSMContext) -> None:
-        await message.answer("Bye bye!")
+        state_data = await state.get_data()
+
+        correct_answers_count = state_data.get("correct_answers_count")
+        wrong_answers_count = state_data.get("wrong_answers_count")
+        pairs: list[LanguagePairSchema] = state_data.get("language_pairs")
+
+        questions_count = len(pairs)
+        success_rate = round(correct_answers_count / questions_count * 100, 1)
+
+        await message.answer(VocabularyMessages.quiz_stats.format(
+            correct_guesses=correct_answers_count,
+            wrong_guesses=wrong_answers_count,
+            success_rate=success_rate,
+            total_words_attempted=questions_count,
+        ))
 
 
 router = Router()

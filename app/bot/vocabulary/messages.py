@@ -15,29 +15,42 @@ class VocabularyMessages:
     """
 
     start_quiz_msg = """
-🌟 <strong>Welcome to Vocabulary Quiz!</strong> 🌟
+🌟 <b>Welcome to Vocabulary Quiz!</b> 🌟
 
-📚 <strong>How to Play:</strong>
+📚 <b>How to Play:</b>
 1. 🤖 The bot will send you a word.
 2. 📝 Respond with the translation of that word.
 3. ✅ The bot will check if your answer is correct.
 
-🔍 <strong>Correctness Check:</strong>
-- 🧐 <strong>Full translation:</strong>
+🔍 <b>Correctness Check:</b>
+- 🧐 <b>Full translation:</b>
   - U can send all variants of translating separated y comma. (Then u should send all variants, in the correct order)
 
-- 🕵️ <strong>One variant translation:</strong>
+- 🕵️ <b>One variant translation:</b>
   - U also can send one variant of translation, if it will match with at least one correct variant, answer will be correct.
 
-🤔 <strong>Tips:</strong>
+🤔 <b>Tips:</b>
 - 🚫 Avoid using extra symbols or unnecessary details in your response.
 
-🔇 <strong>Alerts during the Quiz:</strong>
+🔇 <b>Alerts during the Quiz:</b>
 - 🚨 All alerts will be disabled during the quiz.
 - 🔚 They will be re-enabled when you press the "End Quiz" button or answer all the questions.
 
-🚀 <strong>Let's Start the Quiz!</strong> 🚀
+🚀 <b>Let's Start the Quiz!</b> 🚀
 Simply respond to the bot's prompts with your translations, and let's see how well you know your vocabulary! 🌐💬
+"""
+    quiz_stats = """
+🎉 <b>Quiz Results!</b> 🎉
+🌟 You've completed the Vocabulary Quiz!
+
+🏆 <b>Statistics:</b>
+
+📈 <b>Total Words Attempted:</b> {total_words_attempted}
+✅ <b>Correct Guesses:</b> {correct_guesses}
+❌ <b>Wrong Guesses:</b> {wrong_guesses}
+📊 <b>Success Rate:</b> {success_rate}%
+
+👏 <b>Well Done!</b> Keep expanding your vocabulary and come back for more challenges! 🚀💬
 """
     quiz_question = "🤔 Enter translation for: <b>{word}</b>"
     quiz_success_answer = "✅ {word} - <b>{translation}</b>"
