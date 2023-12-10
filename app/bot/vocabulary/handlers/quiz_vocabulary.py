@@ -7,6 +7,7 @@ from aiogram.fsm.scene import Scene, on
 
 from app.bot.vocabulary.callback_patterns import VocabularyAction, VocabularyCallbackData
 from app.bot.vocabulary.messages import VocabularyMessages
+from app.bot.vocabulary.validators import QuizAnswerChecker
 from app.vocabulary.services import VocabularyService
 
 
@@ -47,10 +48,11 @@ class QuizScene(Scene, state="quiz"):
         step = state_data.get("step")
         current_pair = state_data.get("language_pairs")[step]
 
-        if current_pair.word != message.text:
-            await message.answer(f"Wrong! Correct is: \"{current_pair.word}\"")
-        else:
+        answer_checker = QuizAnswerChecker(message.text, current_pair.word)
+        if answer_checker.check_correctness():
             await message.answer("Youre damn right!")
+        else:
+            await message.answer(f"Wrong! Correct is: \"{current_pair.word}\"")
         
         await state.update_data(step=step+1)
         await self.wizard.retake()

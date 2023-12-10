@@ -39,6 +39,7 @@ class VocabularyMessages:
 🚀 <strong>Let's Start the Quiz!</strong> 🚀
 Simply respond to the bot's prompts with your translations, and let's see how well you know your vocabulary! 🌐💬
 """
+    quiz_stats_msg_header = "🧠 Quiz for: {vocabulary_name}"
 
     user_havent_any_vocabularies = "You're haven't any vocabularies yet("
     user_is_not_owner_of_vocabulary = "☢️ You're not owner of this vocabulary! ☢️"
