@@ -59,7 +59,7 @@ Simply respond to the bot's prompts with your translations, and let's see how we
 Feel free to come back anytime! 👋✨
 """
 
-    quiz_question = "🤔 Enter translation for: <b>{word}</b>"
+    quiz_question = "({answered}/{total}) Enter translation for: \"<b>{word}</b>\" 🤔"
     quiz_success_answer = "✅ {word} - <b>{translation}</b>"
     quiz_wrong_answer = "❌ {word} - <b>{translation}</b>. Your'e answer: <u>{suggestion}</u>"
 

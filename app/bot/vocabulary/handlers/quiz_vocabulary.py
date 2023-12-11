@@ -38,6 +38,11 @@ class QuizScene(Scene, state="quiz"):
     async def ask(self, message: Message, state: FSMContext):
         state_data = await state.get_data()
         language_pairs = state_data.get("language_pairs")
+        questions__count = state_data.get("questions_count")
+        correct_answers_count = state_data.get("correct_answers_count")
+        wrong_answers_count = state_data.get("wrong_answers_count")
+
+        answered_questions_count = correct_answers_count + wrong_answers_count + 1
 
         try:
             question_item = language_pairs.pop()
@@ -45,7 +50,11 @@ class QuizScene(Scene, state="quiz"):
             return await self.wizard.exit(show_stats=True)
 
         last_question_msg = await message.answer(
-            VocabularyMessages.quiz_question.format(word=question_item.translation)
+            VocabularyMessages.quiz_question.format(
+                answered=answered_questions_count,
+                total=questions__count,
+                word=question_item.translation,
+            )
         )
         await state.update_data(last_question_msg=last_question_msg, current_language_pair=question_item)
     
