@@ -6,6 +6,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.scene import Scene, on
 
 from app.bot.vocabulary.callback_patterns import VocabularyAction, VocabularyCallbackData
+from app.bot.vocabulary.keyboards import get_quiz_keyboard
 from app.bot.vocabulary.messages import VocabularyMessages
 from app.bot.vocabulary.schemas import LanguagePairSchema
 from app.bot.vocabulary.validators import QuizAnswerChecker
@@ -20,7 +21,7 @@ class QuizScene(Scene, state="quiz"):
 
     @on.callback_query.enter(VocabularyCallbackData.filter(F.action == VocabularyAction.quiz))
     async def on_enter_btn(self, query: CallbackQuery, state: FSMContext):
-        await query.message.answer(VocabularyMessages.start_quiz_msg)
+        await query.message.answer(VocabularyMessages.start_quiz_msg, reply_markup=get_quiz_keyboard())
         callback_data = VocabularyCallbackData.unpack(query.data)
         vocabulary = await VocabularyService.get_vocabulary(query.from_user.id, callback_data.vocabulary_id)
         random.shuffle(vocabulary.language_pairs)
@@ -42,10 +43,18 @@ class QuizScene(Scene, state="quiz"):
         try:
             question_item = language_pairs[step]
         except (IndexError, TypeError):
-            return await self.wizard.exit()
+            return await self.wizard.exit(show_stats=True)
 
-        last_question_msg = await message.answer(VocabularyMessages.quiz_question.format(word=question_item.translation))
+        last_question_msg = await message.answer(
+            VocabularyMessages.quiz_question.format(word=question_item.translation)
+        )
         await state.update_data(step=step, last_question_msg=last_question_msg)
+    
+
+    @on.message(F.text == "🚪 Leave quiz")
+    async def leave_quiz(self, message: Message):
+        await message.answer(VocabularyMessages.leave_quiz)
+        return await self.wizard.exit()
         
     
     @on.message(F.text)
@@ -86,8 +95,14 @@ class QuizScene(Scene, state="quiz"):
     async def unknown_message(self, message: Message) -> None:
         await message.answer("I dont get what u mean 🤯. Please send an answer ⬇️.")
     
+
     @on.message.exit()
-    async def on_exit(self, message: Message, state: FSMContext) -> None:
+    async def on_exit(self, message: Message, state: FSMContext, show_stats=False) -> None:
+        if show_stats:
+            await self.show_stats(message, state)
+    
+
+    async def show_stats(self, message: Message, state: FSMContext):
         state_data = await state.get_data()
 
         correct_answers_count = state_data.get("correct_answers_count")

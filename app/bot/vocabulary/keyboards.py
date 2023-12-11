@@ -24,6 +24,18 @@ def get_select_strategy_keyboard():
 
     return select_strategy_keyboard
 
+def get_quiz_keyboard():
+    btn_end_test = KeyboardButton(text="🚪 Leave quiz")
+
+    quiz_keyboard = ReplyKeyboardMarkup(
+        keyboard=[
+            [btn_end_test]
+        ],
+        resize_keyboard=True,
+        one_time_keyboard=True,
+    )
+    return quiz_keyboard
+
 
 class ActionsKeyboard:
     def __init__(self, vocabulary: VocabularySetSchema) -> None:

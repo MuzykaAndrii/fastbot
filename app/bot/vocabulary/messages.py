@@ -52,6 +52,13 @@ Simply respond to the bot's prompts with your translations, and let's see how we
 
 👏 <b>Well Done!</b> Keep expanding your vocabulary and come back for more challenges! 🚀💬
 """
+    leave_quiz = """
+👋 <b>Leaving Quiz!</b> 👋
+
+🚨 Oh no! It looks like you're leaving the Vocabulary Quiz.
+Feel free to come back anytime! 👋✨
+"""
+
     quiz_question = "🤔 Enter translation for: <b>{word}</b>"
     quiz_success_answer = "✅ {word} - <b>{translation}</b>"
     quiz_wrong_answer = "❌ {word} - <b>{translation}</b>. Your'e answer: <u>{suggestion}</u>"
