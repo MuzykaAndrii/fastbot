@@ -7,13 +7,7 @@ from fastapi import FastAPI
 from app.config import settings
 from app.bot.main import bot
 from app.vocabulary.routes import router as vocabulary_router
-
-
-logger = logging.getLogger(__name__)
-logging.basicConfig(
-    level=logging.INFO,
-    format=u'%(filename)s:%(lineno)d #%(levelname)-8s [%(asctime)s] - %(name)s - %(message)s',
-)
+from app.logger import logger
 
 
 @asynccontextmanager
