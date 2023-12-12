@@ -1,5 +1,3 @@
-import random
-
 from aiogram import F, Router
 from aiogram.types import CallbackQuery, Message, ReplyKeyboardRemove
 from aiogram.fsm.context import FSMContext
@@ -11,31 +9,27 @@ from app.bot.vocabulary.messages import VocabularyMessages
 from app.bot.vocabulary.schemas import LanguagePairSchema
 from app.bot.vocabulary.validators import QuizAnswerChecker
 from app.vocabulary.services import VocabularyService
-
+from app.bot.vocabulary.schemas import VocabularyQuiz
 
 class QuizScene(Scene, state="quiz"):
     @on.message.enter()
     async def on_enter_msg(self, message: Message, state: FSMContext):
-        await self.ask(message, state)
+        await self.ask_question(message, state)
 
 
     @on.callback_query.enter(VocabularyCallbackData.filter(F.action == VocabularyAction.quiz))
     async def on_enter_btn(self, query: CallbackQuery, state: FSMContext):
-        await query.message.answer(VocabularyMessages.start_quiz_msg, reply_markup=get_quiz_keyboard())
         callback_data = VocabularyCallbackData.unpack(query.data)
         vocabulary = await VocabularyService.get_vocabulary(query.from_user.id, callback_data.vocabulary_id)
-        random.shuffle(vocabulary.language_pairs)
-        await state.update_data(
-            language_pairs=vocabulary.language_pairs,
-            correct_answers_count=0,
-            wrong_answers_count=0,
-            questions_count=len(vocabulary.language_pairs),
-        )
 
-        await self.ask(query.message, state)
+        quiz = VocabularyQuiz(initial=True, language_pairs=vocabulary.language_pairs)
+        await quiz.save_to_state(state)
+
+        await query.message.answer(VocabularyMessages.start_quiz_msg, reply_markup=get_quiz_keyboard())
+        await self.ask_question(query.message, state)
     
 
-    async def ask(self, message: Message, state: FSMContext):
+    async def ask_question(self, message: Message, state: FSMContext):
         state_data = await state.get_data()
         language_pairs = state_data.get("language_pairs")
         questions__count = state_data.get("questions_count")
@@ -66,7 +60,7 @@ class QuizScene(Scene, state="quiz"):
         
     
     @on.message(F.text)
-    async def answer(self, message: Message, state: FSMContext) -> None:
+    async def handle_user_answer(self, message: Message, state: FSMContext) -> None:
         state_data = await state.get_data()
         correct_answers_count = state_data.get("correct_answers_count")
         wrong_answers_count = state_data.get("wrong_answers_count")
