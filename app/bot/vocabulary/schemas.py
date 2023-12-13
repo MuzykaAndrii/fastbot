@@ -108,8 +108,8 @@ class VocabularyQuiz:
         state_data = await state.get_data()
         return cls(initial=False, **state_data)
     
-    async def save_to_state(self, state: FSMContext) -> None:
-        self_as_dict = {
+    def dump(self) -> dict[str, Any]:
+        return {
             "language_pairs": self.language_pairs,
             "last_question_msg": self.last_question_msg,
             "current_question": self._current_question,
@@ -119,4 +119,6 @@ class VocabularyQuiz:
             "wrong_answers_count": self.wrong_answers_count,
             "skipped_answers_count": self.skipped_answers_count,
         }
-        await state.update_data(**self_as_dict)
+    
+    async def save_to_state(self, state: FSMContext) -> None:
+        await state.update_data(**self.dump())

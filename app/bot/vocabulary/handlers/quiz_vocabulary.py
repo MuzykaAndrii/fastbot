@@ -38,7 +38,7 @@ class QuizScene(Scene, state="quiz"):
         except QuestionsIsGoneError:
             return await self.wizard.exit(show_stats=True)
 
-        last_question_msg = await message.answer(
+        question_msg = await message.answer(
             VocabularyMessages.quiz_question.format(
                 question=quiz.current_question,
                 current_question_num=quiz.answered_questions_count,
@@ -46,7 +46,7 @@ class QuizScene(Scene, state="quiz"):
             )
         )
 
-        quiz.last_question_msg = last_question_msg
+        quiz.last_question_msg = question_msg
         await quiz.save_to_state(state)
     
 
