@@ -1,6 +1,9 @@
+from abc import ABC, abstractmethod
 from datetime import datetime
+from enum import Enum
 from typing import Any
 import random
+from dataclasses import dataclass
 
 from pydantic import BaseModel, ConfigDict
 from aiogram.types.message import Message
@@ -24,50 +27,99 @@ class VocabularySetSchema(BaseModel):
     language_pairs: list[LanguagePairSchema]
 
 
-class VocabularyQuiz:
+class QuizStrategy(str, Enum):
+    guess_native = "guess_own"
+    guess_foreign = "guess_foreign"
+
+
+@dataclass(frozen=True, slots=True)
+class QuestionItem:
+    question: str
+    answer: str
+
+
+class QuestionManager(ABC):
+    @abstractmethod
+    def load_question_item(self) -> QuestionItem:
+        raise NotImplementedError
+
+
+class VocabularyQuestionManager(QuestionManager):
     def __init__(
         self,
-        initial: bool,
         language_pairs: list[LanguagePairSchema],
-        last_question_msg: Message | None = None,
-        current_question: Any | None = None,
-        current_answer: Any | None = None,
-        questions_count: int = 0,
-        correct_answers_count: int = 0,
-        wrong_answers_count: int = 0,
-        skipped_answers_count: int = 0,
+        quiz_strategy: QuizStrategy,
     ) -> None:
         self.language_pairs = language_pairs
-        self.last_question_msg = last_question_msg
-        self._current_question = current_question
-        self._current_answer = current_answer
-        self.questions_count = questions_count
-        self.correct_answers_count = correct_answers_count
-        self.wrong_answers_count = wrong_answers_count
-        self.skipped_answers_count = skipped_answers_count
-        
-        if initial:
-            self._calculate_questions_count()
-            self._shuffle_questions()
-    
-    def _calculate_questions_count(self) -> None:
-        self.questions_count = len(self.language_pairs)
+        self._define_strategy(quiz_strategy)
+        self._calculate_questions_count()
+        self._shuffle_questions()
     
     def _shuffle_questions(self) -> None:
         random.shuffle(self.language_pairs)
+        
+    def _calculate_questions_count(self):
+        self.questions_count = len(self.language_pairs)
     
-    def load_next_quiz_item(self) -> None:
-        """
-        Loads the next quiz pair as question/answer that can be fetched by 
-        current_question or current_answer properties of this instance
-        """
+    def _define_strategy(self, strategy) -> None:
+        match strategy:
+            case QuizStrategy.guess_native:
+                self.question_getter = lambda lang_pair: getattr(lang_pair, "word")
+                self.answer_getter = lambda lang_pair: getattr(lang_pair, "translation")
+            
+            case QuizStrategy.guess_foreign:
+                self.question_getter = lambda lang_pair: getattr(lang_pair, "translation")
+                self.answer_getter = lambda lang_pair: getattr(lang_pair, "word")
+    
+    def load_question_item(self) -> QuestionItem:
         try:
             language_pair = self.language_pairs.pop()
         except IndexError:
             raise QuestionsIsGoneError
+        
+        return QuestionItem(
+            question=self.question_getter(language_pair),
+            answer=self.answer_getter(language_pair),
+        )
 
-        self._current_question = language_pair.translation
-        self._current_answer = language_pair.word
+
+class Quiz:
+    def __init__(
+        self,
+        question_manager: QuestionManager,
+        last_question_msg: Message | None = None,
+        current_question: str | None = None,
+        current_answer: str | None = None,
+        correct_answers_count: int = 0,
+        wrong_answers_count: int = 0,
+        skipped_answers_count: int = 0,
+    ) -> None:
+        self.question_manager = question_manager
+        self.last_question_msg = last_question_msg
+        self._current_question = current_question
+        self._current_answer = current_answer
+        self.correct_answers_count = correct_answers_count
+        self.wrong_answers_count = wrong_answers_count
+        self.skipped_answers_count = skipped_answers_count
+        
+
+    def load_next_quiz_item(self) -> None:
+        """
+        Loads the next quiz pair as question/answer that can be fetched by 
+        current_question or current_answer properties of this instance.
+        raises QuestionsIsGoneError if questions is empty
+        """
+        try:
+            quiz_item = self.question_manager.load_question_item()
+        except QuestionsIsGoneError as e:
+            raise e
+
+        self._current_question = quiz_item.question
+        self._current_answer = quiz_item.answer
+    
+    @property
+    def questions_count(self):
+        return self.question_manager.questions_count
 
     @property
     def current_question(self) -> str:
@@ -106,15 +158,14 @@ class VocabularyQuiz:
     @classmethod
     async def load_form_state(cls, state: FSMContext):
         state_data = await state.get_data()
-        return cls(initial=False, **state_data)
+        return cls(**state_data)
     
     def dump(self) -> dict[str, Any]:
         return {
-            "language_pairs": self.language_pairs,
+            "question_manager": self.question_manager,
             "last_question_msg": self.last_question_msg,
             "current_question": self._current_question,
             "current_answer": self._current_answer,
-            "questions_count": self.questions_count,
             "correct_answers_count": self.correct_answers_count,
             "wrong_answers_count": self.wrong_answers_count,
             "skipped_answers_count": self.skipped_answers_count,

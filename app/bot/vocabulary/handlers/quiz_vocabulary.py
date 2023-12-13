@@ -9,7 +9,7 @@ from app.bot.vocabulary.keyboards import get_quiz_keyboard
 from app.bot.vocabulary.messages import VocabularyMessages
 from app.bot.vocabulary.validators import QuizAnswerChecker
 from app.vocabulary.services import VocabularyService
-from app.bot.vocabulary.schemas import VocabularyQuiz
+from app.bot.vocabulary.schemas import Quiz, QuizStrategy, VocabularyQuestionManager
 
 
 class QuizScene(Scene, state="quiz"):
@@ -23,7 +23,10 @@ class QuizScene(Scene, state="quiz"):
         callback_data = VocabularyCallbackData.unpack(query.data)
         vocabulary = await VocabularyService.get_vocabulary(query.from_user.id, callback_data.vocabulary_id)
 
-        quiz = VocabularyQuiz(initial=True, language_pairs=vocabulary.language_pairs)
+        quiz_strategy = QuizStrategy.guess_native
+        vocabulary_question_manager = VocabularyQuestionManager(vocabulary.language_pairs, quiz_strategy)
+        quiz = Quiz(vocabulary_question_manager)
+
         await quiz.save_to_state(state)
 
         await query.message.answer(VocabularyMessages.start_quiz_msg, reply_markup=get_quiz_keyboard())
@@ -31,7 +34,7 @@ class QuizScene(Scene, state="quiz"):
     
 
     async def ask_question(self, message: Message, state: FSMContext):
-        quiz = await VocabularyQuiz.load_form_state(state)
+        quiz = await Quiz.load_form_state(state)
 
         try:
             quiz.load_next_quiz_item()
@@ -58,7 +61,7 @@ class QuizScene(Scene, state="quiz"):
 
     @on.message(F.text == "🔁 Skip question")
     async def skip_question(self, message: Message, state: FSMContext) -> None:
-        quiz = await VocabularyQuiz.load_form_state(state)
+        quiz = await Quiz.load_form_state(state)
         quiz.increment_skipped_answers_count()
 
         await quiz.last_question_msg.edit_text(VocabularyMessages.quiz_skipped_answer.format(
@@ -72,7 +75,7 @@ class QuizScene(Scene, state="quiz"):
     
     @on.message(F.text)
     async def handle_user_answer(self, message: Message, state: FSMContext) -> None:
-        quiz = await VocabularyQuiz.load_form_state(state)
+        quiz = await Quiz.load_form_state(state)
 
         if QuizAnswerChecker(message.text, quiz.current_answer).is_match():
             answer_response_msg = VocabularyMessages.quiz_success_answer.format(
@@ -107,7 +110,7 @@ class QuizScene(Scene, state="quiz"):
     
 
     async def show_stats(self, message: Message, state: FSMContext):
-        quiz = await VocabularyQuiz.load_form_state(state)
+        quiz = await Quiz.load_form_state(state)
 
         await message.answer(
             VocabularyMessages.quiz_stats.format(
