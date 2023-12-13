@@ -14,6 +14,17 @@ class VocabularyMessages:
 🎉 <b>Have Fun!</b> Enjoy expanding your vocabulary with the bot! 🚀
     """
 
+    select_quiz_type_msg = """
+Welcome to the Language Learning Quiz! 🌐📚
+To get started, use the interactive keyboard below to choose your quiz type:
+
+- Translate from Native to Foreign 🏠➡️🌍
+- Translate from Foreign to Native 🌍➡️🏠
+- Mixed Mode 🔄🔀
+
+Select your preferred type and embark on a language-learning adventure! 🚀🗣️
+"""
+
     start_quiz_msg = """
 🌟 <b>Welcome to Vocabulary Quiz!</b> 🌟
 

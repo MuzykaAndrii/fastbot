@@ -125,4 +125,4 @@ class QuizScene(Scene, state="quiz"):
 
 
 router = Router()
-router.callback_query.register(QuizScene.as_handler())
+# router.callback_query.register(QuizScene.as_handler())
