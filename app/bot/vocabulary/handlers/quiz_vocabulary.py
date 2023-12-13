@@ -54,7 +54,21 @@ class QuizScene(Scene, state="quiz"):
     async def leave_quiz(self, message: Message):
         await message.answer(VocabularyMessages.leave_quiz, reply_markup=ReplyKeyboardRemove())
         return await self.wizard.exit()
-        
+    
+
+    @on.message(F.text == "🔁 Skip question")
+    async def skip_question(self, message: Message, state: FSMContext) -> None:
+        quiz = await VocabularyQuiz.load_form_state(state)
+        quiz.increment_skipped_answers_count()
+
+        await quiz.last_question_msg.edit_text(VocabularyMessages.quiz_skipped_answer.format(
+            word=quiz.current_question,
+            translation=quiz.current_answer,
+        ))
+        await message.delete()
+
+        await quiz.save_to_state(state)
+        await self.wizard.retake()
     
     @on.message(F.text)
     async def handle_user_answer(self, message: Message, state: FSMContext) -> None:
@@ -99,6 +113,7 @@ class QuizScene(Scene, state="quiz"):
             VocabularyMessages.quiz_stats.format(
                 correct_guesses=quiz.correct_answers_count,
                 wrong_guesses=quiz.wrong_answers_count,
+                skipped_answers=quiz.skipped_answers_count,
                 success_rate=quiz.success_rate,
                 total_words_attempted=quiz.questions_count,
             ),

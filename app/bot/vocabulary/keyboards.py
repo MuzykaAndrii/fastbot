@@ -26,13 +26,13 @@ def get_select_strategy_keyboard():
 
 def get_quiz_keyboard():
     btn_end_test = KeyboardButton(text="🚪 Leave quiz")
+    btn_skip_question = KeyboardButton(text="🔁 Skip question")
 
     quiz_keyboard = ReplyKeyboardMarkup(
         keyboard=[
-            [btn_end_test]
+            [btn_end_test, btn_skip_question],
         ],
         resize_keyboard=True,
-        one_time_keyboard=True,
     )
     return quiz_keyboard
 

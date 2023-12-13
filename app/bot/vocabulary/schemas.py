@@ -35,6 +35,7 @@ class VocabularyQuiz:
         questions_count: int = 0,
         correct_answers_count: int = 0,
         wrong_answers_count: int = 0,
+        skipped_answers_count: int = 0,
     ) -> None:
         self.language_pairs = language_pairs
         self.last_question_msg = last_question_msg
@@ -43,6 +44,7 @@ class VocabularyQuiz:
         self.questions_count = questions_count
         self.correct_answers_count = correct_answers_count
         self.wrong_answers_count = wrong_answers_count
+        self.skipped_answers_count = skipped_answers_count
         
         if initial:
             self._calculate_questions_count()
@@ -87,9 +89,12 @@ class VocabularyQuiz:
     def increment_wrong_answers_count(self) -> None:
         self.wrong_answers_count += 1
     
+    def increment_skipped_answers_count(self) -> None:
+        self.skipped_answers_count += 1
+    
     @property
     def answered_questions_count(self) -> int:
-        return self.correct_answers_count + self.wrong_answers_count + 1
+        return self.correct_answers_count + self.wrong_answers_count + self.skipped_answers_count + 1
     
     @property
     def success_rate(self) -> float:
@@ -112,5 +117,6 @@ class VocabularyQuiz:
             "questions_count": self.questions_count,
             "correct_answers_count": self.correct_answers_count,
             "wrong_answers_count": self.wrong_answers_count,
+            "skipped_answers_count": self.skipped_answers_count,
         }
         await state.update_data(**self_as_dict)

@@ -48,6 +48,7 @@ Simply respond to the bot's prompts with your translations, and let's see how we
 📈 <b>Total Words Attempted:</b> {total_words_attempted}
 ✅ <b>Correct Guesses:</b> {correct_guesses}
 ❌ <b>Wrong Guesses:</b> {wrong_guesses}
+🔁 <b>Skipped:</b> {skipped_answers}
 📊 <b>Success Rate:</b> {success_rate}%
 
 👏 <b>Well Done!</b> Keep expanding your vocabulary and come back for more challenges! 🚀💬
@@ -62,6 +63,7 @@ Feel free to come back anytime! 👋✨
     quiz_question = "[{current_question_num}/{total_question_count}] Enter translation for: \"<b>{question}</b>\" 🤔"
     quiz_success_answer = "✅ {word} - <b>{translation}</b>"
     quiz_wrong_answer = "❌ {word} - <b>{translation}</b>. Your'e answer: <u>{suggestion}</u>"
+    quiz_skipped_answer = "🔁 {word} - <b>{translation}</b>"
 
     user_havent_any_vocabularies = "You're haven't any vocabularies yet("
     user_is_not_owner_of_vocabulary = "☢️ You're not owner of this vocabulary! ☢️"
