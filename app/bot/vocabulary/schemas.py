@@ -30,6 +30,7 @@ class VocabularySetSchema(BaseModel):
 class QuizStrategy(str, Enum):
     guess_native = "guess_own"
     guess_foreign = "guess_foreign"
+    combined = "combined"
 
 
 @dataclass(frozen=True, slots=True)
@@ -40,7 +41,7 @@ class QuestionItem:
 
 class QuestionManager(ABC):
     @abstractmethod
-    def load_question_item(self) -> QuestionItem:
+    def get_question_item(self) -> QuestionItem:
         raise NotImplementedError
 
 
@@ -50,37 +51,45 @@ class VocabularyQuestionManager(QuestionManager):
         language_pairs: list[LanguagePairSchema],
         quiz_strategy: QuizStrategy,
     ) -> None:
-        self.language_pairs = language_pairs
-        self._define_strategy(quiz_strategy)
+        self._language_pairs = language_pairs
+        self._strategy = quiz_strategy
         self._calculate_questions_count()
         self._shuffle_questions()
     
     def _shuffle_questions(self) -> None:
-        random.shuffle(self.language_pairs)
+        random.shuffle(self._language_pairs)
         
     def _calculate_questions_count(self):
-        self.questions_count = len(self.language_pairs)
+        self.questions_count = len(self._language_pairs)
     
-    def _define_strategy(self, strategy) -> None:
-        match strategy:
+    def _parse_language_pair_to_question_item(self, language_pair: LanguagePairSchema) -> QuestionItem:
+        match self._strategy:
             case QuizStrategy.guess_native:
-                self.question_getter = lambda lang_pair: getattr(lang_pair, "word")
-                self.answer_getter = lambda lang_pair: getattr(lang_pair, "translation")
+                question=language_pair.word,
+                answer=language_pair.translation
             
             case QuizStrategy.guess_foreign:
-                self.question_getter = lambda lang_pair: getattr(lang_pair, "translation")
-                self.answer_getter = lambda lang_pair: getattr(lang_pair, "word")
+                question=language_pair.translation,
+                answer=language_pair.word,
+            
+            case QuizStrategy.combined:
+                question, answer = random.sample([language_pair.word, language_pair.translation], 2)
+            
+            case _:
+                raise ValueError
+        
+        return QuestionItem(question=question, answer=answer)
     
-    def load_question_item(self) -> QuestionItem:
+    def get_question_item(self) -> QuestionItem:
         try:
-            language_pair = self.language_pairs.pop()
+            language_pair = self._language_pairs.pop()
         except IndexError:
             raise QuestionsIsGoneError
         
-        return QuestionItem(
-            question=self.question_getter(language_pair),
-            answer=self.answer_getter(language_pair),
-        )
+        q_item = self._parse_language_pair_to_question_item(language_pair)
+        return q_item
+        
+
 
 
 class Quiz:
@@ -110,7 +119,7 @@ class Quiz:
         raises QuestionsIsGoneError if questions is empty
         """
         try:
-            quiz_item = self.question_manager.load_question_item()
+            quiz_item = self.question_manager.get_question_item()
         except QuestionsIsGoneError as e:
             raise e
 
