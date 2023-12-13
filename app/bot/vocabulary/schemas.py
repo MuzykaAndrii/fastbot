@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Any
 import random
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict
 from aiogram.types.message import Message
 from aiogram.fsm.context import FSMContext
 
@@ -24,19 +24,25 @@ class VocabularySetSchema(BaseModel):
     language_pairs: list[LanguagePairSchema]
 
 
-class VocabularyQuiz(BaseModel):
-    language_pairs: list[LanguagePairSchema]
-    last_question_msg: Message | None = None
-
-    current_question: Any | None = None
-    current_answer: Any | None = None
-
-    questions_count: int = 0
-    correct_answers_count: int = 0
-    wrong_answers_count: int = 0
-
-    def __init__(self, initial: bool, **data) -> None:
-        super().__init__(**data)
+class VocabularyQuiz:
+    def __init__(
+        self,
+        initial: bool,
+        language_pairs: list[LanguagePairSchema],
+        last_question_msg: Message | None = None,
+        current_question: Any | None = None,
+        current_answer: Any | None = None,
+        questions_count: int = 0,
+        correct_answers_count: int = 0,
+        wrong_answers_count: int = 0,
+    ) -> None:
+        self.language_pairs = language_pairs
+        self.last_question_msg = last_question_msg
+        self._current_question = current_question
+        self._current_answer = current_answer
+        self.questions_count = questions_count
+        self.correct_answers_count = correct_answers_count
+        self.wrong_answers_count = wrong_answers_count
         
         if initial:
             self._calculate_questions_count()
@@ -58,22 +64,22 @@ class VocabularyQuiz(BaseModel):
         except IndexError:
             raise QuestionsIsGoneError
 
-        self.current_question = language_pair.translation
-        self.current_answer = language_pair.word
+        self._current_question = language_pair.translation
+        self._current_answer = language_pair.word
 
     @property
     def current_question(self) -> str:
-        if self.current_question is None:
+        if self._current_question is None:
             raise QuizItemNotLoadedError
         else:
-            return self.current_question
+            return self._current_question
     
     @property
     def current_answer(self) -> str:
-        if self.current_answer is None:
+        if self._current_answer is None:
             raise QuizItemNotLoadedError
         else:
-            return self.current_answer
+            return self._current_answer
     
     def increment_correct_answers_count(self) -> None:
         self.correct_answers_count += 1
@@ -98,5 +104,13 @@ class VocabularyQuiz(BaseModel):
         return cls(initial=False, **state_data)
     
     async def save_to_state(self, state: FSMContext) -> None:
-        self_as_dict = self.model_dump()
+        self_as_dict = {
+            "language_pairs": self.language_pairs,
+            "last_question_msg": self.last_question_msg,
+            "current_question": self._current_question,
+            "current_answer": self._current_answer,
+            "questions_count": self.questions_count,
+            "correct_answers_count": self.correct_answers_count,
+            "wrong_answers_count": self.wrong_answers_count,
+        }
         await state.update_data(**self_as_dict)

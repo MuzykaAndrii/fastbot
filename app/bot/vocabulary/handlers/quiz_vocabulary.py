@@ -2,7 +2,6 @@ from aiogram import F, Router
 from aiogram.types import CallbackQuery, Message, ReplyKeyboardRemove
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.scene import Scene, on
-from aiogram.methods import EditMessageText
 
 from app.bot.vocabulary.callback_patterns import VocabularyAction, VocabularyCallbackData
 from app.bot.vocabulary.exceptions import QuestionsIsGoneError
