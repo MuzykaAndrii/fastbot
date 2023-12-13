@@ -2,14 +2,16 @@ from datetime import datetime
 from typing import Any
 import random
 
-from pydantic import BaseModel
-from aiogram.types import Message
+from pydantic import BaseModel, ConfigDict, Field
+from aiogram.types.message import Message
 from aiogram.fsm.context import FSMContext
 
 from app.bot.vocabulary.exceptions import LanguagePairsForQuestionsIsEmptyError, QuestionsIsGoneError, QuizItemNotLoadedError
 
 
 class LanguagePairSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     word: str
     translation: str
 
@@ -24,7 +26,7 @@ class VocabularySetSchema(BaseModel):
 
 class VocabularyQuiz(BaseModel):
     language_pairs: list[LanguagePairSchema]
-    last_question_msg: Message = None
+    last_question_msg: Message | None = None
 
     current_question: Any | None = None
     current_answer: Any | None = None
@@ -35,12 +37,10 @@ class VocabularyQuiz(BaseModel):
 
     def __init__(self, initial: bool, **data) -> None:
         super().__init__(**data)
+        
         if initial:
             self._calculate_questions_count()
             self._shuffle_questions()
-    
-    # @classmethod
-    # def _init_without_
     
     def _calculate_questions_count(self) -> None:
         self.questions_count = len(self.language_pairs)
