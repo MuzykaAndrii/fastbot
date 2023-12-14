@@ -65,12 +65,12 @@ class VocabularyQuestionManager(QuestionManager):
     def _parse_language_pair_to_question_item(self, language_pair: LanguagePairSchema) -> QuestionItem:
         match self._strategy:
             case QuizStrategy.guess_native:
-                question=language_pair.word,
-                answer=language_pair.translation
+                question = language_pair.word
+                answer = language_pair.translation
             
             case QuizStrategy.guess_foreign:
-                question=language_pair.translation,
-                answer=language_pair.word,
+                question = language_pair.translation
+                answer = language_pair.word
             
             case QuizStrategy.combined:
                 question, answer = random.sample([language_pair.word, language_pair.translation], 2)

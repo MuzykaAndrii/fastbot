@@ -3,13 +3,13 @@ from aiogram.types import CallbackQuery, Message, ReplyKeyboardRemove
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.scene import Scene, on
 
-from app.bot.vocabulary.callback_patterns import VocabularyAction, VocabularyCallbackData
+from app.bot.vocabulary.callback_patterns import StartQuizCallbackData
 from app.bot.vocabulary.exceptions import QuestionsIsGoneError
 from app.bot.vocabulary.keyboards import get_quiz_keyboard
 from app.bot.vocabulary.messages import VocabularyMessages
 from app.bot.vocabulary.validators import QuizAnswerChecker
 from app.vocabulary.services import VocabularyService
-from app.bot.vocabulary.schemas import Quiz, QuizStrategy, VocabularyQuestionManager
+from app.bot.vocabulary.schemas import Quiz, VocabularyQuestionManager
 
 
 class QuizScene(Scene, state="quiz"):
@@ -18,13 +18,12 @@ class QuizScene(Scene, state="quiz"):
         await self.ask_question(message, state)
 
 
-    @on.callback_query.enter(VocabularyCallbackData.filter(F.action == VocabularyAction.quiz))
+    @on.callback_query.enter(StartQuizCallbackData)
     async def start_quiz(self, query: CallbackQuery, state: FSMContext):
-        callback_data = VocabularyCallbackData.unpack(query.data)
+        callback_data = StartQuizCallbackData.unpack(query.data)
         vocabulary = await VocabularyService.get_vocabulary(query.from_user.id, callback_data.vocabulary_id)
 
-        quiz_strategy = QuizStrategy.guess_native
-        vocabulary_question_manager = VocabularyQuestionManager(vocabulary.language_pairs, quiz_strategy)
+        vocabulary_question_manager = VocabularyQuestionManager(vocabulary.language_pairs, callback_data.quiz_strategy)
         quiz = Quiz(vocabulary_question_manager)
 
         await quiz.save_to_state(state)
@@ -125,4 +124,4 @@ class QuizScene(Scene, state="quiz"):
 
 
 router = Router()
-# router.callback_query.register(QuizScene.as_handler())
+router.callback_query.register(QuizScene.as_handler())
