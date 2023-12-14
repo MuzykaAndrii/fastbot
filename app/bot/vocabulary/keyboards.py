@@ -105,7 +105,7 @@ class ActionsKeyboard:
         return callback_data.pack()
 
 
-class StartQuizKeyboard:
+class QuizTypesKeyboard:
     def __init__(self, vocabulary_id) -> None:
         self.vocabulary_id = vocabulary_id
     

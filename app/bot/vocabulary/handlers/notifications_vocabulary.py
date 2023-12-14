@@ -4,36 +4,10 @@ from aiogram import F
 
 from app.bot.vocabulary.callback_patterns import VocabularyCallbackData, VocabularyAction
 from app.bot.vocabulary.handlers.utils import update_vocabulary_msg
-from app.bot.vocabulary.keyboards import StartQuizKeyboard
 from app.bot.vocabulary.messages import VocabularyMessages
-from app.shared.exceptions import NoVocabulariesFound
 from app.vocabulary.services import VocabularyService
 
 router = Router()
-
-@router.callback_query(VocabularyCallbackData.filter(F.action == VocabularyAction.quiz))
-async def show_quiz_types(query: types.CallbackQuery, callback_data: VocabularyCallbackData):
-    select_quiz_types_keyboard = StartQuizKeyboard(callback_data.vocabulary_id).get_markup()
-    await query.message.edit_text(VocabularyMessages.select_quiz_type_msg)
-    await query.message.edit_reply_markup(reply_markup=select_quiz_types_keyboard)
-
-
-@router.callback_query(VocabularyCallbackData.filter(F.action == VocabularyAction.delete))
-async def handle_delete_vocabulary_action(query: types.CallbackQuery, callback_data: VocabularyCallbackData):
-    await VocabularyService.delete_vocabulary(query.from_user.id, callback_data.vocabulary_id)
-
-    try:
-        latest_vocabulary = await VocabularyService.get_recent_user_vocabulary(query.from_user.id)
-    
-    except NoVocabulariesFound:
-        await query.message.edit_text(VocabularyMessages.user_havent_any_vocabularies)
-        await query.message.edit_reply_markup(reply_markup=None)
-
-    else:
-        await update_vocabulary_msg(query, latest_vocabulary)
-
-    finally:
-        await query.answer(text=VocabularyMessages.vocabulary_deleted_successfully)
 
 
 @router.callback_query(VocabularyCallbackData.filter(F.action == VocabularyAction.enable_notification))

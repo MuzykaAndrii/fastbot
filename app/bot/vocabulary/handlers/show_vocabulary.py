@@ -13,7 +13,7 @@ router = Router()
 
 @router.message(Command("my"))
 @flags.chat_action("typing")
-async def handle_show_vocabularies(message: types.Message):
+async def show_vocabularies(message: types.Message):
     latest_vocabulary = await VocabularyService.get_recent_user_vocabulary(message.from_user.id)
     
     vocabulary_set_msg = VocabularyMessages.get_full_vocabulary_entity_msg(latest_vocabulary)
@@ -23,12 +23,12 @@ async def handle_show_vocabularies(message: types.Message):
 
 
 @router.callback_query(VocabularyCallbackData.filter(F.action == VocabularyAction.move_forward))
-async def handle_show_next_vocabulary(query: types.CallbackQuery, callback_data: VocabularyCallbackData):
+async def show_next_vocabulary(query: types.CallbackQuery, callback_data: VocabularyCallbackData):
     next_vocabulary = await VocabularyService.get_next_vocabulary(query.from_user.id, callback_data.vocabulary_id)
     await update_vocabulary_msg(query, next_vocabulary)
 
 
 @router.callback_query(VocabularyCallbackData.filter(F.action == VocabularyAction.move_backward))
-async def handle_show_previous_vocabulary(query: types.CallbackQuery, callback_data: VocabularyCallbackData):
+async def show_previous_vocabulary(query: types.CallbackQuery, callback_data: VocabularyCallbackData):
     previous_vocabulary = await VocabularyService.get_previous_vocabulary(query.from_user.id, callback_data.vocabulary_id)
     await update_vocabulary_msg(query, previous_vocabulary)
