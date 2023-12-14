@@ -5,8 +5,8 @@ from aiogram.types import (
     InlineKeyboardMarkup,
 )
 
-from app.bot.vocabulary.callback_patterns import StartQuizCallbackData, VocabularyAction, VocabularyCallbackData
-from app.bot.vocabulary.schemas import QuizStrategy, VocabularySetSchema
+from app.bot.vocabulary.callback_patterns import QuizStrategy, StartQuizCallbackData, VocabularyAction, VocabularyCallbackData
+from app.bot.vocabulary.schemas import VocabularySetSchema
 
 
 def get_select_strategy_keyboard():
