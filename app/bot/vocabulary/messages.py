@@ -14,6 +14,17 @@ class VocabularyMessages:
 🎉 <b>Have Fun!</b> Enjoy expanding your vocabulary with the bot! 🚀
     """
 
+    select_quiz_type_msg = """
+Welcome to the Language Learning Quiz! 🌐📚
+To get started, use the interactive keyboard below to choose your quiz type:
+
+- Translate from Native to Foreign 🏠➡️🌍
+- Translate from Foreign to Native 🌍➡️🏠
+- Mixed Mode 🔄🔀
+
+Select your preferred type and embark on a language-learning adventure! 🚀🗣️
+"""
+
     start_quiz_msg = """
 🌟 <b>Welcome to Vocabulary Quiz!</b> 🌟
 
@@ -48,6 +59,7 @@ Simply respond to the bot's prompts with your translations, and let's see how we
 📈 <b>Total Words Attempted:</b> {total_words_attempted}
 ✅ <b>Correct Guesses:</b> {correct_guesses}
 ❌ <b>Wrong Guesses:</b> {wrong_guesses}
+🔁 <b>Skipped:</b> {skipped_answers}
 📊 <b>Success Rate:</b> {success_rate}%
 
 👏 <b>Well Done!</b> Keep expanding your vocabulary and come back for more challenges! 🚀💬
@@ -59,9 +71,10 @@ Simply respond to the bot's prompts with your translations, and let's see how we
 Feel free to come back anytime! 👋✨
 """
 
-    quiz_question = "({answered}/{total}) Enter translation for: \"<b>{word}</b>\" 🤔"
+    quiz_question = "[{current_question_num}/{total_question_count}] Enter translation for: \"<b>{question}</b>\" 🤔"
     quiz_success_answer = "✅ {word} - <b>{translation}</b>"
     quiz_wrong_answer = "❌ {word} - <b>{translation}</b>. Your'e answer: <u>{suggestion}</u>"
+    quiz_skipped_answer = "🔁 {word} - <b>{translation}</b>"
 
     user_havent_any_vocabularies = "You're haven't any vocabularies yet("
     user_is_not_owner_of_vocabulary = "☢️ You're not owner of this vocabulary! ☢️"

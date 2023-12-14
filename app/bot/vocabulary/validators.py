@@ -36,7 +36,7 @@ class QuizAnswerChecker:
         self._similarity_ratio_treshold = similarity_ratio_treshold
         self._variants_separator = variants_separator
     
-    def check_correctness(self) -> bool:
+    def is_match(self) -> bool:
         if self._variants_separator in self.suggested_translation:
             return self.check_full_similarity()
         else:
