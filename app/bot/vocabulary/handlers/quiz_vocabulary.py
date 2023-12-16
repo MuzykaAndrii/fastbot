@@ -2,8 +2,9 @@ from aiogram import F, Router
 from aiogram.types import CallbackQuery, Message, ReplyKeyboardRemove
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.scene import Scene, on
-from app.bot.modules.base_quiz import Quiz
+from aiogram.fsm.scene import SceneRegistry
 
+from app.bot.modules.base_quiz import Quiz
 from app.bot.vocabulary.callback_patterns import StartQuizCallbackData, VocabularyAction, VocabularyCallbackData
 from app.bot.vocabulary.exceptions import QuestionsIsGoneError
 from app.bot.vocabulary.keyboards import QuizTypesKeyboard, get_quiz_keyboard
@@ -134,4 +135,6 @@ class QuizScene(Scene, state="quiz"):
         )
 
 
+scene_registry = SceneRegistry(router)
+scene_registry.add(QuizScene)
 router.callback_query.register(QuizScene.as_handler())
