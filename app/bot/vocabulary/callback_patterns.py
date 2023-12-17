@@ -2,8 +2,6 @@ from enum import Enum
 
 from aiogram.filters.callback_data import CallbackData
 
-from app.bot.vocabulary.schemas import QuizStrategy
-
 
 class VocabularyAction(str, Enum):
     move_forward = "forward"
@@ -17,6 +15,12 @@ class VocabularyAction(str, Enum):
 class VocabularyCallbackData(CallbackData, prefix="vocabulary_action"):
     action: VocabularyAction
     vocabulary_id: int
+
+
+class QuizStrategy(str, Enum):
+    guess_native = "guess_own"
+    guess_foreign = "guess_foreign"
+    combined = "combined"
 
 
 class StartQuizCallbackData(CallbackData, prefix="select_quiz"):

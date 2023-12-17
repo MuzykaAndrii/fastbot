@@ -1,7 +1,7 @@
 from aiogram import types, Router
 from aiogram.filters import CommandStart
-from app.bot.base.messages import BaseMessages
 
+from app.bot.base.messages import BaseMessages
 from app.users.services.user import UserService
 
 

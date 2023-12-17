@@ -5,8 +5,6 @@ from aiogram.enums import ParseMode
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.utils.chat_action import ChatActionMiddleware
 from aiogram.fsm.storage.memory import SimpleEventIsolation
-from aiogram.fsm.scene import SceneRegistry
-from app.bot.vocabulary.handlers.quiz_vocabulary import QuizScene
 
 from app.config import settings
 from app.bot.base.handlers.start import router as start_router
@@ -28,11 +26,6 @@ class TelegramBot:
             storage=fsm_storage,
             events_isolation=SimpleEventIsolation(),
         )
-        self._scene_registry = SceneRegistry(self._dp)
-    
-    def register_scenes(self, *scenes) -> None:
-        for scene in scenes:
-            self._scene_registry.add(scene)
 
     @property
     def bot(self) -> Bot:
@@ -65,7 +58,3 @@ bot.include_routes([
     vocabulary_router,
     start_router,
 ])
-
-bot.register_scenes(
-    QuizScene,
-)
