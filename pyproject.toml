@@ -17,6 +17,7 @@ asyncpg = "^0.29.0"
 alembic = "^1.12.1"
 magic-filter = "^1.0.12"
 gunicorn = "^21.2.0"
+g4f = "0.1.9.3"
 
 
 [build-system]

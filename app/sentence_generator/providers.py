@@ -1,0 +1,31 @@
+from g4f import Provider
+
+
+providers = [
+    Provider.Chatgpt4Online,
+    Provider.ChatgptDemoAi,
+    Provider.ChatAnywhere,
+    Provider.ChatgptNext,
+    # Provider.HuggingChat,
+    Provider.GptForLove,
+    # Provider.ChatgptAi,
+    Provider.DeepInfra,
+    # Provider.OnlineGpt,
+    Provider.ChatBase,
+    Provider.Liaobots,
+    Provider.GeekGpt,
+    Provider.FakeGpt,
+    Provider.FreeGpt,
+    Provider.Berlin,
+    Provider.Llama2,
+    Provider.Vercel, 
+    # Provider.Phind,
+    Provider.Koala,
+    Provider.GptGo,
+    # Provider.Bard,
+    # Provider.Bing,
+    Provider.You,
+    Provider.H2o,
+    # Provider.Pi,
+    # Provider.VoiGpt,
+]

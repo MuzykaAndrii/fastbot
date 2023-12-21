@@ -1,6 +1,8 @@
+import random
 import re
 
 from app.shared.exceptions import NoVocabulariesFound, UserIsNotOwnerOfVocabulary, VocabularyDoesNotExist, VocabularyIsAlreadyActive
+from app.shared.schemas import ExtendedLanguagePairSchema
 from app.users.dal import UserDAL
 from app.users.services.user import UserService
 from app.vocabulary.dal import VocabularySetDAL, LanguagePairDAL
@@ -99,9 +101,20 @@ class VocabularyService:
     
 
     @classmethod
-    async def get_active_vocabularies(cls) -> list[VocabularySet]:
+    async def get_random_lang_pair_from_every_active_vocabulary(cls) -> list[ExtendedLanguagePairSchema]:
         active_vocabularies = await VocabularySetDAL.filter_by(is_active=True)
-        return active_vocabularies
+        random_lang_pairs: list[ExtendedLanguagePairSchema] = []
+
+        for vocabulary in active_vocabularies:
+            random_lang_pair = random.choice(vocabulary.language_pairs)
+            
+            random_lang_pairs.append(ExtendedLanguagePairSchema(
+                word=random_lang_pair.word,
+                translation=random_lang_pair.translation,
+                owner_tg_id=vocabulary.owner.tg_id,
+            ))
+
+        return random_lang_pairs
     
 
     @classmethod
