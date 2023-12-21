@@ -1,4 +1,5 @@
 from app.bot.vocabulary.schemas import VocabularySetSchema
+from app.shared.schemas import ExtendedLanguagePairSchema
 
 
 class VocabularyMessages:
@@ -88,7 +89,23 @@ Feel free to come back anytime! 👋✨
     active_vocabulary = "✅ Alerts active for: <b>{vocabulary_name}</b>"
     no_active_vocabulary = "📵 Alerts is turned off"
     vocabulary_entity_item = "{number}. <b>{word}</b> - {translation}"
+
     language_pair_notification = "<b>{word}</b> - {translation}"
+    language_pair_notification_sentence_example = "📖 {sentence}"
+    
+    @classmethod
+    def get_language_pair_notification(cls, lang_pair: ExtendedLanguagePairSchema) -> str:
+        notification = cls.language_pair_notification.format(
+            word=lang_pair.word,
+            translation=lang_pair.translation
+        )
+
+        if lang_pair.sentence_example:
+            sentence_example = cls.language_pair_notification_sentence_example.format(sentence=lang_pair.sentence_example)
+            notification = f"{notification}\n{sentence_example}"
+        
+        return notification
+
     
     @classmethod
     def get_full_vocabulary_entity_msg(cls, vocabulary_set: VocabularySetSchema) -> str:
