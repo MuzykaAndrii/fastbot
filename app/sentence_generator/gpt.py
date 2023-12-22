@@ -5,7 +5,7 @@ from g4f import ChatCompletion, debug, models
 from g4f.Provider import BaseProvider
 
 
-debug.logging = True
+debug.logging = False
 debug.version_check = False
 
 
