@@ -20,6 +20,7 @@ gunicorn = "^21.2.0"
 g4f = "0.1.9.3"
 passlib = "^1.7.4"
 bcrypt = "^4.1.2"
+starlette-admin = "^0.12.2"
 
 
 [build-system]
