@@ -14,3 +14,7 @@ class UserService:
     async def get_by_id(id: int) -> User:
         user = await UserDAL.get_one(id=id)
         return user
+    
+    @staticmethod
+    async def get_by_email(email: str) -> User:
+        return await UserDAL.get_one(email=email)
