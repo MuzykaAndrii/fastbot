@@ -5,17 +5,19 @@ from app.users.services.pwd import PWDService
 from app.users.services.user import UserService
 
 
-async def authenticate_user(user_in: UserLogin) -> User:
-    user = await UserService.get_by_email(user_in.username_or_email)
+class AuthService:
+    @staticmethod
+    async def authenticate_user(user_in: UserLogin) -> User:
+        user = await UserService.get_by_email(user_in.username_or_email)
 
-    if not user:
-        raise UserNotFoundError
+        if not user:
+            raise UserNotFoundError
 
-    pass_matching = PWDService.verify_password(
-        raw_password=user_in.password, hashed_password=user.password_hash
-    )
+        pass_matching = PWDService.verify_password(
+            raw_password=user_in.password, hashed_password=user.password_hash
+        )
 
-    if not pass_matching:
-        raise UserInvalidPassword
+        if not pass_matching:
+            raise UserInvalidPassword
 
-    return user
+        return user

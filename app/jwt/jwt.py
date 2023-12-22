@@ -16,7 +16,7 @@ from app.jwt.exceptions import (
 )
 
 
-class JwtService:
+class Jwt:
     @staticmethod
     def _get_expire_time(exp_minutes=settings.JWT_EXPIRE_MINUTES) -> datetime:
         return datetime.utcnow() + timedelta(minutes=int(exp_minutes))
