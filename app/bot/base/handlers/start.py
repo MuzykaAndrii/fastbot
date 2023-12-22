@@ -10,7 +10,7 @@ router = Router()
 
 @router.message(CommandStart())
 async def start_handler(message: types.Message):
-    await UserService.get_or_create_by_tg_id(message.from_user.id)
+    await UserService.get_or_create_by_id(message.from_user.id)
 
     await message.answer(BaseMessages.start_msg.format(username=message.from_user.username))
 

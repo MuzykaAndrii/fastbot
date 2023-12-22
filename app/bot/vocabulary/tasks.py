@@ -7,19 +7,19 @@ from app.shared.schemas import ExtendedLanguagePairSchema
 
 async def send_notifications(language_pairs: list[ExtendedLanguagePairSchema]) -> None:
     for lang_pair in language_pairs:
-        us = UserService(lang_pair.owner_tg_id)
+        us = UserService(lang_pair.owner_id)
         state = await us.user_has_active_state()
 
         if state:
-            logger.info(f"Notification to {lang_pair.owner_tg_id} skipped")
+            logger.info(f"Notification to {lang_pair.owner_id} skipped")
             continue
         
         sended_notification = await bot.bot.send_message(
-            lang_pair.owner_tg_id,
+            lang_pair.owner_id,
             VocabularyMessages.get_language_pair_notification(lang_pair),
         )
         
         if sended_notification:
-            logger.info(f"Sended notification to {lang_pair.owner_tg_id}")
+            logger.info(f"Sended notification to {lang_pair.owner_id}")
         else:
-            logger.warn(f"Sending notification to {lang_pair.owner_tg_id} failed")
+            logger.warn(f"Sending notification to {lang_pair.owner_id} failed")

@@ -37,12 +37,11 @@ class VocabularyParser:
 
 class VocabularyService:
     @classmethod
-    async def save_bulk_vocabulary(cls, vocabulary_data: dict, user_tg_id: int):
+    async def save_bulk_vocabulary(cls, vocabulary_data: dict, user_id: int):
         raw_vocabulary = vocabulary_data.get("bulk_vocabulary")
         vocabulary_name = vocabulary_data.get("name")
 
-        user = await UserDAL.get_or_create(tg_id=user_tg_id)
-        vocabulary_set = await VocabularySetDAL.create(name=vocabulary_name, owner_id=user.id)
+        vocabulary_set = await VocabularySetDAL.create(name=vocabulary_name, owner_id=user_id)
 
         vocabulary_parser = VocabularyParser(vocabulary_id=vocabulary_set.id)
         parsed_vocabulary = vocabulary_parser.parse_bulk_vocabulary(raw_vocabulary)
@@ -51,9 +50,8 @@ class VocabularyService:
     
 
     @classmethod
-    async def get_recent_user_vocabulary(cls, user_tg_id: int) -> VocabularySet:
-        user = await UserService.get_by_tg_id(user_tg_id)
-        latest_vocabulary = await VocabularySetDAL.get_latest_user_vocabulary(user.id)
+    async def get_recent_user_vocabulary(cls, user_id: int) -> VocabularySet:
+        latest_vocabulary = await VocabularySetDAL.get_latest_user_vocabulary(user_id)
 
         if not latest_vocabulary:
             raise NoVocabulariesFound
@@ -62,29 +60,26 @@ class VocabularyService:
     
     
     @classmethod
-    async def get_next_vocabulary(cls, user_tg_id: int, vocabulary_id: int) -> VocabularySet:
-        user = await UserService.get_by_tg_id(user_tg_id)
+    async def get_next_vocabulary(cls, user_id: int, vocabulary_id: int) -> VocabularySet:
         next_vocabulary = await VocabularySetDAL.get_vocabulary_that_latest_than_given(vocabulary_id)
 
-        cls._validate_user_vocabulary(user, next_vocabulary)
+        cls._validate_user_vocabulary(user_id, next_vocabulary)
 
         return next_vocabulary
     
 
     @classmethod
-    async def get_previous_vocabulary(cls, user_tg_id: int, vocabulary_id: int) -> VocabularySet:
-        user = await UserService.get_by_tg_id(user_tg_id)
+    async def get_previous_vocabulary(cls, user_id: int, vocabulary_id: int) -> VocabularySet:
         previous_vocabulary = await VocabularySetDAL.get_vocabulary_that_earliest_than_given(vocabulary_id)
 
-        cls._validate_user_vocabulary(user, previous_vocabulary)
+        cls._validate_user_vocabulary(user_id, previous_vocabulary)
 
         return previous_vocabulary
 
 
     @classmethod
-    async def get_all_user_vocabularies(cls, user_tg_id: int) -> list[VocabularySet]:
-        user = await UserService.get_or_create_by_tg_id(user_tg_id)
-        vocabulary_sets = await VocabularySetDAL.filter_by(owner_id=user.id)
+    async def get_all_user_vocabularies(cls, user_id: int) -> list[VocabularySet]:
+        vocabulary_sets = await VocabularySetDAL.filter_by(owner_id=user_id)
 
         if vocabulary_sets:
             return vocabulary_sets
@@ -92,17 +87,16 @@ class VocabularyService:
 
 
     @classmethod
-    async def get_vocabulary(cls, user_tg_id: int, vocabulary_id: int) -> VocabularySet:
-        user = await UserService.get_by_tg_id(user_tg_id)
+    async def get_vocabulary(cls, user_id: int, vocabulary_id: int) -> VocabularySet:
         vocabulary = await VocabularySetDAL.get_by_id(vocabulary_id)
 
-        cls._validate_user_vocabulary(user, vocabulary)
+        cls._validate_user_vocabulary(user_id, vocabulary)
         return vocabulary
     
 
     @classmethod
     async def get_random_lang_pair_from_every_active_vocabulary(cls) -> list[ExtendedLanguagePairSchema]:
-        active_vocabularies = await VocabularySetDAL.filter_by(is_active=True)
+        active_vocabularies: list[VocabularySet] = await VocabularySetDAL.filter_by(is_active=True)
         random_lang_pairs: list[ExtendedLanguagePairSchema] = []
 
         for vocabulary in active_vocabularies:
@@ -111,48 +105,50 @@ class VocabularyService:
             random_lang_pairs.append(ExtendedLanguagePairSchema(
                 word=random_lang_pair.word,
                 translation=random_lang_pair.translation,
-                owner_tg_id=vocabulary.owner.tg_id,
+                owner_id=vocabulary.owner.id,
             ))
 
         return random_lang_pairs
     
 
     @classmethod
-    async def delete_vocabulary(cls, user_tg_id: int, vocabulary_id: int) -> VocabularySet:
-        user = await UserService.get_by_tg_id(user_tg_id)
+    async def delete_vocabulary(cls, user_id: int, vocabulary_id: int) -> VocabularySet:
         vocabulary = await VocabularySetDAL.get_by_id(vocabulary_id)
 
-        cls._validate_user_vocabulary(user, vocabulary)
+        cls._validate_user_vocabulary(user_id, vocabulary)
         
         deleted_vocabulary = await VocabularySetDAL.delete_by_id(vocabulary.id)
         return deleted_vocabulary
     
 
     @classmethod
-    async def disable_active_vocabulary_and_enable_given(cls, user_tg_id: int, vocabulary_id: int) -> VocabularySet:
-        user = await UserService.get_by_tg_id(user_tg_id)
+    async def disable_active_vocabulary_and_enable_given(cls, user_id: int, vocabulary_id: int) -> VocabularySet:
         vocabulary_to_activate = await VocabularySetDAL.get_by_id(vocabulary_id)
 
-        cls._validate_user_vocabulary(user, vocabulary_to_activate, check_active=True)            
+        cls._validate_user_vocabulary(user_id, vocabulary_to_activate, check_active=True)            
         
-        await VocabularySetDAL.disable_user_active_vocabulary(user.id)
+        await VocabularySetDAL.disable_user_active_vocabulary(user_id)
         activated_vocabulary = await VocabularySetDAL.make_active(vocabulary_to_activate.id)
 
         return activated_vocabulary
 
     
     @classmethod
-    async def disable_user_vocabulary(cls, user_tg_id: int):
-        user = await UserService.get_by_tg_id(user_tg_id)
-        await VocabularySetDAL.disable_user_active_vocabulary(user.id)
+    async def disable_user_vocabulary(cls, user_id: int) -> None:
+        await VocabularySetDAL.disable_user_active_vocabulary(user_id)
     
 
     @classmethod
-    def _validate_user_vocabulary(cls, user, vocabulary, check_active=False):
+    def _validate_user_vocabulary(
+        cls,
+        user_id: int,
+        vocabulary: VocabularySet,
+        check_active: bool = False,
+    ):
         if not vocabulary:
             raise VocabularyDoesNotExist
 
-        if user.id != vocabulary.owner_id:
+        if user_id != vocabulary.owner_id:
             raise UserIsNotOwnerOfVocabulary
         
         if check_active and vocabulary.is_active:
