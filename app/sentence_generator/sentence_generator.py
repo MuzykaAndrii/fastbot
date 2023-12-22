@@ -1,3 +1,4 @@
+import random
 from .providers import providers
 from .prompts import Prompts
 from .gpt import GPT
@@ -10,7 +11,7 @@ class SentenceGenerator:
     async def gen_from_keyword(self, keyword: str) -> str | None:
         prompt = Prompts.sentence_from_word.format(word=keyword)
 
-        return await self.gpt.retry_ask(prompt)
+        return await self.gpt.bulk_ask(prompt)
 
 
 def formatter(sentence: str) -> str:
@@ -20,9 +21,11 @@ def formatter(sentence: str) -> str:
 async def generate_sentence_from_word(word: str) -> str | None:
     gpt = GPT(providers)
     sg = SentenceGenerator(gpt)
-    sentence = await sg.gen_from_keyword(word)
+    sentences = await sg.gen_from_keyword(word)
 
-    if not sentence:
+    try:
+        sentence = random.choice(sentences)
+    except IndexError:
         return None
-    
-    return formatter(sentence)
+    else:
+        return formatter(sentence)
