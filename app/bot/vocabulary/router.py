@@ -13,8 +13,8 @@ vocabulary_router.include_routers(
     create_vocabulary_router,
     show_vocabulary_router,
     notifications_vocabulary_router,
-    quiz_vocabulary_router,
     delete_vocabulary_router,
+    quiz_vocabulary_router,
 
     errors_handler_router,
 )
