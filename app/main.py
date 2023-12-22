@@ -5,6 +5,7 @@ from fastapi import FastAPI
 
 from app.config import settings
 from app.bot.main import bot
+from app.users.services.user import UserService
 from app.vocabulary.routes import router as vocabulary_router
 from app.logger import logger
 
@@ -12,6 +13,8 @@ from app.logger import logger
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # on startup
+    await UserService.ensure_admin_exists()
+
     await bot.start_bot()
     logger.info("App started")
 
