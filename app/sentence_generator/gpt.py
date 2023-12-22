@@ -5,7 +5,7 @@ from g4f import ChatCompletion, debug, models
 from g4f.Provider import BaseProvider
 
 
-debug.logging = True
+debug.logging = False
 debug.version_check = False
 
 
@@ -31,12 +31,13 @@ class GPT:
                 return gpt_answer
         
         return None
+    
+    async def bulk_ask(self, prompt: str) -> list[str | None]:
+        calls = [self.ask_gpt(provider, prompt) for provider in self.providers]
+        packed_calls = await asyncio.gather(*calls)
+        return self._filter_bulk_answers(packed_calls)
 
     def _filter_bulk_answers(self, bulk_answers: list[str | None]) -> list[str]:
         valid_responses = list(filter(lambda x: x is not None and x != "", bulk_answers))
         return valid_responses
 
-    async def bulk_ask(self, prompt: str) -> list[str | None]:
-        calls = [self.ask_gpt(provider, prompt) for provider in self.providers]
-        packed_calls = await asyncio.gather(*calls)
-        return self._filter_bulk_answers(packed_calls)
