@@ -26,7 +26,7 @@ async def handle_enable_notification_vocabulary_action(query: types.CallbackQuer
 
 @router.callback_query(VocabularyCallbackData.filter(F.action == VocabularyAction.disable_notification))
 async def handle_disable_notification_btn(query: types.CallbackQuery):
-    await VocabularyService.disable_user_vocabulary(query.from_user.id)
+    await VocabularyService.disable_user_active_vocabulary(query.from_user.id)
 
     vocabulary_disabled_message = await query.message.answer(text=VocabularyMessages.no_active_vocabulary)
     await vocabulary_disabled_message.pin(disable_notification=True)
@@ -40,7 +40,7 @@ async def handle_disable_notification_btn(query: types.CallbackQuery):
 
 @router.message(Command("disable"))
 async def handle_disable_notifications_command(message: types.Message):
-    await VocabularyService.disable_user_vocabulary(message.from_user.id)
+    await VocabularyService.disable_user_active_vocabulary(message.from_user.id)
 
     vocabulary_disabled_message = await message.answer(text=VocabularyMessages.no_active_vocabulary)
     await vocabulary_disabled_message.pin(disable_notification=True)

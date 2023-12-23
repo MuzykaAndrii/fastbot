@@ -134,7 +134,7 @@ class VocabularyService:
 
     
     @classmethod
-    async def disable_user_vocabulary(cls, user_id: int) -> None:
+    async def disable_user_active_vocabulary(cls, user_id: int) -> None:
         await VocabularySetDAL.disable_user_active_vocabulary(user_id)
     
 

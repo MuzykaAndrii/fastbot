@@ -1,7 +1,13 @@
+from typing import Any
+from contextlib import suppress
+
+from starlette.requests import Request
 from starlette_admin.contrib.sqla.ext.pydantic import ModelView
+from app.shared.exceptions import VocabularyIsAlreadyActive
 
 from app.vocabulary.admin.schemas import LanguagePairAdminSchema, VocabularyAdminSchema
 from app.vocabulary.models import LanguagePair, VocabularySet
+from app.vocabulary.services import VocabularyService
 
 
 class VocabularyAdminView(ModelView):
@@ -22,6 +28,19 @@ class VocabularyAdminView(ModelView):
         VocabularySet.is_active,
         VocabularySet.language_pairs,
     ]
+
+    # TODO: fix bug
+    async def before_edit(self, request: Request, data: dict, vocabulary: VocabularySet) -> None:
+        await self._disable_user_active_vocabulary_if_given_ought_be_enabled(vocabulary)
+    
+
+    async def before_create(self, request: Request, data: dict, vocabulary: VocabularySet) -> None:
+        await self._disable_user_active_vocabulary_if_given_ought_be_enabled(vocabulary)
+
+
+    async def _disable_user_active_vocabulary_if_given_ought_be_enabled(self, vocabulary: VocabularySet) -> None:
+        if vocabulary.is_active:
+            await VocabularyService.disable_user_active_vocabulary(vocabulary.owner_id)
 
 
 class LanguagePairAdminView(ModelView):
