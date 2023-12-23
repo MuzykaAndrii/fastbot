@@ -8,6 +8,7 @@ from app.bot.main import bot
 from app.users.services.user import UserService
 from app.vocabulary.routes import router as vocabulary_router
 from app.logger import logger
+from app.admin.admin import admin
 
 
 @asynccontextmanager
@@ -41,3 +42,4 @@ async def ping():
 
 
 app.include_router(vocabulary_router)
+admin.mount_to(app)
