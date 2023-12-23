@@ -50,7 +50,7 @@ class AdminAuthProvider(AuthProvider):
         try:
             user = await AuthService.authenticate_user(credentials)
         except UserNotFoundError:
-            raise LoginFailed("Invalid username/email")
+            raise LoginFailed("Invalid email")
         except UserInvalidPassword:
             raise LoginFailed("Invalid password")
 

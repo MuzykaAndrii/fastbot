@@ -5,6 +5,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from app.config import settings
 from app.db.session import engine
 from app.admin.auth import AdminAuthProvider
+from app.users.admin.views import UserAdminView
 
 
 admin = Admin(
@@ -14,3 +15,5 @@ admin = Admin(
     auth_provider=AdminAuthProvider(),
     middlewares=[Middleware(SessionMiddleware, secret_key=settings.JWT_SECRET)],
 )
+
+admin.add_view(UserAdminView())
