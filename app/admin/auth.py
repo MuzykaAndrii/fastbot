@@ -41,7 +41,7 @@ class AdminAuthProvider(AuthProvider):
     ) -> Response:
         try:
             credentials = UserLogin(
-                username_or_email=username,
+                email=username,
                 password=password,
             )
         except ValidationError:

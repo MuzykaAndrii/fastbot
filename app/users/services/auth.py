@@ -8,7 +8,7 @@ from app.users.services.user import UserService
 class AuthService:
     @staticmethod
     async def authenticate_user(user_in: UserLogin) -> User:
-        user = await UserService.get_by_email(user_in.username_or_email)
+        user = await UserService.get_by_email(user_in.email)
 
         if not user:
             raise UserNotFoundError
