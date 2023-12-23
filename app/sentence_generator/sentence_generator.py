@@ -15,7 +15,10 @@ class SentenceGenerator:
 
 
 def formatter(sentence: str) -> str:
-    return sentence.split("\n")[-1]
+    sentence = sentence.split("\n")[-1]
+    if ":" in sentence:
+        return sentence.split(":")[-1]
+    return sentence
 
 
 async def generate_sentence_from_word(word: str) -> str | None:

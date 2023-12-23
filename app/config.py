@@ -4,7 +4,7 @@ from pydantic_settings import (
     BaseSettings,
     SettingsConfigDict,
 )
-from pydantic import computed_field
+from pydantic import EmailStr, computed_field
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -36,6 +36,12 @@ class Settings(BaseSettings):
     PGADMIN_DEFAULT_PASSWORD: str
 
     API_KEY: str
+    JWT_SECRET: str
+    JWT_EXPIRE_MINUTES: int
+
+    BASE_ADMIN_EMAIL: EmailStr
+    BASE_ADMIN_PASS: str
+
 
     @computed_field
     @property
