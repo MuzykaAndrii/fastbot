@@ -1,16 +1,17 @@
+from typing import Any
 from fastapi import Request
 from starlette_admin.fields import StringField
 
-from app.admin.view_overriding import MyModelView
-from app.users.admin.schemas import UserCreateAdminSchema
+from starlette_admin.contrib.sqla.ext.pydantic import ModelView
+from app.users.admin.schemas import UserAdminSchema
 from app.users.models import User
 from app.users.services.pwd import PWDService
 
 
-class UserAdminView(MyModelView):
+class UserAdminView(ModelView):
     def __init__(self, *args, **kwargs):
         model = User
-        pydantic_model = UserCreateAdminSchema
+        pydantic_model = UserAdminSchema
         icon = "fa-regular fa-user"
         name = "User"
         label = "Users"
@@ -29,23 +30,9 @@ class UserAdminView(MyModelView):
             exclude_from_edit=True,
             exclude_from_list=True,
         ),
-        StringField(
-            "password_hash",
-            exclude_from_detail=True,
-            exclude_from_edit=True,
-            exclude_from_list=True,
-            disabled=True,
-            input_type="hidden",
-            label="",
-        ),
         User.is_superuser,
     ]
 
-    def on_before_create(self, request: Request, data: dict) -> dict:
+    async def before_create(self, request: Request, data: dict[str, Any], user: User) -> None:
         raw_password = data.get("password")
-        password_hash = PWDService.get_password_hash(raw_password)
-
-        data.update({"password_hash": password_hash})
-        data.pop("password", None)
-
-        return data
+        user.password_hash = PWDService.get_password_hash(raw_password)
