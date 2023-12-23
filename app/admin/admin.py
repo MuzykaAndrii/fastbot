@@ -6,6 +6,7 @@ from app.config import settings
 from app.db.session import engine
 from app.admin.auth import AdminAuthProvider
 from app.users.admin.views import UserAdminView
+from app.vocabulary.admin.views import LanguagePairAdminView, VocabularyAdminView
 
 
 admin = Admin(
@@ -17,3 +18,5 @@ admin = Admin(
 )
 
 admin.add_view(UserAdminView())
+admin.add_view(VocabularyAdminView())
+admin.add_view(LanguagePairAdminView())
