@@ -42,14 +42,9 @@ class ActionsKeyboard:
         self.vocabulary = vocabulary
     
     def get_markup(self):
-        if self.vocabulary.is_active:
-            notification_btn = self.disable_notification_btn
-        else:
-            notification_btn = self.enable_notification_btn
-
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [self.delete_btn, self.quiz_btn],
-            [notification_btn],
+            [self.notification_btn],
             [self.move_backward_btn, self.move_forward_btn],
         ])
 
@@ -96,6 +91,13 @@ class ActionsKeyboard:
             text="📵 Disable alerts",
             callback_data=self._make_callback_data(VocabularyAction.disable_notification),
         )
+    
+    @property
+    def notification_btn(self):
+        if self.vocabulary.is_active:
+            return self.disable_notification_btn
+        else:
+            return self.enable_notification_btn
     
     def _make_callback_data(self, action: VocabularyAction):
         callback_data = VocabularyCallbackData(
