@@ -13,6 +13,11 @@ debug.version_check = False
 class GPT:
     def __init__(self, providers: list[BaseProvider]) -> None:
         self.providers = providers
+    
+    @classmethod
+    def from_base_providers(cls):
+        from .providers import providers
+        return cls(providers)
 
     async def manual_ask(self, provider, prompt: str) -> str | None:
         with suppress(Exception):

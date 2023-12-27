@@ -1,4 +1,3 @@
-from .providers import providers
 from .prompts import Prompts
 from .gpt import GPT
 
@@ -21,7 +20,7 @@ def formatter(sentence: str) -> str:
 
 
 async def generate_sentence_from_word(word: str) -> str | None:
-    gpt = GPT(providers)
+    gpt = GPT.from_base_providers()
     sg = SentenceGenerator(gpt)
     sentence = await sg.gen_from_keyword(word)
 
