@@ -17,6 +17,7 @@ class TextGenerator:
             return sentence
     
     async def get_text_from_keywords(self, *keywords) -> str | None:
+        # TODO: add randomness to text length calculating
         prompt = Prompts.text_from_words.format(
             text_length=round(len(keywords)/4),
             keywords=", ".join(keywords),
