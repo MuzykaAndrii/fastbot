@@ -5,7 +5,12 @@ from aiogram.types import (
     InlineKeyboardMarkup,
 )
 
-from app.bot.vocabulary.callback_patterns import QuizStrategy, StartQuizCallbackData, VocabularyAction, VocabularyCallbackData
+from app.bot.vocabulary.callback_patterns import (
+    QuizStrategy,
+    StartQuizCallbackData,
+    VocabularyAction,
+    VocabularyCallbackData
+)
 from app.bot.vocabulary.schemas import VocabularySetSchema
 
 
@@ -53,14 +58,14 @@ class ActionsKeyboard:
     @property
     def gen_text_btn(self):
         return InlineKeyboardButton(
-            text="📖 Gen story",
+            text="📖 Story",
             callback_data=self._make_callback_data(VocabularyAction.gen_text),
         )
 
     @property
     def quiz_btn(self):
         return InlineKeyboardButton(
-            text="📝 Start quiz",
+            text="📝 Quiz",
             callback_data=self._make_callback_data(VocabularyAction.quiz)
         )
     
