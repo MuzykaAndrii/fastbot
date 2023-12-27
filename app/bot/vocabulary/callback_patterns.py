@@ -10,6 +10,7 @@ class VocabularyAction(str, Enum):
     delete = "delete"
     enable_notification = "notification_on"
     disable_notification = "notification_off"
+    gen_text = "gen_text"
 
 
 class VocabularyCallbackData(CallbackData, prefix="vocabulary_action"):
