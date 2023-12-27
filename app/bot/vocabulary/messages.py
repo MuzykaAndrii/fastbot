@@ -92,6 +92,9 @@ Feel free to come back anytime! 👋✨
 
     language_pair_notification = "<b>{word}</b> - {translation}"
     language_pair_notification_sentence_example = "📖 {sentence}"
+
+    text_generator_not_available = "Oops! 🙊 Text generation is not available now. 😰 Please try again later. ⌛️"
+    generated_text = "This is a generated text from your vocabulary: <b>{vocabulary_name}</b>\n\n{text}"
     
     @classmethod
     def get_language_pair_notification(cls, lang_pair: ExtendedLanguagePairSchema) -> str:

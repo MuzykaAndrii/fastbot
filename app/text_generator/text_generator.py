@@ -1,3 +1,4 @@
+from typing import Iterable
 from .prompts import Prompts
 from app.gpt.gpt import GPT
 
@@ -36,3 +37,10 @@ async def generate_sentence_from_word(word: str) -> str | None:
     sentence = await tg.get_sentence_from_keyword(word)
 
     return sentence
+
+async def generate_text_from_words(words: Iterable[str]) -> str:
+    gpt = GPT.from_base_providers()
+    tg = TextGenerator(gpt)
+    text = await tg.get_text_from_keywords(*words)
+
+    return text
