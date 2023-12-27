@@ -1,5 +1,5 @@
 from .prompts import Prompts
-from .gpt import GPT
+from ..gpt.gpt import GPT
 
 
 class SentenceGenerator:
