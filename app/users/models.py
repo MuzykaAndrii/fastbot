@@ -1,3 +1,4 @@
+from fastapi import Request
 from sqlalchemy import (
     Boolean,
     Integer,
@@ -25,3 +26,13 @@ class User(Base):
     )
 
     is_superuser: Mapped[bool] = mc(Boolean, default=False, nullable=False)
+
+    def __str__(self):
+        return f"User(id={self.id}, username={self.username}, email={self.email}"
+
+    def __repr__(self):
+        return (f"User(id={self.id}, username={repr(self.username)}, "
+                f"email={repr(self.email)}, is_superuser={self.is_superuser})")
+    
+    def __admin_repr__(self, request: Request) -> str:
+        return f"{self.id}"

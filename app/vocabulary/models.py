@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
 from datetime import datetime
+from fastapi import Request
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, relationship
@@ -32,10 +33,14 @@ class VocabularySet(Base):
     )
 
     def __str__(self) -> str:
-        return f"Vocabulary set: {self.name} with: {self.language_pairs}"
-    
+        return f"Vocabulary: name={self.name}, is_active={self.is_active}, owner_id={self.owner_id}"
+
     def __repr__(self) -> str:
-        return str(self)
+        return (f"VocabularySet(id={self.id}, name={repr(self.name)}, is_active={self.is_active}, created_at={repr(self.created_at)}, "
+        f"owner_id={self.owner_id}, language_pairs={repr(self.language_pairs)})")
+    
+    def __admin_repr__(self, request: Request) -> str:
+        return f"{self.name}"
 
 
 class LanguagePair(Base):
@@ -52,7 +57,10 @@ class LanguagePair(Base):
     translation: Mapped[str] = mc(String(100), nullable=False)
 
     def __str__(self) -> str:
-        return f"Lang pair: {self.word} - {self.translation}"
-    
+        return f"LanguagePair: id={self.id}, word={self.word}, translation={self.translation}, vocabulary_id={self.vocabulary_id})"
+
     def __repr__(self) -> str:
-        return str(self)
+        return f"LanguagePair(id={self.id}, word={repr(self.word)}, translation={repr(self.translation)}, vocabulary_id={self.vocabulary_id})"
+    
+    def __admin_repr__(self, request: Request) -> str:
+        return f"{self.word} - {self.translation}"
