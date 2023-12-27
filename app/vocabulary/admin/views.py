@@ -29,7 +29,6 @@ class VocabularyAdminView(ModelView):
         VocabularySet.language_pairs,
     ]
 
-    # TODO: fix bug
     async def before_edit(self, request: Request, data: dict, vocabulary: VocabularySet) -> None:
         await self._disable_user_active_vocabulary_if_given_ought_be_enabled(vocabulary)
     
@@ -40,7 +39,7 @@ class VocabularyAdminView(ModelView):
 
     async def _disable_user_active_vocabulary_if_given_ought_be_enabled(self, vocabulary: VocabularySet) -> None:
         if vocabulary.is_active:
-            await VocabularyService.disable_user_active_vocabulary(vocabulary.owner_id)
+            await VocabularyService.disable_user_active_vocabulary(vocabulary.owner.id)
 
 
 class LanguagePairAdminView(ModelView):
