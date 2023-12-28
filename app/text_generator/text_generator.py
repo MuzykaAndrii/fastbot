@@ -25,7 +25,7 @@ class TextGenerator:
         text = await self.gpt.get_answer(prompt)
         return text
 
-    def _format_answer(sentence: str) -> str:
+    def _format_answer(self, sentence: str) -> str:
         sentence = sentence.split("\n")[-1]
         if ":" in sentence:
             return sentence.split(":")[-1]
