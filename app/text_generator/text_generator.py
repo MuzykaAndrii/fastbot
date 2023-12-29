@@ -1,4 +1,5 @@
 from typing import Iterable
+
 from .prompts import Prompts
 from app.gpt.gpt import GPT
 
@@ -11,7 +12,7 @@ class TextGenerator:
         prompt = Prompts.sentence_from_word.format(word=keyword)
         sentence = await self.gpt.get_answer(prompt)
         
-        if format:
+        if format and sentence is not None:
             return self._format_answer(sentence)
         else:
             return sentence
