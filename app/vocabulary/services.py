@@ -1,10 +1,13 @@
 import random
 import re
 
-from app.shared.exceptions import NoVocabulariesFound, UserIsNotOwnerOfVocabulary, VocabularyDoesNotExist, VocabularyIsAlreadyActive
+from app.shared.exceptions import (
+    NoVocabulariesFound,
+    UserIsNotOwnerOfVocabulary,
+    VocabularyDoesNotExist,
+    VocabularyIsAlreadyActive
+)
 from app.shared.schemas import ExtendedLanguagePairSchema
-from app.users.dal import UserDAL
-from app.users.services.user import UserService
 from app.vocabulary.dal import VocabularySetDAL, LanguagePairDAL
 from app.vocabulary.models import VocabularySet
 from app.vocabulary.schemas import LanguagePairSchema
