@@ -25,9 +25,9 @@ class VocabularyValidator:
 
 
 class StringMatcher:
-    def __init__(self, text: str, similarity_ratio_treshold: float = .95) -> None:
+    def __init__(self, text: str, similarity_treshold: float = .95) -> None:
         self._text = text
-        self.similarity_ratio_treshold = similarity_ratio_treshold
+        self.similarity_treshold = similarity_treshold
 
     def __eq__(self, other: Union[str, "StringMatcher"]) -> bool:
         match other:
@@ -38,7 +38,7 @@ class StringMatcher:
             case _:
                 raise TypeError
             
-        return SequenceMatcher(None, self._text, to_compare).ratio() >= self.similarity_ratio_treshold
+        return SequenceMatcher(None, self._text, to_compare).ratio() >= self.similarity_treshold
 
 
 class TranslationChecker:
@@ -49,14 +49,14 @@ class TranslationChecker:
         return any(translation == to_compare for translation in self._variants)
 
     @property
-    def variants(self) -> set[StringMatcher]:
+    def variants(self) -> tuple[StringMatcher]:
         return self._variants
 
-    def _split_variants(self, text: str) -> set[str]:
+    def _split_variants(self, text: str) -> tuple[StringMatcher]:
         text: str = text.strip().lower()
         text: str = self._trim_parenthesis(text)
-        text: list[str] = self._split_text(text)
-        text: set[str] = set(text)
+        text: set[str] = set(self._split_text(text))
+        text: tuple[StringMatcher] = tuple(StringMatcher(variant) for variant in text)
         return text
 
     def _trim_parenthesis(self, text: str) -> str:
