@@ -22,46 +22,52 @@ class VocabularyValidator:
         else:
             return True
 
+# TODO: divide class below into two classes
+class StringMatcher:
+    def __init__(self, text: str, similarity_ratio_treshold: float = .95) -> None:
+        self._lines = self._clean_text(text)
+        self.similarity_ratio_treshold = similarity_ratio_treshold
 
-class QuizAnswerChecker:
-    def __init__(
-            self,
-            suggested_translation: str,
-            correct_translation: str,
-            similarity_ratio_treshold: float = .95,
-            variants_separator: str = ","
-    ) -> None:
-        self.suggested_translation = suggested_translation.strip().lower()
-        self.correct_translation = self._trim_parenthesis(correct_translation).strip().lower()
-        self._similarity_ratio_treshold = similarity_ratio_treshold
-        self._variants_separator = variants_separator
-    
-    def is_match(self) -> bool:
-        if self._variants_separator in self.suggested_translation:
-            return self.check_full_similarity()
-        else:
-            return self.check_partial_similarity()
-    
-    def check_full_similarity(self) -> bool:
-        return self._is_suggested_translation_match(self.suggested_translation, self.correct_translation)
-    
-    def check_partial_similarity(self) -> bool:
-        correct_translation_variants = self._get_correct_translation_variants()
-
-        for variant in correct_translation_variants:
-            if self._is_suggested_translation_match(self.suggested_translation, variant):
+    def __contains__(self, to_compare: str) -> bool:
+        for line in self._lines:
+            if SequenceMatcher(None, to_compare, line).ratio() >= self.similarity_ratio_treshold:
                 return True
         return False
-
-    def _get_correct_translation_variants(self) -> list[str]:
-        return re.split(r"\s*,\s*", self.correct_translation)
-
-    def _is_suggested_translation_match(self, suggested_translation: str, correct_translation: str) -> bool:
-        similarity = SequenceMatcher(None, suggested_translation, correct_translation).ratio()
-
-        return similarity >= self._similarity_ratio_treshold
+    
+    @property
+    def lines(self) -> list[str]:
+        return self._lines
+    
+    def _clean_text(self, text: str) -> list[str]:
+        text: str = text.strip().lower()
+        text: str = self._trim_parenthesis(text)
+        text: list[str] = self._split_text(text)
+        return text
 
     def _trim_parenthesis(self, text: str) -> str:
-        pattern = r'\([^)]*\)'
-        return re.sub(pattern, '', text)
+        return re.sub(r"\([^)]*\)", '', text)
+
+    def _split_text(self, text: str) -> list[str]:
+        return re.split(r"\s*,\s*", text)
+
+
+class QuizAnswerChecker:
+    def __init__(self, suggested_translation: str, correct_translation: str) -> None:
+        self.suggested_translation = StringMatcher(suggested_translation)
+        self.correct_translation = StringMatcher(correct_translation)
     
+    def is_match(self) -> bool:
+        return all(suggested in self.correct_translation for suggested in self.suggested_translation.lines)
+
+
+if __name__ == '__main__':
+    assert QuizAnswerChecker("винний, зобовязаний", "зобовязаний, винний").is_match() == True
+    assert QuizAnswerChecker("зобовязаний, винний", "зобовязаний, винний").is_match() == True
+    assert QuizAnswerChecker("зобовязаний, винний, ще якись", "зобовязаний, винний").is_match() == False
+
+    assert QuizAnswerChecker("зобовязаний, винний, ще якись", "ще якись, зобовязаний, винний").is_match() == True
+    assert QuizAnswerChecker(",", "ще якись, зобовязаний, винний").is_match() == False
+    assert QuizAnswerChecker("зобовязаний,", "ще якись, зобовязаний, винний").is_match() == False
+
+    assert QuizAnswerChecker("зобовязаний, винний", "ще якись, зобовязаний, винний").is_match() == True
+    assert QuizAnswerChecker("винний, зобовязаний", "ще якись, зобовязаний, винний").is_match() == True
