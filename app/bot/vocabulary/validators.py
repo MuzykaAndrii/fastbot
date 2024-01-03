@@ -1,5 +1,6 @@
 import re
 from difflib import SequenceMatcher
+from typing import Union
 
 
 class VocabularyValidator:
@@ -22,26 +23,40 @@ class VocabularyValidator:
         else:
             return True
 
-# TODO: divide class below into two classes
+
 class StringMatcher:
     def __init__(self, text: str, similarity_ratio_treshold: float = .95) -> None:
-        self._lines = self._clean_text(text)
+        self._text = text
         self.similarity_ratio_treshold = similarity_ratio_treshold
 
-    def __contains__(self, to_compare: str) -> bool:
-        for line in self._lines:
-            if SequenceMatcher(None, to_compare, line).ratio() >= self.similarity_ratio_treshold:
-                return True
-        return False
-    
+    def __eq__(self, other: Union[str, "StringMatcher"]) -> bool:
+        match other:
+            case str():
+                to_compare = other
+            case StringMatcher():
+                to_compare = other._text
+            case _:
+                raise TypeError
+            
+        return SequenceMatcher(None, self._text, to_compare).ratio() >= self.similarity_ratio_treshold
+
+
+class TranslationChecker:
+    def __init__(self, text: str) -> None:
+        self._variants = self._split_variants(text)
+
+    def __contains__(self, to_compare: str | StringMatcher) -> bool:
+        return any(translation == to_compare for translation in self._variants)
+
     @property
-    def lines(self) -> list[str]:
-        return self._lines
-    
-    def _clean_text(self, text: str) -> list[str]:
+    def variants(self) -> set[StringMatcher]:
+        return self._variants
+
+    def _split_variants(self, text: str) -> set[str]:
         text: str = text.strip().lower()
         text: str = self._trim_parenthesis(text)
         text: list[str] = self._split_text(text)
+        text: set[str] = set(text)
         return text
 
     def _trim_parenthesis(self, text: str) -> str:
@@ -53,11 +68,11 @@ class StringMatcher:
 
 class QuizAnswerChecker:
     def __init__(self, suggested_translation: str, correct_translation: str) -> None:
-        self.suggested_translation = StringMatcher(suggested_translation)
-        self.correct_translation = StringMatcher(correct_translation)
+        self.suggested_translation = TranslationChecker(suggested_translation)
+        self.correct_translation = TranslationChecker(correct_translation)
     
     def is_match(self) -> bool:
-        return all(suggested in self.correct_translation for suggested in self.suggested_translation.lines)
+        return all(suggested in self.correct_translation for suggested in self.suggested_translation.variants)
 
 
 if __name__ == '__main__':
