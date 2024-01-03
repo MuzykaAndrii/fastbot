@@ -28,13 +28,17 @@ class StringMatcher:
     def __init__(self, text: str, similarity_treshold: float = .95) -> None:
         self._text = text
         self.similarity_treshold = similarity_treshold
+    
+    @property
+    def text(self) -> str:
+        return self._text
 
     def __eq__(self, other: Union[str, "StringMatcher"]) -> bool:
         match other:
             case str():
                 to_compare = other
             case StringMatcher():
-                to_compare = other._text
+                to_compare = other.text
             case _:
                 raise TypeError
             
@@ -42,21 +46,21 @@ class StringMatcher:
 
 
 class TranslationChecker:
-    def __init__(self, text: str) -> None:
+    def __init__(self, text: str, accuracy: float = .95) -> None:
+        self.accuracy = accuracy
         self._variants = self._split_variants(text)
 
     def __contains__(self, to_compare: str | StringMatcher) -> bool:
-        return any(translation == to_compare for translation in self._variants)
-
-    @property
-    def variants(self) -> tuple[StringMatcher]:
-        return self._variants
+        return any(translation == to_compare for translation in self)
+    
+    def __iter__(self):
+        return iter(self._variants)
 
     def _split_variants(self, text: str) -> tuple[StringMatcher]:
         text: str = text.strip().lower()
         text: str = self._trim_parenthesis(text)
         text: set[str] = set(self._split_text(text))
-        text: tuple[StringMatcher] = tuple(StringMatcher(variant) for variant in text)
+        text: tuple[StringMatcher] = tuple(StringMatcher(variant, self.accuracy) for variant in text)
         return text
 
     def _trim_parenthesis(self, text: str) -> str:
@@ -72,7 +76,7 @@ class QuizAnswerChecker:
         self.correct_translation = TranslationChecker(correct_translation)
     
     def is_match(self) -> bool:
-        return all(suggested in self.correct_translation for suggested in self.suggested_translation.variants)
+        return all(suggested in self.correct_translation for suggested in self.suggested_translation)
 
 
 if __name__ == '__main__':
