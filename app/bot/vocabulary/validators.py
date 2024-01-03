@@ -1,5 +1,6 @@
 import re
 from difflib import SequenceMatcher
+from typing import Union
 
 
 class VocabularyValidator:
@@ -23,45 +24,69 @@ class VocabularyValidator:
             return True
 
 
-class QuizAnswerChecker:
-    def __init__(
-            self,
-            suggested_translation: str,
-            correct_translation: str,
-            similarity_ratio_treshold: float = .95,
-            variants_separator: str = ","
-    ) -> None:
-        self.suggested_translation = suggested_translation.strip().lower()
-        self.correct_translation = self._trim_parenthesis(correct_translation).strip().lower()
-        self._similarity_ratio_treshold = similarity_ratio_treshold
-        self._variants_separator = variants_separator
+class StringMatcher:
+    def __init__(self, text: str, similarity_treshold: float = .95) -> None:
+        self._text = text
+        self.similarity_treshold = similarity_treshold
     
-    def is_match(self) -> bool:
-        if self._variants_separator in self.suggested_translation:
-            return self.check_full_similarity()
-        else:
-            return self.check_partial_similarity()
+    @property
+    def text(self) -> str:
+        return self._text
+
+    def __eq__(self, other: Union[str, "StringMatcher"]) -> bool:
+        match other:
+            case str():
+                to_compare = other
+            case StringMatcher():
+                to_compare = other.text
+            case _:
+                raise TypeError
+            
+        return SequenceMatcher(None, self._text, to_compare).ratio() >= self.similarity_treshold
+
+
+class TranslationChecker:
+    def __init__(self, text: str, accuracy: float = .95) -> None:
+        self.accuracy = accuracy
+        self._variants = self._split_variants(text)
+
+    def __contains__(self, to_compare: str | StringMatcher) -> bool:
+        return any(translation == to_compare for translation in self)
     
-    def check_full_similarity(self) -> bool:
-        return self._is_suggested_translation_match(self.suggested_translation, self.correct_translation)
-    
-    def check_partial_similarity(self) -> bool:
-        correct_translation_variants = self._get_correct_translation_variants()
+    def __iter__(self):
+        return iter(self._variants)
 
-        for variant in correct_translation_variants:
-            if self._is_suggested_translation_match(self.suggested_translation, variant):
-                return True
-        return False
-
-    def _get_correct_translation_variants(self) -> list[str]:
-        return re.split(r"\s*,\s*", self.correct_translation)
-
-    def _is_suggested_translation_match(self, suggested_translation: str, correct_translation: str) -> bool:
-        similarity = SequenceMatcher(None, suggested_translation, correct_translation).ratio()
-
-        return similarity >= self._similarity_ratio_treshold
+    def _split_variants(self, text: str) -> tuple[StringMatcher]:
+        text: str = text.strip().lower()
+        text: str = self._trim_parenthesis(text)
+        text: set[str] = set(self._split_text(text))
+        text: tuple[StringMatcher] = tuple(StringMatcher(variant, self.accuracy) for variant in text)
+        return text
 
     def _trim_parenthesis(self, text: str) -> str:
-        pattern = r'\([^)]*\)'
-        return re.sub(pattern, '', text)
+        return re.sub(r"\([^)]*\)", '', text)
+
+    def _split_text(self, text: str) -> list[str]:
+        return re.split(r"\s*,\s*", text)
+
+
+class QuizAnswerChecker:
+    def __init__(self, suggested_translation: str, correct_translation: str) -> None:
+        self.suggested_translation = TranslationChecker(suggested_translation)
+        self.correct_translation = TranslationChecker(correct_translation)
     
+    def is_match(self) -> bool:
+        return all(suggested in self.correct_translation for suggested in self.suggested_translation)
+
+
+if __name__ == '__main__':
+    assert QuizAnswerChecker("винний, зобовязаний", "зобовязаний, винний").is_match() == True
+    assert QuizAnswerChecker("зобовязаний, винний", "зобовязаний, винний").is_match() == True
+    assert QuizAnswerChecker("зобовязаний, винний, ще якись", "зобовязаний, винний").is_match() == False
+
+    assert QuizAnswerChecker("зобовязаний, винний, ще якись", "ще якись, зобовязаний, винний").is_match() == True
+    assert QuizAnswerChecker(",", "ще якись, зобовязаний, винний").is_match() == False
+    assert QuizAnswerChecker("зобовязаний,", "ще якись, зобовязаний, винний").is_match() == False
+
+    assert QuizAnswerChecker("зобовязаний, винний", "ще якись, зобовязаний, винний").is_match() == True
+    assert QuizAnswerChecker("винний, зобовязаний", "ще якись, зобовязаний, винний").is_match() == True
