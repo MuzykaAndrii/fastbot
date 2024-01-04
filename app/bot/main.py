@@ -42,8 +42,8 @@ class TelegramBot:
     async def handle_update(self, update: types.Update) -> None:
         await self._dp.feed_update(bot=self._bot, update=update)
     
-    async def start_bot(self) -> None:
-        await self._bot.set_webhook(self._webhook_url)
+    async def start_bot(self, drop_pending_updates: bool = False) -> None:
+        await self._bot.set_webhook(self._webhook_url, drop_pending_updates=drop_pending_updates)
     
     async def stop_bot(self) -> None:
         await self._bot.session.close()
