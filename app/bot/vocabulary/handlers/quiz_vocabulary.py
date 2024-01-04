@@ -28,9 +28,9 @@ async def show_quiz_types(query: CallbackQuery, callback_data: VocabularyCallbac
 
 
 class QuizScene(Scene, state="quiz"):
-    @on.message.enter()
-    async def ask_next_question(self, message: Message, state: FSMContext):
-        await self.ask_question(message, state)
+    # @on.message.enter()
+    # async def ask_next_question(self, message: Message, state: FSMContext):
+    #     await self.ask_question(message, state)
 
 
     @on.callback_query.enter(StartQuizCallbackData)
@@ -77,15 +77,16 @@ class QuizScene(Scene, state="quiz"):
     async def skip_question(self, message: Message, state: FSMContext) -> None:
         quiz = await Quiz.load_form_state(state)
         quiz.increment_skipped_answers_count()
-
-        await quiz.last_question_msg.edit_text(VocabularyMessages.quiz_skipped_answer.format(
-            word=quiz.current_question,
-            translation=quiz.current_answer,
-        ))
-        await message.delete()
+        
+        with suppress(TelegramBadRequest):
+            await quiz.last_question_msg.edit_text(VocabularyMessages.quiz_skipped_answer.format(
+                word=quiz.current_question,
+                translation=quiz.current_answer,
+            ))
+            await message.delete()
 
         await quiz.save_to_state(state)
-        await self.wizard.retake()
+        await self.ask_question(message, state)
     
     @on.message(F.text)
     async def handle_user_answer(self, message: Message, state: FSMContext) -> None:
@@ -110,7 +111,7 @@ class QuizScene(Scene, state="quiz"):
             await message.delete()
 
         await quiz.save_to_state(state)
-        await self.wizard.retake()
+        await self.ask_question(message, state)
 
 
     @on.message()
