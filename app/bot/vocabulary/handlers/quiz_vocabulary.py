@@ -6,6 +6,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.scene import Scene, on
 from aiogram.fsm.scene import SceneRegistry
 from aiogram.exceptions import TelegramBadRequest
+from aiogram.filters import Command
 
 from app.bot.modules.base_quiz import Quiz
 from app.bot.vocabulary.callback_patterns import StartQuizCallbackData, VocabularyAction, VocabularyCallbackData
@@ -28,13 +29,13 @@ async def show_quiz_types(query: CallbackQuery, callback_data: VocabularyCallbac
 
 
 class QuizScene(Scene, state="quiz"):
-    # @on.message.enter()
-    # async def ask_next_question(self, message: Message, state: FSMContext):
-    #     await self.ask_question(message, state)
+    @on.message.enter()
+    async def start_quiz_from_all_vocabularies(self, message: Message, state: FSMContext):
+        ...
 
 
     @on.callback_query.enter(StartQuizCallbackData)
-    async def start_quiz(self, query: CallbackQuery, state: FSMContext):
+    async def start_quiz_from_certain_vocabulary(self, query: CallbackQuery, state: FSMContext):
         callback_data = StartQuizCallbackData.unpack(query.data)
         vocabulary = await VocabularyService.get_vocabulary(query.from_user.id, callback_data.vocabulary_id)
 
@@ -143,3 +144,4 @@ class QuizScene(Scene, state="quiz"):
 scene_registry = SceneRegistry(router)
 scene_registry.add(QuizScene)
 router.callback_query.register(QuizScene.as_handler())
+router.message.register(QuizScene.as_handler(), Command("quiz"))
