@@ -1,4 +1,6 @@
 from contextlib import suppress
+from itertools import chain
+from random import sample
 
 from aiogram import F, Router
 from aiogram.types import CallbackQuery, Message, ReplyKeyboardRemove
@@ -6,13 +8,15 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.scene import Scene, on
 from aiogram.fsm.scene import SceneRegistry
 from aiogram.exceptions import TelegramBadRequest
+from aiogram.filters import Command
 
 from app.bot.modules.base_quiz import Quiz
-from app.bot.vocabulary.callback_patterns import StartQuizCallbackData, VocabularyAction, VocabularyCallbackData
+from app.bot.vocabulary.callback_patterns import QuizStrategy, VocabularyQuizCallbackData, VocabularyAction, VocabularyCallbackData
 from app.bot.vocabulary.exceptions import QuestionsIsGoneError
 from app.bot.vocabulary.keyboards import QuizTypesKeyboard, get_quiz_keyboard
 from app.bot.vocabulary.messages import VocabularyMessages
 from app.bot.vocabulary.question_manager import VocabularyQuestionManager
+from app.bot.vocabulary.schemas import LanguagePairSchema
 from app.bot.vocabulary.validators import QuizAnswerChecker
 from app.vocabulary.services import VocabularyService
 
@@ -29,13 +33,26 @@ async def show_quiz_types(query: CallbackQuery, callback_data: VocabularyCallbac
 
 class QuizScene(Scene, state="quiz"):
     @on.message.enter()
-    async def ask_next_question(self, message: Message, state: FSMContext):
+    async def init_global_quiz(self, message: Message, state: FSMContext):
+        vocabularies = await VocabularyService.get_all_user_vocabularies(message.from_user.id)
+        if not vocabularies: raise ValueError ## TODO: send msg that user has no vocabularies
+
+        language_pairs: list[LanguagePairSchema] = list(chain(*(v.language_pairs for v in vocabularies)))
+        language_pairs: list[LanguagePairSchema] = sample(language_pairs, len(language_pairs) // len(vocabularies))
+
+
+        vocabulary_question_manager = VocabularyQuestionManager(language_pairs, QuizStrategy.guess_foreign)
+        quiz = Quiz(vocabulary_question_manager)
+
+        await quiz.save_to_state(state)
+
+        await message.answer(VocabularyMessages.start_quiz_msg, reply_markup=get_quiz_keyboard())
         await self.ask_question(message, state)
 
 
-    @on.callback_query.enter(StartQuizCallbackData)
-    async def start_quiz(self, query: CallbackQuery, state: FSMContext):
-        callback_data = StartQuizCallbackData.unpack(query.data)
+    @on.callback_query.enter(VocabularyQuizCallbackData)
+    async def init_vocabulary_quiz(self, query: CallbackQuery, state: FSMContext):
+        callback_data = VocabularyQuizCallbackData.unpack(query.data)
         vocabulary = await VocabularyService.get_vocabulary(query.from_user.id, callback_data.vocabulary_id)
 
         vocabulary_question_manager = VocabularyQuestionManager(vocabulary.language_pairs, callback_data.quiz_strategy)
@@ -77,15 +94,16 @@ class QuizScene(Scene, state="quiz"):
     async def skip_question(self, message: Message, state: FSMContext) -> None:
         quiz = await Quiz.load_form_state(state)
         quiz.increment_skipped_answers_count()
-
-        await quiz.last_question_msg.edit_text(VocabularyMessages.quiz_skipped_answer.format(
-            word=quiz.current_question,
-            translation=quiz.current_answer,
-        ))
-        await message.delete()
+        
+        with suppress(TelegramBadRequest):
+            await quiz.last_question_msg.edit_text(VocabularyMessages.quiz_skipped_answer.format(
+                word=quiz.current_question,
+                translation=quiz.current_answer,
+            ))
+            await message.delete()
 
         await quiz.save_to_state(state)
-        await self.wizard.retake()
+        await self.ask_question(message, state)
     
     @on.message(F.text)
     async def handle_user_answer(self, message: Message, state: FSMContext) -> None:
@@ -110,7 +128,7 @@ class QuizScene(Scene, state="quiz"):
             await message.delete()
 
         await quiz.save_to_state(state)
-        await self.wizard.retake()
+        await self.ask_question(message, state)
 
 
     @on.message()
@@ -142,3 +160,4 @@ class QuizScene(Scene, state="quiz"):
 scene_registry = SceneRegistry(router)
 scene_registry.add(QuizScene)
 router.callback_query.register(QuizScene.as_handler())
+router.message.register(QuizScene.as_handler(), Command("quiz"))
