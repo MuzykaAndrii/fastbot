@@ -1,4 +1,6 @@
 from contextlib import suppress
+from itertools import chain
+from random import sample
 
 from aiogram import F, Router
 from aiogram.types import CallbackQuery, Message, ReplyKeyboardRemove
@@ -9,11 +11,12 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command
 
 from app.bot.modules.base_quiz import Quiz
-from app.bot.vocabulary.callback_patterns import VocabularyQuizCallbackData, VocabularyAction, VocabularyCallbackData
+from app.bot.vocabulary.callback_patterns import QuizStrategy, VocabularyQuizCallbackData, VocabularyAction, VocabularyCallbackData
 from app.bot.vocabulary.exceptions import QuestionsIsGoneError
 from app.bot.vocabulary.keyboards import QuizTypesKeyboard, get_quiz_keyboard
 from app.bot.vocabulary.messages import VocabularyMessages
 from app.bot.vocabulary.question_manager import VocabularyQuestionManager
+from app.bot.vocabulary.schemas import LanguagePairSchema
 from app.bot.vocabulary.validators import QuizAnswerChecker
 from app.vocabulary.services import VocabularyService
 
@@ -30,12 +33,25 @@ async def show_quiz_types(query: CallbackQuery, callback_data: VocabularyCallbac
 
 class QuizScene(Scene, state="quiz"):
     @on.message.enter()
-    async def start_quiz_from_all_vocabularies(self, message: Message, state: FSMContext):
-        ...
+    async def init_global_quiz(self, message: Message, state: FSMContext):
+        vocabularies = await VocabularyService.get_all_user_vocabularies(message.from_user.id)
+        if not vocabularies: raise ValueError ## TODO: send msg that user has no vocabularies
+
+        language_pairs: list[LanguagePairSchema] = list(chain(*(v.language_pairs for v in vocabularies)))
+        language_pairs: list[LanguagePairSchema] = sample(language_pairs, len(language_pairs) // len(vocabularies))
+
+
+        vocabulary_question_manager = VocabularyQuestionManager(language_pairs, QuizStrategy.guess_foreign)
+        quiz = Quiz(vocabulary_question_manager)
+
+        await quiz.save_to_state(state)
+
+        await message.answer(VocabularyMessages.start_quiz_msg, reply_markup=get_quiz_keyboard())
+        await self.ask_question(message, state)
 
 
     @on.callback_query.enter(VocabularyQuizCallbackData)
-    async def start_quiz_from_certain_vocabulary(self, query: CallbackQuery, state: FSMContext):
+    async def init_vocabulary_quiz(self, query: CallbackQuery, state: FSMContext):
         callback_data = VocabularyQuizCallbackData.unpack(query.data)
         vocabulary = await VocabularyService.get_vocabulary(query.from_user.id, callback_data.vocabulary_id)
 
