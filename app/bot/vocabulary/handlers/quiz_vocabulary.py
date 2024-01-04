@@ -9,7 +9,7 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command
 
 from app.bot.modules.base_quiz import Quiz
-from app.bot.vocabulary.callback_patterns import StartQuizCallbackData, VocabularyAction, VocabularyCallbackData
+from app.bot.vocabulary.callback_patterns import VocabularyQuizCallbackData, VocabularyAction, VocabularyCallbackData
 from app.bot.vocabulary.exceptions import QuestionsIsGoneError
 from app.bot.vocabulary.keyboards import QuizTypesKeyboard, get_quiz_keyboard
 from app.bot.vocabulary.messages import VocabularyMessages
@@ -34,9 +34,9 @@ class QuizScene(Scene, state="quiz"):
         ...
 
 
-    @on.callback_query.enter(StartQuizCallbackData)
+    @on.callback_query.enter(VocabularyQuizCallbackData)
     async def start_quiz_from_certain_vocabulary(self, query: CallbackQuery, state: FSMContext):
-        callback_data = StartQuizCallbackData.unpack(query.data)
+        callback_data = VocabularyQuizCallbackData.unpack(query.data)
         vocabulary = await VocabularyService.get_vocabulary(query.from_user.id, callback_data.vocabulary_id)
 
         vocabulary_question_manager = VocabularyQuestionManager(vocabulary.language_pairs, callback_data.quiz_strategy)

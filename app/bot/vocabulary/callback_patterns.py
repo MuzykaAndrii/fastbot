@@ -24,6 +24,6 @@ class QuizStrategy(str, Enum):
     combined = "combined"
 
 
-class StartQuizCallbackData(CallbackData, prefix="select_quiz"):
+class VocabularyQuizCallbackData(CallbackData, prefix="select_quiz"):
     quiz_strategy: QuizStrategy
     vocabulary_id: int

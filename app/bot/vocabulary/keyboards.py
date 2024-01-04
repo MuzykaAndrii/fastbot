@@ -7,7 +7,7 @@ from aiogram.types import (
 
 from app.bot.vocabulary.callback_patterns import (
     QuizStrategy,
-    StartQuizCallbackData,
+    VocabularyQuizCallbackData,
     VocabularyAction,
     VocabularyCallbackData
 )
@@ -155,7 +155,7 @@ class QuizTypesKeyboard:
         )
     
     def _make_callback_data(self, strategy: QuizStrategy):
-        callback_data = StartQuizCallbackData(
+        callback_data = VocabularyQuizCallbackData(
             quiz_strategy=strategy,
             vocabulary_id=self.vocabulary_id,
         )
