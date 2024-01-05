@@ -35,7 +35,6 @@ class QuizScene(Scene, state="quiz"):
     @on.message.enter()
     async def init_global_quiz(self, message: Message, state: FSMContext):
         vocabularies = await VocabularyService.get_all_user_vocabularies(message.from_user.id)
-        if not vocabularies: raise ValueError ## TODO: send msg that user has no vocabularies
 
         language_pairs: list[LanguagePairSchema] = list(chain(*(v.language_pairs for v in vocabularies)))
         language_pairs: list[LanguagePairSchema] = sample(language_pairs, len(language_pairs) // len(vocabularies))
