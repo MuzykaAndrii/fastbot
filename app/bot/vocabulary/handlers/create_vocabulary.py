@@ -19,7 +19,7 @@ class VocabularyCreationStates(StatesGroup):
 @router.message(Command("create"))
 async def handle_create_cmd(message: types.Message, state: FSMContext):
     await state.set_state(VocabularyCreationStates.name_specifying)
-    await message.answer(f"Hey {message.from_user.first_name}, to create vocabulary, specify its name")
+    await message.answer(f"✨ To create a new vocabulary, specify its name")
 
 
 @router.message(Command("cancel"))
@@ -30,15 +30,12 @@ async def handle_cancel_cmd(message: types.Message, state: FSMContext):
         return
 
     await state.clear()
-    await message.answer(
-        "Cancelled.",
-        reply_markup=types.ReplyKeyboardRemove(),
-    )
+    await message.answer("Cancelled. ❌")
 
 
 @router.message(VocabularyCreationStates.name_specifying, ~F.text)
 async def handle_incorrect_vocabulary_name(message: types.Message, state: FSMContext):
-    await message.reply("Invalid vocabulary name, please try again")
+    await message.reply("Invalid vocabulary name, please try again 🤔")
 
 
 @router.message(VocabularyCreationStates.name_specifying)
@@ -55,9 +52,9 @@ async def handle_lang_pairs_input(message: types.Message, state: FSMContext):
 
     await VocabularyService.save_bulk_vocabulary(vocabulary_data, message.from_user.id)
     await state.clear()
-    await message.answer("Vocabulary saved successfully! Check it out")
+    await message.answer("Vocabulary saved successfully! 🎉 Check it out using /my command!")
 
 
 @router.message(VocabularyCreationStates.lang_pairs_specifying)
 async def handle_lang_pairs_invalid_input(message: types.Message, state: FSMContext):
-    await message.answer("Invalid vocabulary, please follow the correct format")
+    await message.answer("Invalid vocabulary, please follow the correct format 🚫") 
