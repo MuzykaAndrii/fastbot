@@ -3,8 +3,8 @@ from app.shared.schemas import ExtendedLanguagePairSchema
 
 
 class VocabularyMessages:
-    bulk_vocabulary_creation_rules = """
-    <b>There are several rules to create bulk vocabulary:</b>
+    vocabulary_creation_rules = """
+    <b>There are several rules to create vocabulary:</b>
 
 📝 <b>Format:</b> Enter word pairs with a hyphen "-" on each line.
 🚫 <b>Minimum Pairs:</b> Include at least two pairs. Less won't cut it!

@@ -14,21 +14,6 @@ from app.bot.vocabulary.callback_patterns import (
 from app.bot.vocabulary.schemas import VocabularySetSchema
 
 
-def get_select_strategy_keyboard():
-    btn_bulk = KeyboardButton(text="Bulk")
-    btn_line_by_line = KeyboardButton(text="Line by line")
-    btn_cancel = KeyboardButton(text="Cancel")
-
-    select_strategy_keyboard = ReplyKeyboardMarkup(
-        keyboard=[
-            [btn_bulk, btn_line_by_line],
-            [btn_cancel],
-        ],
-        resize_keyboard=True,
-    )
-
-    return select_strategy_keyboard
-
 def get_quiz_keyboard():
     btn_end_test = KeyboardButton(text="🚪 Leave quiz")
     btn_skip_question = KeyboardButton(text="🔁 Skip question")
