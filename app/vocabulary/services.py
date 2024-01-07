@@ -82,12 +82,11 @@ class VocabularyService:
 
     @classmethod
     async def get_all_user_vocabularies(cls, user_id: int) -> list[VocabularySet]:
-        vocabulary_sets = await VocabularySetDAL.filter_by(owner_id=user_id)
+        vocabularies = await VocabularySetDAL.filter_by(owner_id=user_id)
 
-        if vocabulary_sets:
-            return vocabulary_sets
-        return None
-
+        if not vocabularies:
+            raise NoVocabulariesFound
+        return vocabularies
 
     @classmethod
     async def get_vocabulary(cls, user_id: int, vocabulary_id: int) -> VocabularySet:

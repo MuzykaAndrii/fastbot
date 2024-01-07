@@ -3,13 +3,12 @@ from app.shared.schemas import ExtendedLanguagePairSchema
 
 
 class VocabularyMessages:
-    bulk_vocabulary_creation_rules = """
-    <b>There are several rules to create bulk vocabulary:</b>
+    vocabulary_creation_rules = """
+    <b>There are several rules to create vocabulary:</b>
 
 📝 <b>Format:</b> Enter word pairs with a hyphen "-" on each line.
 🚫 <b>Minimum Pairs:</b> Include at least two pairs. Less won't cut it!
 🔄 <b>Case Insensitive:</b> Cases don't matter; "Word - Translation" = "word - translation."
-✨ <b>Special Characters:</b> Go ahead, use emojis, punctuation, or anything fancy!
 ➖ <b>Hyphen in Words:</b> Totally allowed, but only as a separator.
 🌟 <b>Multiple Translations:</b> Use commas for multiple translations, like "Word - Translation, Another."
 🎉 <b>Have Fun!</b> Enjoy expanding your vocabulary with the bot! 🚀
@@ -36,7 +35,7 @@ Select your preferred type and embark on a language-learning adventure! 🚀🗣
 
 🔍 <b>Correctness Check:</b>
 - 🧐 <b>Full translation:</b>
-  - U can send all variants of translating separated y comma. (Then u should send all variants, in the correct order)
+  - U can send several variants of translating separated y comma.
 
 - 🕵️ <b>One variant translation:</b>
   - U also can send one variant of translation, if it will match with at least one correct variant, answer will be correct.
