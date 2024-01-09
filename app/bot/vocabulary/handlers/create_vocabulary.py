@@ -5,7 +5,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram import F
 
 from app.bot.vocabulary.messages import VocabularyMessages
-from app.bot.vocabulary.validators import VocabularyValidator
+from app.bot.vocabulary.validators import VocabularyParser, VocabularyValidator
+from app.shared.schemas import VocabularyCreateSchema
 from app.vocabulary.services import VocabularyService
 
 router = Router()
@@ -47,10 +48,15 @@ async def save_vocabulary_name(message: types.Message, state: FSMContext):
 
 @router.message(VocabularyCreationStates.lang_pairs_specifying, F.text.func(VocabularyValidator.validate_bulk))
 async def handle_lang_pairs_input(message: types.Message, state: FSMContext):
-    await state.update_data(bulk_vocabulary=message.text)
-    vocabulary_data = await state.get_data()
+    state_data = await state.get_data()
 
-    await VocabularyService.save_bulk_vocabulary(vocabulary_data, message.from_user.id)
+    vocabulary = VocabularyCreateSchema(
+        owner_id=message.from_user.id,
+        name=state_data.get('name'),
+        language_pairs=VocabularyParser().parse_bulk_vocabulary(message.text),
+    )
+
+    await VocabularyService.create_vocabulary(vocabulary)
     await state.clear()
     await message.answer("Vocabulary saved successfully! 🎉 Check it out using /my command!")
 
