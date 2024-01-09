@@ -30,7 +30,7 @@ class VocabularyValidator:
     line_vocabulary_pattern = re.compile(r'^\s*([^-\n]+)\s*-\s*([^-\n]+[^\s])\s*$', re.I|re.X|re.S|re.U)
 
     @classmethod
-    def validate_bulk(cls, bulk_vocabulary: str) -> bool:
+    def validate(cls, bulk_vocabulary: str) -> bool:
         raw_language_pairs = bulk_vocabulary.split("\n")
 
         if len(raw_language_pairs) < 2:

@@ -46,7 +46,7 @@ async def save_vocabulary_name(message: types.Message, state: FSMContext):
     await message.answer(VocabularyMessages.vocabulary_creation_rules)
 
 
-@router.message(VocabularyCreationStates.lang_pairs_specifying, F.text.func(VocabularyValidator.validate_bulk))
+@router.message(VocabularyCreationStates.lang_pairs_specifying, F.text.func(VocabularyValidator.validate))
 async def handle_lang_pairs_input(message: types.Message, state: FSMContext):
     state_data = await state.get_data()
 
