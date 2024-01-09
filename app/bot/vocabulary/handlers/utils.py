@@ -2,7 +2,7 @@ from aiogram.types import CallbackQuery
 
 from app.bot.vocabulary.keyboards import ActionsKeyboard
 from app.bot.vocabulary.messages import VocabularyMessages
-from app.bot.vocabulary.schemas import VocabularySchema
+from app.shared.schemas import VocabularySchema
 
 
 async def update_vocabulary_msg(query: CallbackQuery, vocabulary: VocabularySchema) -> None:

@@ -1,5 +1,4 @@
-from app.bot.vocabulary.schemas import VocabularySchema
-from app.shared.schemas import ExtendedLanguagePairSchema
+from app.shared.schemas import VocabularySchema, ExtendedLanguagePairSchema
 
 
 class VocabularyMessages:

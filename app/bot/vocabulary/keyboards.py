@@ -11,7 +11,7 @@ from app.bot.vocabulary.callback_patterns import (
     VocabularyAction,
     VocabularyCallbackData
 )
-from app.bot.vocabulary.schemas import VocabularySchema
+from app.shared.schemas import VocabularySchema
 
 
 def get_quiz_keyboard():

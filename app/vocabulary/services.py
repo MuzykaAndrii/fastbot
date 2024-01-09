@@ -10,7 +10,7 @@ from app.shared.exceptions import (
 from app.shared.schemas import ExtendedLanguagePairSchema
 from app.vocabulary.dal import VocabularySetDAL, LanguagePairDAL
 from app.vocabulary.models import VocabularySet
-from app.vocabulary.schemas import LanguagePairSchema
+from app.shared.schemas import LanguagePairSchema
 
 
 class VocabularyParser:
