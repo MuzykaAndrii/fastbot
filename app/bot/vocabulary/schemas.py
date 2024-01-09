@@ -10,7 +10,7 @@ class LanguagePairSchema(BaseModel):
     translation: str
 
 
-class VocabularySetSchema(BaseModel):
+class VocabularySchema(BaseModel):
     id: int
     name: str
     is_active: bool

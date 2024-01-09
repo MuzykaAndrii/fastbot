@@ -1,4 +1,4 @@
-from app.bot.vocabulary.schemas import VocabularySetSchema
+from app.bot.vocabulary.schemas import VocabularySchema
 from app.shared.schemas import ExtendedLanguagePairSchema
 
 
@@ -110,7 +110,7 @@ Feel free to come back anytime! 👋✨
 
     
     @classmethod
-    def get_full_vocabulary_entity_msg(cls, vocabulary_set: VocabularySetSchema) -> str:
+    def get_full_vocabulary_entity_msg(cls, vocabulary_set: VocabularySchema) -> str:
         full_msg: list[str] = []
         if vocabulary_set.is_active:
             notification_status = cls.notification_active
