@@ -11,7 +11,7 @@ from app.bot.vocabulary.callback_patterns import (
     VocabularyAction,
     VocabularyCallbackData
 )
-from app.bot.vocabulary.schemas import VocabularySetSchema
+from app.shared.schemas import VocabularySchema
 
 
 def get_quiz_keyboard():
@@ -28,17 +28,24 @@ def get_quiz_keyboard():
 
 
 class ActionsKeyboard:
-    def __init__(self, vocabulary: VocabularySetSchema) -> None:
+    def __init__(self, vocabulary: VocabularySchema) -> None:
         self.vocabulary = vocabulary
     
     def get_markup(self):
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [self.delete_btn, self.notification_btn],
+            [self.delete_btn, self.append_btn, self.notification_btn],
             [self.gen_text_btn, self.quiz_btn,],
             [self.move_backward_btn, self.move_forward_btn],
         ])
 
         return keyboard
+    
+    @property
+    def append_btn(self):
+        return InlineKeyboardButton(
+            text="➕ Add words",
+            callback_data=self._make_callback_data(VocabularyAction.append_language_pairs),
+        )
     
     @property
     def gen_text_btn(self):

@@ -16,7 +16,7 @@ from app.bot.vocabulary.exceptions import QuestionsIsGoneError
 from app.bot.vocabulary.keyboards import QuizTypesKeyboard, get_quiz_keyboard
 from app.bot.vocabulary.messages import VocabularyMessages
 from app.bot.vocabulary.question_manager import VocabularyQuestionManager
-from app.bot.vocabulary.schemas import LanguagePairSchema
+from app.shared.schemas import LanguagePairSchema
 from app.bot.vocabulary.validators import QuizAnswerChecker
 from app.vocabulary.services import VocabularyService
 

@@ -17,7 +17,7 @@ class BaseMessages:
 🗑️ /cancel - Cancel the current command. 
 
 <strong>Restrictions: 🚧</strong>
-- Only one vocabulary can be active for notifications. Enabling one will turn off any other enabled vocabularies.
+- Only single vocabulary can be active for notifications. Enabling one will turn off any other enabled vocabularies.
 - Each vocabulary must have at least two word pairs (word pair - the word you're learning and its translation).
-- The quiz button from the menu (/my command) will involve words from one vocabulary.
+- The quiz from the menu (/my command) will involve words from one vocabulary.
 """

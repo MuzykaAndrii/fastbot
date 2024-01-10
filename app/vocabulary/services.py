@@ -1,5 +1,4 @@
 import random
-import re
 
 from app.shared.exceptions import (
     NoVocabulariesFound,
@@ -7,50 +6,34 @@ from app.shared.exceptions import (
     VocabularyDoesNotExist,
     VocabularyIsAlreadyActive
 )
-from app.shared.schemas import ExtendedLanguagePairSchema
-from app.vocabulary.dal import VocabularySetDAL, LanguagePairDAL
-from app.vocabulary.models import VocabularySet
-from app.vocabulary.schemas import LanguagePairSchema
-
-
-class VocabularyParser:
-    split_rule: str = r'\s*-\s*'
-
-    def __init__(self, vocabulary_id: int):
-        self.vocabulary_id = vocabulary_id
-
-    def parse_bulk_vocabulary(self, raw_bulk_vocabulary: str) -> list[LanguagePairSchema]:
-        lines = raw_bulk_vocabulary.split('\n')
-        result: list[LanguagePairSchema] = []
-
-        for line in lines:
-            result.append(self.parse_line_vocabulary(line))
-
-        return result
-    
-    def parse_line_vocabulary(self, raw_line_vocabulary: str) -> LanguagePairSchema:
-        word, translation = re.split(self.split_rule, raw_line_vocabulary)
-
-        return LanguagePairSchema(
-            word=word.strip(),
-            translation=translation.strip(),
-            vocabulary_id=self.vocabulary_id,
-        )
+from app.shared.schemas import ExtendedLanguagePairSchema, LanguagePairsAppendSchema, VocabularyCreateSchema
+from app.vocabulary.dal import LanguagePairDAL, VocabularySetDAL
+from app.vocabulary.models import VocabularySet, LanguagePair
 
 
 class VocabularyService:
     @classmethod
-    async def save_bulk_vocabulary(cls, vocabulary_data: dict, user_id: int):
-        raw_vocabulary = vocabulary_data.get("bulk_vocabulary")
-        vocabulary_name = vocabulary_data.get("name")
+    async def create_vocabulary(cls, vocabulary: VocabularyCreateSchema):
+        vocabulary: dict = vocabulary.model_dump()
+        lang_pairs = [LanguagePair(**lp) for lp in vocabulary.get("language_pairs")]
+        vocabulary.update({"language_pairs": lang_pairs})
 
-        vocabulary_set = await VocabularySetDAL.create(name=vocabulary_name, owner_id=user_id)
+        await VocabularySetDAL.create(**vocabulary)
 
-        vocabulary_parser = VocabularyParser(vocabulary_id=vocabulary_set.id)
-        parsed_vocabulary = vocabulary_parser.parse_bulk_vocabulary(raw_vocabulary)
 
-        await LanguagePairDAL.bulk_create([word_pair.model_dump() for word_pair in parsed_vocabulary])
-    
+    @classmethod
+    async def append_language_pairs_to_vocabulary(cls, append_lp_data: LanguagePairsAppendSchema):
+        vocabulary_to_append = await VocabularySetDAL.get_by_id(append_lp_data.vocabulary_id)
+        cls._validate_user_vocabulary(append_lp_data.user_id, vocabulary_to_append)
+
+        # TODO: move vocabulary_id population to schema
+        language_pairs: list[dict] = []
+        for lp in append_lp_data.language_pairs:
+            lp_as_dict = lp.model_dump()
+            lp_as_dict.update({"vocabulary_id": append_lp_data.vocabulary_id})
+            language_pairs.append(lp_as_dict)
+
+        await LanguagePairDAL.bulk_create(language_pairs)
 
     @classmethod
     async def get_recent_user_vocabulary(cls, user_id: int) -> VocabularySet:

@@ -1,5 +1,4 @@
-from app.bot.vocabulary.schemas import VocabularySetSchema
-from app.shared.schemas import ExtendedLanguagePairSchema
+from app.shared.schemas import VocabularySchema, ExtendedLanguagePairSchema
 
 
 class VocabularyMessages:
@@ -11,8 +10,19 @@ class VocabularyMessages:
 🔄 <b>Case Insensitive:</b> Cases don't matter; "Word - Translation" = "word - translation."
 ➖ <b>Hyphen in Words:</b> Totally allowed, but only as a separator.
 🌟 <b>Multiple Translations:</b> Use commas for multiple translations, like "Word - Translation, Another."
+📌 <b>Extra info:</b> You can add some extra info for each part of pair in parenthesis.
 🎉 <b>Have Fun!</b> Enjoy expanding your vocabulary with the bot! 🚀
     """
+
+    vocabulary_appending_rules = """
+    <b>This is rules to append new words to vocabulary:</b>
+
+📝 <b>Format:</b> Enter word pairs with a hyphen "-" on each line.
+🔄 <b>Case Insensitive:</b> Cases don't matter; "Word - Translation" = "word - translation."
+➖ <b>Hyphen in Words:</b> Totally allowed, but only as a separator.
+🌟 <b>Multiple Translations:</b> Use commas for multiple translations, like "Word - Translation, Another."
+📌 <b>Extra info:</b> You can add some extra info for each part of pair in parenthesis.
+"""
 
     select_quiz_type_msg = """
 Welcome to the Language Learning Quiz! 🌐📚
@@ -110,7 +120,7 @@ Feel free to come back anytime! 👋✨
 
     
     @classmethod
-    def get_full_vocabulary_entity_msg(cls, vocabulary_set: VocabularySetSchema) -> str:
+    def get_full_vocabulary_entity_msg(cls, vocabulary_set: VocabularySchema) -> str:
         full_msg: list[str] = []
         if vocabulary_set.is_active:
             notification_status = cls.notification_active

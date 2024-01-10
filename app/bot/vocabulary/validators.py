@@ -2,23 +2,55 @@ import re
 from difflib import SequenceMatcher
 from typing import Union
 
+from app.shared.schemas import LanguagePairSchema
+
+
+class VocabularyParser:
+    split_rule: str = r'\s*-\s*'
+
+    def parse_bulk_vocabulary(self, raw_bulk_vocabulary: str) -> list[LanguagePairSchema]:
+        lines = raw_bulk_vocabulary.split('\n')
+        result: list[LanguagePairSchema] = []
+
+        for line in lines:
+            result.append(self.parse_line_vocabulary(line))
+
+        return result
+    
+    def parse_line_vocabulary(self, raw_line_vocabulary: str) -> LanguagePairSchema:
+        word, translation = re.split(self.split_rule, raw_line_vocabulary)
+
+        return LanguagePairSchema(
+            word=word.strip(),
+            translation=translation.strip(),
+        )
+
 
 class VocabularyValidator:
     line_vocabulary_pattern = re.compile(r'^\s*([^-\n]+)\s*-\s*([^-\n]+[^\s])\s*$', re.I|re.X|re.S|re.U)
 
-    @classmethod
-    def validate_bulk(cls, bulk_vocabulary: str) -> bool:
-        raw_language_pairs = bulk_vocabulary.split("\n")
+    def __init__(
+            self,
+            min_lines: int = 2,
+            max_lines: int = 30,
+            split_rule: str = "\n"
+        ) -> None:
+        self._min_lines = min_lines
+        self._max_lines = max_lines
+        self._split_rule = split_rule
 
-        if len(raw_language_pairs) < 2:
+    def validate(self, bulk_vocabulary: str) -> bool:
+        raw_language_pairs = bulk_vocabulary.split(self._split_rule)
+        language_pairs_count = len(raw_language_pairs)
+
+        if language_pairs_count > self._max_lines or language_pairs_count < self._min_lines:
             return False
         
-        is_all_lines_valid = all(cls.validate_line(lang_pair) for lang_pair in raw_language_pairs)
+        is_all_lines_valid = all(self.validate_line(lang_pair) for lang_pair in raw_language_pairs)
         return is_all_lines_valid
     
-    @classmethod
-    def validate_line(cls, raw_lang_pair: str):
-        if cls.line_vocabulary_pattern.match(raw_lang_pair) is None:
+    def validate_line(self, raw_lang_pair: str):
+        if self.line_vocabulary_pattern.match(raw_lang_pair) is None:
             return False
         else:
             return True
