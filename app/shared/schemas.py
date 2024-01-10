@@ -28,3 +28,9 @@ class VocabularyCreateSchema(BaseModel):
     owner_id: int
     name: str
     language_pairs: list[LanguagePairSchema]
+
+
+class LanguagePairsAppendSchema(BaseModel):
+    user_id: int
+    vocabulary_id: int
+    language_pairs: list[LanguagePairSchema]
