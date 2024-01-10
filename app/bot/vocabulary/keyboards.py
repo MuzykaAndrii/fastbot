@@ -33,12 +33,19 @@ class ActionsKeyboard:
     
     def get_markup(self):
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [self.delete_btn, self.notification_btn],
+            [self.delete_btn, self.append_btn, self.notification_btn],
             [self.gen_text_btn, self.quiz_btn,],
             [self.move_backward_btn, self.move_forward_btn],
         ])
 
         return keyboard
+    
+    @property
+    def append_btn(self):
+        return InlineKeyboardButton(
+            text="➕ Add words",
+            callback_data=self._make_callback_data(VocabularyAction.append_words),
+        )
     
     @property
     def gen_text_btn(self):

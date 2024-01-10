@@ -11,6 +11,7 @@ class VocabularyAction(str, Enum):
     enable_notification = "notification_on"
     disable_notification = "notification_off"
     gen_text = "gen_text"
+    append_words = "append_words"
 
 
 class VocabularyCallbackData(CallbackData, prefix="vocabulary_action"):
