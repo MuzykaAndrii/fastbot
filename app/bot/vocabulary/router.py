@@ -6,6 +6,7 @@ from app.bot.vocabulary.handlers.notifications_vocabulary import router as notif
 from app.bot.vocabulary.handlers.quiz_vocabulary import router as quiz_vocabulary_router
 from app.bot.vocabulary.handlers.delete_vocabulary import router as delete_vocabulary_router
 from app.bot.vocabulary.handlers.gen_text_from_vocabulary import router as gen_text_router
+from app.bot.vocabulary.handlers.append_lang_pairs import router as append_lang_pairs_router
 from app.bot.vocabulary.exceptions_handlers import errors_handler_router
 
 
@@ -16,6 +17,7 @@ vocabulary_router.include_routers(
     notifications_vocabulary_router,
     delete_vocabulary_router,
     gen_text_router,
+    append_lang_pairs_router,
     quiz_vocabulary_router,
 
     errors_handler_router,
