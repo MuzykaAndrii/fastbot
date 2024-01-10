@@ -44,7 +44,7 @@ class ActionsKeyboard:
     def append_btn(self):
         return InlineKeyboardButton(
             text="➕ Add words",
-            callback_data=self._make_callback_data(VocabularyAction.append_words),
+            callback_data=self._make_callback_data(VocabularyAction.append_language_pairs),
         )
     
     @property
