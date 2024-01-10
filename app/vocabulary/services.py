@@ -6,8 +6,8 @@ from app.shared.exceptions import (
     VocabularyDoesNotExist,
     VocabularyIsAlreadyActive
 )
-from app.shared.schemas import ExtendedLanguagePairSchema, VocabularyCreateSchema
-from app.vocabulary.dal import VocabularySetDAL
+from app.shared.schemas import ExtendedLanguagePairSchema, LanguagePairsAppendSchema, VocabularyCreateSchema
+from app.vocabulary.dal import LanguagePairDAL, VocabularySetDAL
 from app.vocabulary.models import VocabularySet, LanguagePair
 
 
@@ -19,6 +19,14 @@ class VocabularyService:
         vocabulary.update({"language_pairs": lang_pairs})
 
         await VocabularySetDAL.create(**vocabulary)
+
+
+    @classmethod
+    async def append_language_pairs_to_vocabulary(cls, append_lp_data: LanguagePairsAppendSchema):
+        vocabulary_to_append = await VocabularySetDAL.get_by_id(append_lp_data.vocabulary_id)
+        cls._validate_user_vocabulary(append_lp_data.user_id, vocabulary_to_append)
+
+        await LanguagePairDAL.bulk_create([lp.model_dump() for lp in append_lp_data.language_pairs])
 
     @classmethod
     async def get_recent_user_vocabulary(cls, user_id: int) -> VocabularySet:
