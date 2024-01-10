@@ -26,7 +26,13 @@ class VocabularyService:
         vocabulary_to_append = await VocabularySetDAL.get_by_id(append_lp_data.vocabulary_id)
         cls._validate_user_vocabulary(append_lp_data.user_id, vocabulary_to_append)
 
-        await LanguagePairDAL.bulk_create([lp.model_dump() for lp in append_lp_data.language_pairs])
+        language_pairs: list[dict] = []
+        for lp in append_lp_data.language_pairs:
+            lp_as_dict = lp.model_dump()
+            lp_as_dict.update({"vocabulary_id": append_lp_data.vocabulary_id})
+            language_pairs.append(lp_as_dict)
+
+        await LanguagePairDAL.bulk_create(language_pairs)
 
     @classmethod
     async def get_recent_user_vocabulary(cls, user_id: int) -> VocabularySet:

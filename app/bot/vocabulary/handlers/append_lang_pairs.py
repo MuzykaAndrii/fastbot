@@ -1,11 +1,13 @@
 from aiogram import F, Router
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, Message, ReplyKeyboardRemove
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 
 from app.bot.vocabulary.callback_patterns import VocabularyAction, VocabularyCallbackData
 from app.bot.vocabulary.messages import VocabularyMessages
-from app.bot.vocabulary.validators import VocabularyValidator
+from app.bot.vocabulary.validators import VocabularyParser, VocabularyValidator
+from app.shared.schemas import LanguagePairsAppendSchema
+from app.vocabulary.services import VocabularyService
 
 
 router = Router()
@@ -18,14 +20,22 @@ class AppendLanguagePairsStates(StatesGroup):
 async def append_language_pairs(query: CallbackQuery, callback_data: VocabularyCallbackData, state: FSMContext):
     await state.set_state(AppendLanguagePairsStates.handling_input)
     await state.update_data({"vocabulary_id": callback_data.vocabulary_id})
-    await query.message.answer(VocabularyMessages.vocabulary_appending_rules)
+    await query.message.edit_text(VocabularyMessages.vocabulary_appending_rules, reply_markup=None)
+    await query.message.answer("Okay, send me new words! I am waiting)")
 
 
 @router.message(AppendLanguagePairsStates.handling_input, F.text.func(VocabularyValidator(1).validate))
 async def save_language_pairs(message: Message, state: FSMContext):
-    await message.answer("success")
-    ...
+    state_data = await state.get_data()
 
+    append_lp_data = LanguagePairsAppendSchema(
+        user_id=message.from_user.id,
+        vocabulary_id=state_data.get("vocabulary_id"),
+        language_pairs=VocabularyParser().parse_bulk_vocabulary(message.text),
+    )
+    await VocabularyService.append_language_pairs_to_vocabulary(append_lp_data)
+
+    await message.answer("New words saved successfully, check it out!")
 
 @router.message(AppendLanguagePairsStates.handling_input, ~F.text)
 async def handle_wrong_input_type(message: Message):
