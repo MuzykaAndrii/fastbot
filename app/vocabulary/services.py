@@ -26,6 +26,7 @@ class VocabularyService:
         vocabulary_to_append = await VocabularySetDAL.get_by_id(append_lp_data.vocabulary_id)
         cls._validate_user_vocabulary(append_lp_data.user_id, vocabulary_to_append)
 
+        # TODO: move vocabulary_id population to schema
         language_pairs: list[dict] = []
         for lp in append_lp_data.language_pairs:
             lp_as_dict = lp.model_dump()

@@ -35,13 +35,14 @@ async def save_language_pairs(message: Message, state: FSMContext):
     )
     await VocabularyService.append_language_pairs_to_vocabulary(append_lp_data)
 
-    await message.answer("New words saved successfully, check it out!")
+    # TODO: show edited vocabulary
+    await message.answer("New words saved successfully, check it out by /my")
 
 @router.message(AppendLanguagePairsStates.handling_input, ~F.text)
 async def handle_wrong_input_type(message: Message):
     await message.answer("Oh no! It seems what your'e sent something wrong. Try again.")
 
-
+ 
 @router.message(AppendLanguagePairsStates.handling_input)
 async def handle_invalid_input(message: Message):
     await message.answer("Oh no! Your'e sent word(s) in wrong format. Please send me word pairs appropriate to instructions above.")
