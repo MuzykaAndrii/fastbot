@@ -76,6 +76,9 @@ class StringMatcher:
             
         return SequenceMatcher(None, self._text, to_compare).ratio() >= self.similarity_treshold
 
+    def __str__(self) -> str:
+        return str(self._text)
+
 
 class TranslationChecker:
     def __init__(self, text: str, accuracy: float = .95) -> None:
@@ -89,8 +92,8 @@ class TranslationChecker:
         return iter(self._variants)
 
     def _split_variants(self, text: str) -> tuple[StringMatcher]:
-        text: str = text.strip().lower()
         text: str = self._trim_parenthesis(text)
+        text: str = text.strip().lower()
         text: set[str] = set(self._split_text(text))
         text: tuple[StringMatcher] = tuple(StringMatcher(variant, self.accuracy) for variant in text)
         return text
@@ -100,6 +103,9 @@ class TranslationChecker:
 
     def _split_text(self, text: str) -> list[str]:
         return re.split(r"\s*,\s*", text)
+    
+    def __str__(self) -> str:
+        return " | ".join(str(variant) for variant in self._variants)
 
 
 class QuizAnswerChecker:
@@ -122,3 +128,5 @@ if __name__ == '__main__':
 
     assert QuizAnswerChecker("зобовязаний, винний", "ще якись, зобовязаний, винний").is_match() == True
     assert QuizAnswerChecker("винний, зобовязаний", "ще якись, зобовязаний, винний").is_match() == True
+
+    assert QuizAnswerChecker("грубий (про стан якоїсь речі)", "Грубий").is_match() == True
