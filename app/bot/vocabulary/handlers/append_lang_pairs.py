@@ -36,6 +36,7 @@ async def save_language_pairs(message: Message, state: FSMContext):
     await VocabularyService.append_language_pairs_to_vocabulary(append_lp_data)
 
     # TODO: show edited vocabulary
+    await state.clear()
     await message.answer("New words saved successfully, check it out by /my")
 
 @router.message(AppendLanguagePairsStates.handling_input, ~F.text)
