@@ -88,7 +88,6 @@ Feel free to come back anytime! 👋✨
 
     user_havent_any_vocabularies = "You're haven't any vocabularies yet("
     user_is_not_owner_of_vocabulary = "☢️ You're not owner of this vocabulary! ☢️"
-    vocabulary_deleted_successfully = "🗑️ Vocabulary deleted successfully 🫡"
     vocabulary_dont_exists = "Vocabulary does not exist 🤷🏻‍♂️"
 
     vocabulary_already_active = "Notifications for this vocabulary already active 😉"
