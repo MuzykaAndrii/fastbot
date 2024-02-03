@@ -4,7 +4,7 @@ from app.bot.vocabulary.handlers.create_vocabulary import router as create_vocab
 from app.bot.vocabulary.handlers.show_vocabulary import router as show_vocabulary_router
 from app.bot.vocabulary.handlers.notifications_vocabulary import router as notifications_vocabulary_router
 from app.bot.vocabulary.handlers.quiz_vocabulary import router as quiz_vocabulary_router
-from app.bot.vocabulary.handlers.delete_vocabulary import router as delete_vocabulary_router
+from app.bot.vocabulary.delete.handlers import router as delete_vocabulary_router
 from app.bot.vocabulary.handlers.gen_text_from_vocabulary import router as gen_text_router
 from app.bot.vocabulary.handlers.append_lang_pairs import router as append_lang_pairs_router
 from app.bot.vocabulary.exceptions_handlers import errors_handler_router
