@@ -1,7 +1,7 @@
 from aiogram.types import CallbackQuery
 
-from app.bot.vocabulary.handlers.utils import update_vocabulary_msg
 from app.bot.vocabulary.messages import VocabularyMessages
+from app.bot.vocabulary.show.actions import update_vocabulary_msg
 from . import messages
 from app.shared.exceptions import NoVocabulariesFound
 from app.vocabulary.services import VocabularyService

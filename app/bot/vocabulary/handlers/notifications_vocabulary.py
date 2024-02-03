@@ -3,8 +3,8 @@ from aiogram.filters import Command
 from aiogram import F
 
 from app.bot.vocabulary.callback_patterns import VocabularyCallbackData, VocabularyAction
-from app.bot.vocabulary.handlers.utils import update_vocabulary_msg
 from app.bot.vocabulary.messages import VocabularyMessages
+from app.bot.vocabulary.show.actions import update_vocabulary_msg
 from app.vocabulary.services import VocabularyService
 
 router = Router()
