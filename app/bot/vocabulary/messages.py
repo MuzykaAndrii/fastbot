@@ -1,4 +1,4 @@
-from app.shared.schemas import VocabularySchema, ExtendedLanguagePairSchema
+from app.shared.schemas import ExtendedLanguagePairSchema
 
 
 class VocabularyMessages:
@@ -91,12 +91,8 @@ Feel free to come back anytime! 👋✨
     vocabulary_dont_exists = "Vocabulary does not exist 🤷🏻‍♂️"
 
     vocabulary_already_active = "Notifications for this vocabulary already active 😉"
-    notification_active = " "*20 + "alerts is on ✅"
-    notification_unactive = " "*19 + "alerts is off 📴"
-    vocabulary_entity_header = "📃 <i>{vocabulary_name}</i>{notification_status}\n"
     active_vocabulary = "✅ Alerts active for: <b>{vocabulary_name}</b>"
     no_active_vocabulary = "📵 Alerts is turned off"
-    vocabulary_entity_item = "{number}. <b>{word}</b> - {translation}"
 
     language_pair_notification = "<b>{word}</b> - {translation}"
     language_pair_notification_sentence_example = "📖 {sentence}"
@@ -116,25 +112,3 @@ Feel free to come back anytime! 👋✨
             notification = f"{notification}\n{sentence_example}"
         
         return notification
-
-    
-    @classmethod
-    def get_full_vocabulary_entity_msg(cls, vocabulary_set: VocabularySchema) -> str:
-        full_msg: list[str] = []
-        if vocabulary_set.is_active:
-            notification_status = cls.notification_active
-        else:
-            notification_status = cls.notification_unactive
-
-        header = cls.vocabulary_entity_header.format(vocabulary_name=vocabulary_set.name, notification_status=notification_status)
-
-        full_msg.append(header)
-
-        for index, lang_pair in enumerate(vocabulary_set.language_pairs, start=1):
-            full_msg.append(cls.vocabulary_entity_item.format(
-                number=index,
-                word=lang_pair.word,
-                translation=lang_pair.translation,
-            ))
-        
-        return "\n".join(full_msg)
