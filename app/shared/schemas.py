@@ -18,6 +18,7 @@ class ExtendedLanguagePairSchema(BaseModel):
 
 class VocabularySchema(BaseModel):
     id: int
+    owner_id: int
     name: str
     is_active: bool
     created_at: datetime

@@ -90,10 +90,6 @@ Feel free to come back anytime! 👋✨
     user_is_not_owner_of_vocabulary = "☢️ You're not owner of this vocabulary! ☢️"
     vocabulary_dont_exists = "Vocabulary does not exist 🤷🏻‍♂️"
 
-    vocabulary_already_active = "Notifications for this vocabulary already active 😉"
-    active_vocabulary = "✅ Alerts active for: <b>{vocabulary_name}</b>"
-    no_active_vocabulary = "📵 Alerts is turned off"
-
     language_pair_notification = "<b>{word}</b> - {translation}"
     language_pair_notification_sentence_example = "📖 {sentence}"
     
