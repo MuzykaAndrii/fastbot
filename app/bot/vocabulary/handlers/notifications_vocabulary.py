@@ -4,7 +4,7 @@ from aiogram import F
 
 from app.bot.vocabulary.callback_patterns import VocabularyCallbackData, VocabularyAction
 from app.bot.vocabulary.messages import VocabularyMessages
-from app.bot.vocabulary.show.actions import show_vocabulary
+from app.bot.vocabulary.show.actions import show_vocabulary_in_existing_msg
 from app.vocabulary.services import VocabularyService
 
 router = Router()
@@ -21,7 +21,7 @@ async def handle_enable_notification_vocabulary_action(query: types.CallbackQuer
         text=VocabularyMessages.active_vocabulary.format(vocabulary_name=enabled_vocabulary.name)
     )
     await vocabulary_is_active_msg.pin(disable_notification=True)
-    await show_vocabulary(enabled_vocabulary, edit_existing=query.message)
+    await show_vocabulary_in_existing_msg(enabled_vocabulary, query.message)
 
 
 @router.callback_query(VocabularyCallbackData.filter(F.action == VocabularyAction.disable_notification))
@@ -33,7 +33,7 @@ async def handle_disable_notification_btn(query: types.CallbackQuery):
 
     latest_vocabulary = await VocabularyService.get_recent_user_vocabulary(query.from_user.id)
     
-    await show_vocabulary(latest_vocabulary, edit_existing=query.message)
+    await show_vocabulary_in_existing_msg(latest_vocabulary, query.message)
 
 
     

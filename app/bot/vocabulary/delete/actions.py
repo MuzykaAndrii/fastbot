@@ -1,7 +1,7 @@
 from aiogram.types import CallbackQuery
 
 from app.bot.vocabulary.messages import VocabularyMessages
-from app.bot.vocabulary.show.actions import show_vocabulary
+from app.bot.vocabulary.show.actions import show_vocabulary_in_existing_msg
 from . import messages
 from app.shared.exceptions import NoVocabulariesFound
 from app.vocabulary.services import VocabularyService
@@ -22,7 +22,7 @@ async def delete_vocabulary(
         await query.message.edit_reply_markup(reply_markup=None)
 
     else:
-        await show_vocabulary(latest_vocabulary, edit_existing=query.message)
+        await show_vocabulary_in_existing_msg(latest_vocabulary, query.message)
 
     finally:
         await query.answer(text=messages.vocabulary_deleted_successfully)
