@@ -1,6 +1,6 @@
-from aiogram import types
+from aiogram import Bot, types
 
-from app.shared.schemas import VocabularySchema
+from app.shared.schemas import ExtendedLanguagePairSchema, VocabularySchema
 
 from . import messages
 from app.vocabulary.services import VocabularyService
@@ -33,3 +33,12 @@ async def disable_user_active_vocabulary(message: types.Message):
 
     vocabulary_disabled_message = await message.answer(messages.no_active_vocabulary)
     await vocabulary_disabled_message.pin(disable_notification=True)
+
+
+async def send_notification(bot: Bot, language_pair: ExtendedLanguagePairSchema) -> types.Message | None:
+    notification = await bot.send_message(
+        language_pair.owner_id,
+        messages.get_language_pair_notification(language_pair),
+    )
+
+    return notification

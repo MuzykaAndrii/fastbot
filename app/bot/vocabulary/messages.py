@@ -68,19 +68,3 @@ Feel free to come back anytime! 👋✨
     user_havent_any_vocabularies = "You're haven't any vocabularies yet("
     user_is_not_owner_of_vocabulary = "☢️ You're not owner of this vocabulary! ☢️"
     vocabulary_dont_exists = "Vocabulary does not exist 🤷🏻‍♂️"
-
-    language_pair_notification = "<b>{word}</b> - {translation}"
-    language_pair_notification_sentence_example = "📖 {sentence}"
-    
-    @classmethod
-    def get_language_pair_notification(cls, lang_pair: ExtendedLanguagePairSchema) -> str:
-        notification = cls.language_pair_notification.format(
-            word=lang_pair.word,
-            translation=lang_pair.translation
-        )
-
-        if lang_pair.sentence_example:
-            sentence_example = cls.language_pair_notification_sentence_example.format(sentence=lang_pair.sentence_example)
-            notification = f"{notification}\n{sentence_example}"
-        
-        return notification
