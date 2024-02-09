@@ -33,6 +33,7 @@ async def save_language_pairs(message: Message, state: FSMContext):
         raw_language_pairs=message.text,
     )
 
+    await state.clear()
     await message.answer(messages.successful_save_text)
 
 @router.message(AppendLanguagePairsStates.handling_input, ~F.text)
