@@ -15,6 +15,7 @@ class TranslationChecker:
         return iter(self._variants)
 
     def _split_variants(self, text: str) -> tuple[StringMatcher]:
+        text: str = text.strip().lower()
         text: str = self._trim_parenthesis(text)
         text: str = text.strip().lower()
         text: set[str] = set(self._split_text(text))
