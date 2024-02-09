@@ -26,14 +26,9 @@ class VocabularyService:
         vocabulary_to_append = await VocabularySetDAL.get_by_id(append_lp_data.vocabulary_id)
         cls._validate_user_vocabulary(append_lp_data.user_id, vocabulary_to_append)
 
-        # TODO: move vocabulary_id population to schema
-        language_pairs: list[dict] = []
-        for lp in append_lp_data.language_pairs:
-            lp_as_dict = lp.model_dump()
-            lp_as_dict.update({"vocabulary_id": append_lp_data.vocabulary_id})
-            language_pairs.append(lp_as_dict)
+        lang_pairs_as_dicts = (lp.model_dump() for lp in append_lp_data.language_pairs)
 
-        await LanguagePairDAL.bulk_create(language_pairs)
+        await LanguagePairDAL.bulk_create(lang_pairs_as_dicts)
 
     @classmethod
     async def get_recent_user_vocabulary(cls, user_id: int) -> VocabularySet:
@@ -122,6 +117,12 @@ class VocabularyService:
     async def disable_user_active_vocabulary(cls, user_id: int) -> None:
         await VocabularySetDAL.disable_user_active_vocabulary(user_id)
     
+
+    @classmethod
+    async def disable_vocabulary(cls, vocabulary_id: int) -> None:
+        disabled_vocabulary = await VocabularySetDAL.make_unactive(vocabulary_id)
+        return disabled_vocabulary
+
 
     @classmethod
     def _validate_user_vocabulary(

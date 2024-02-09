@@ -1,8 +1,11 @@
+import logging
+
 from app.bot.user.services import UserService
-from app.bot.vocabulary.messages import VocabularyMessages
 from app.bot.main import bot
-from app.logger import logger
+from app.bot.vocabulary.notifications.actions import send_notification
 from app.shared.schemas import ExtendedLanguagePairSchema
+
+logger = logging.getLogger(__name__)
 
 
 async def send_notifications(language_pairs: list[ExtendedLanguagePairSchema]) -> None:
@@ -14,12 +17,9 @@ async def send_notifications(language_pairs: list[ExtendedLanguagePairSchema]) -
             logger.info(f"Notification to {lang_pair.owner_id} skipped")
             continue
         
-        sended_notification = await bot.bot.send_message(
-            lang_pair.owner_id,
-            VocabularyMessages.get_language_pair_notification(lang_pair),
-        )
+        notification = await send_notification(bot.bot, lang_pair)
         
-        if sended_notification:
+        if notification:
             logger.info(f"Sended notification to {lang_pair.owner_id}")
         else:
             logger.warn(f"Sending notification to {lang_pair.owner_id} failed")

@@ -29,6 +29,19 @@ class VocabularySetDAL(BaseDAL):
             await session.execute(query)
             await session.commit()
             return await session.get(VocabularySet, vocabulary_id)
+    
+
+    @classmethod
+    async def make_unactive(cls, vocabulary_id: int) -> VocabularySet:
+        async with cls.make_session() as session:
+            query = (
+                update(VocabularySet)
+                .where(VocabularySet.id == vocabulary_id)
+                .values(is_active=False)
+            )
+            await session.execute(query)
+            await session.commit()
+            return await session.get(VocabularySet, vocabulary_id)
 
     
     @classmethod

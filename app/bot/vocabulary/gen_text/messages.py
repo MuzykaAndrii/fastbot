@@ -1,0 +1,2 @@
+text_generator_not_available = "Oops! 🙊 Text generation is not available now. 😰 Please try again later. ⌛️"
+generated_text = "This is a generated text from your vocabulary: <b>{vocabulary_name}</b>\n\n{text}"

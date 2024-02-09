@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from aiogram.types.message import Message
 from aiogram.fsm.context import FSMContext
 
-from app.bot.vocabulary.exceptions import LanguagePairsForQuestionsIsEmptyError, QuestionsIsGoneError, QuizItemNotLoadedError
+from .exceptions import QuestionsIsEmptyError, QuestionsIsGoneError, QuizItemNotLoadedError
 
 
 @dataclass(frozen=True, slots=True)
@@ -17,7 +17,7 @@ class QuestionItem:
 class QuestionManager(ABC):
     @abstractmethod
     def get_question_item(self) -> QuestionItem:
-        raise NotImplementedError
+        pass
 
 
 class Quiz:
@@ -90,7 +90,7 @@ class Quiz:
         try:
             return round(self.correct_answers_count / self.questions_count * 100, 1)
         except ZeroDivisionError:
-            raise LanguagePairsForQuestionsIsEmptyError
+            raise QuestionsIsEmptyError
     
     @classmethod
     async def load_form_state(cls, state: FSMContext):

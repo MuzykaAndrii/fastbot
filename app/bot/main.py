@@ -8,7 +8,7 @@ from aiogram.fsm.storage.memory import SimpleEventIsolation
 
 from app.config import settings
 from app.bot.base.handlers.start import router as start_router
-from app.bot.vocabulary.router import vocabulary_router
+from app.bot.vocabulary import router as vocabulary_router
 
 
 logging.basicConfig(level=logging.INFO)
