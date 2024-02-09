@@ -8,7 +8,7 @@ from .notifications.handlers import router as notifications_vocabulary_router
 from .handlers.quiz_vocabulary import router as quiz_vocabulary_router
 from .delete.handlers import router as delete_vocabulary_router
 from .gen_text.handlers import router as gen_text_router
-from .handlers.append_lang_pairs import router as append_lang_pairs_router
+from .append.handlers import router as append_lang_pairs_router
 from .exceptions_handlers import errors_handler_router
 
 
