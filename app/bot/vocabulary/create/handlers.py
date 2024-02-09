@@ -4,10 +4,10 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram import F
 
+from .actions import create_vocabulary
+from . import messages
 from app.bot.vocabulary.messages import VocabularyMessages
-from app.bot.vocabulary.validators import VocabularyParser, VocabularyValidator
-from app.shared.schemas import VocabularyCreateSchema
-from app.vocabulary.services import VocabularyService
+from app.bot.vocabulary.validators import VocabularyValidator
 
 router = Router()
 
@@ -20,7 +20,7 @@ class VocabularyCreationStates(StatesGroup):
 @router.message(Command("create"))
 async def handle_create_cmd(message: types.Message, state: FSMContext):
     await state.set_state(VocabularyCreationStates.name_specifying)
-    await message.answer(f"✨ To create a new vocabulary, specify its name")
+    await message.answer(messages.create_vocabulary_text)
 
 
 @router.message(Command("cancel"))
@@ -31,36 +31,30 @@ async def handle_cancel_cmd(message: types.Message, state: FSMContext):
         return
 
     await state.clear()
-    await message.answer("Cancelled. ❌")
+    await message.answer(VocabularyMessages.cancelled_text)
 
 
 @router.message(VocabularyCreationStates.name_specifying, ~F.text)
 async def handle_incorrect_vocabulary_name(message: types.Message, state: FSMContext):
-    await message.reply("Invalid vocabulary name, please try again 🤔")
+    await message.reply(messages.invalid_vocabulary_name_text)
 
 
 @router.message(VocabularyCreationStates.name_specifying)
 async def save_vocabulary_name(message: types.Message, state: FSMContext):
     await state.update_data(name=message.text)
     await state.set_state(VocabularyCreationStates.lang_pairs_specifying)
-    await message.answer(VocabularyMessages.vocabulary_creation_rules)
+    await message.answer(messages.vocabulary_creation_rules)
 
 
 @router.message(VocabularyCreationStates.lang_pairs_specifying, F.text.func(VocabularyValidator().validate))
 async def handle_lang_pairs_input(message: types.Message, state: FSMContext):
     state_data = await state.get_data()
 
-    vocabulary = VocabularyCreateSchema(
-        owner_id=message.from_user.id,
-        name=state_data.get('name'),
-        language_pairs=VocabularyParser().parse_bulk_vocabulary(message.text),
-    )
-
-    await VocabularyService.create_vocabulary(vocabulary)
+    await create_vocabulary(message=message, vocabulary_name=state_data.get('name'))
+    
     await state.clear()
-    await message.answer("Vocabulary saved successfully! 🎉 Check it out using /my command!")
 
 
 @router.message(VocabularyCreationStates.lang_pairs_specifying)
 async def handle_lang_pairs_invalid_input(message: types.Message, state: FSMContext):
-    await message.answer("Invalid vocabulary, please follow the correct format 🚫") 
+    await message.answer(messages.invalid_vocabulary_input_text) 

@@ -2,7 +2,7 @@ __all__ = ("router",)
 
 from aiogram import Router
 
-from .handlers.create_vocabulary import router as create_vocabulary_router
+from .create.handlers import router as create_vocabulary_router
 from .show.handlers import router as show_vocabulary_router
 from .notifications.handlers import router as notifications_vocabulary_router
 from .handlers.quiz_vocabulary import router as quiz_vocabulary_router
