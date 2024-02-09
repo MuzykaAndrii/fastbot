@@ -1,4 +1,4 @@
-from app.bot.vocabulary.validators import VocabularyParser
+from app.bot.vocabulary.parsers import VocabularyParser
 from app.shared.schemas import LanguagePairsAppendSchema
 from app.vocabulary.services import VocabularyService
 

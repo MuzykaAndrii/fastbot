@@ -1,6 +1,6 @@
 from aiogram import types
 
-from app.bot.vocabulary.validators import VocabularyParser
+from app.bot.vocabulary.parsers import VocabularyParser
 from app.shared.schemas import VocabularyCreateSchema
 from app.vocabulary.services import VocabularyService
 

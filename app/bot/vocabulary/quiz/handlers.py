@@ -13,12 +13,12 @@ from app.bot.modules.base_quiz.base_quiz import Quiz
 
 from app.bot.modules.base_quiz.exceptions import QuestionsIsGoneError
 from app.bot.vocabulary.callback_patterns import VocabularyAction, VocabularyCallbackData
+from .answer_checker import QuizAnswerChecker
 from .callback_patterns import QuizStrategy, VocabularyQuizCallbackData
 from .keyboards import SelectQuizTypeKeyboard, get_quiz_keyboard
 from . import messages
 from app.bot.vocabulary.quiz.question_manager import VocabularyQuestionManager
 from app.shared.schemas import LanguagePairSchema
-from app.bot.vocabulary.validators import QuizAnswerChecker
 from app.vocabulary.services import VocabularyService
 
 
