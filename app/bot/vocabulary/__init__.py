@@ -5,7 +5,7 @@ from aiogram import Router
 from .create.handlers import router as create_vocabulary_router
 from .show.handlers import router as show_vocabulary_router
 from .notifications.handlers import router as notifications_vocabulary_router
-from .handlers.quiz_vocabulary import router as quiz_vocabulary_router
+from .quiz.handlers import router as quiz_vocabulary_router
 from .delete.handlers import router as delete_vocabulary_router
 from .gen_text.handlers import router as gen_text_router
 from .append.handlers import router as append_lang_pairs_router

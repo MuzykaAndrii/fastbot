@@ -9,13 +9,14 @@ from aiogram.fsm.scene import Scene, on
 from aiogram.fsm.scene import SceneRegistry
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command
+from app.bot.modules.base_quiz.base_quiz import Quiz
 
-from app.bot.modules.base_quiz import Quiz
-from app.bot.vocabulary.callback_patterns import QuizStrategy, VocabularyQuizCallbackData, VocabularyAction, VocabularyCallbackData
-from app.bot.vocabulary.exceptions import QuestionsIsGoneError
-from app.bot.vocabulary.keyboards import QuizTypesKeyboard, get_quiz_keyboard
-from app.bot.vocabulary.messages import VocabularyMessages
-from app.bot.vocabulary.question_manager import VocabularyQuestionManager
+from app.bot.modules.base_quiz.exceptions import QuestionsIsGoneError
+from app.bot.vocabulary.callback_patterns import VocabularyAction, VocabularyCallbackData
+from .callback_patterns import QuizStrategy, VocabularyQuizCallbackData
+from .keyboards import SelectQuizTypeKeyboard, get_quiz_keyboard
+from . import messages
+from app.bot.vocabulary.quiz.question_manager import VocabularyQuestionManager
 from app.shared.schemas import LanguagePairSchema
 from app.bot.vocabulary.validators import QuizAnswerChecker
 from app.vocabulary.services import VocabularyService
@@ -26,8 +27,8 @@ router = Router()
 
 @router.callback_query(VocabularyCallbackData.filter(F.action == VocabularyAction.quiz))
 async def show_quiz_types(query: CallbackQuery, callback_data: VocabularyCallbackData):
-    select_quiz_types_keyboard = QuizTypesKeyboard(callback_data.vocabulary_id).get_markup()
-    await query.message.edit_text(VocabularyMessages.select_quiz_type_msg)
+    select_quiz_types_keyboard = SelectQuizTypeKeyboard(callback_data.vocabulary_id).get_markup()
+    await query.message.edit_text(messages.select_quiz_type_msg)
     await query.message.edit_reply_markup(reply_markup=select_quiz_types_keyboard)
 
 
@@ -45,7 +46,7 @@ class QuizScene(Scene, state="quiz"):
 
         await quiz.save_to_state(state)
 
-        await message.answer(VocabularyMessages.start_quiz_msg, reply_markup=get_quiz_keyboard())
+        await message.answer(messages.start_quiz_msg, reply_markup=get_quiz_keyboard())
         await self.ask_question(message, state)
 
 
@@ -59,7 +60,7 @@ class QuizScene(Scene, state="quiz"):
 
         await quiz.save_to_state(state)
 
-        await query.message.answer(VocabularyMessages.start_quiz_msg, reply_markup=get_quiz_keyboard())
+        await query.message.answer(messages.start_quiz_msg, reply_markup=get_quiz_keyboard())
         await self.ask_question(query.message, state)
     
 
@@ -72,7 +73,7 @@ class QuizScene(Scene, state="quiz"):
             return await self.wizard.exit(show_stats=True)
 
         question_msg = await message.answer(
-            VocabularyMessages.quiz_question.format(
+            messages.quiz_question.format(
                 question=quiz.current_question,
                 current_question_num=quiz.answered_questions_count,
                 total_question_count=quiz.questions_count,
@@ -85,7 +86,7 @@ class QuizScene(Scene, state="quiz"):
 
     @on.message(F.text == "🚪 Leave quiz")
     async def leave_quiz(self, message: Message):
-        await message.answer(VocabularyMessages.leave_quiz, reply_markup=ReplyKeyboardRemove())
+        await message.answer(messages.leave_quiz, reply_markup=ReplyKeyboardRemove())
         return await self.wizard.exit()
     
 
@@ -95,7 +96,7 @@ class QuizScene(Scene, state="quiz"):
         quiz.increment_skipped_answers_count()
         
         with suppress(TelegramBadRequest):
-            await quiz.last_question_msg.edit_text(VocabularyMessages.quiz_skipped_answer.format(
+            await quiz.last_question_msg.edit_text(messages.quiz_skipped_answer.format(
                 word=quiz.current_question,
                 translation=quiz.current_answer,
             ))
@@ -109,13 +110,13 @@ class QuizScene(Scene, state="quiz"):
         quiz = await Quiz.load_form_state(state)
 
         if QuizAnswerChecker(message.text, quiz.current_answer).is_match():
-            answer_response_msg = VocabularyMessages.quiz_success_answer.format(
+            answer_response_msg = messages.quiz_success_answer.format(
                 word=quiz.current_question,
                 translation=quiz.current_answer,
             )
             quiz.increment_correct_answers_count()
         else:
-            answer_response_msg = VocabularyMessages.quiz_wrong_answer.format(
+            answer_response_msg = messages.quiz_wrong_answer.format(
                 word=quiz.current_question,
                 translation=quiz.current_answer,
                 suggestion=message.text
@@ -145,7 +146,7 @@ class QuizScene(Scene, state="quiz"):
         quiz = await Quiz.load_form_state(state)
 
         await message.answer(
-            VocabularyMessages.quiz_stats.format(
+            messages.quiz_stats.format(
                 correct_guesses=quiz.correct_answers_count,
                 wrong_guesses=quiz.wrong_answers_count,
                 skipped_answers=quiz.skipped_answers_count,

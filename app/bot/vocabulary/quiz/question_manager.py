@@ -1,8 +1,8 @@
 import random
 
-from app.bot.modules.base_quiz import QuestionItem, QuestionManager
-from app.bot.vocabulary.callback_patterns import QuizStrategy
-from app.bot.vocabulary.exceptions import QuestionsIsGoneError
+from app.bot.modules.base_quiz.base_quiz import QuestionItem, QuestionManager
+from app.bot.modules.base_quiz.exceptions import QuestionsIsGoneError
+from app.bot.vocabulary.quiz.callback_patterns import QuizStrategy
 from app.shared.schemas import LanguagePairSchema
 
 
