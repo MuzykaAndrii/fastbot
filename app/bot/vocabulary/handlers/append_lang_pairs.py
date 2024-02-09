@@ -1,5 +1,5 @@
 from aiogram import F, Router
-from aiogram.types import CallbackQuery, Message, ReplyKeyboardRemove
+from aiogram.types import CallbackQuery, Message
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
 
@@ -28,10 +28,14 @@ async def append_language_pairs(query: CallbackQuery, callback_data: VocabularyC
 async def save_language_pairs(message: Message, state: FSMContext):
     state_data = await state.get_data()
 
+    user_id = message.from_user.id
+    vocabulary_id = state_data.get("vocabulary_id")
+    language_pairs = VocabularyParser().parse_bulk_vocabulary(message.text)
+
     append_lp_data = LanguagePairsAppendSchema(
-        user_id=message.from_user.id,
-        vocabulary_id=state_data.get("vocabulary_id"),
-        language_pairs=VocabularyParser().parse_bulk_vocabulary(message.text),
+        user_id=user_id,
+        vocabulary_id=vocabulary_id,
+        language_pairs=language_pairs,
     )
     await VocabularyService.append_language_pairs_to_vocabulary(append_lp_data)
 
