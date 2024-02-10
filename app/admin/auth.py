@@ -17,7 +17,7 @@ from app.jwt.exceptions import (
     JwtMissingError,
     JwtNotValidError,
 )
-from app.jwt.jwt import Jwt
+from app.jwt import Jwt
 from app.users.exceptions import (
     InvalidUserIdError,
     UserInvalidPassword,

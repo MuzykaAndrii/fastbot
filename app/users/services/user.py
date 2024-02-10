@@ -1,6 +1,6 @@
 from app.config import settings
 from app.jwt.exceptions import JWTExpiredError, JwtNotValidError
-from app.jwt.jwt import Jwt
+from app.jwt import Jwt
 from app.users.dal import UserDAL
 from app.users.exceptions import InvalidUserIdError, UserNotFoundError
 from app.users.models import User
