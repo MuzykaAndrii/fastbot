@@ -32,7 +32,7 @@ class VocabularySetDAL(BaseDAL):
     
 
     @classmethod
-    async def make_unactive(cls, vocabulary_id: int) -> VocabularySet:
+    async def make_inactive(cls, vocabulary_id: int) -> VocabularySet:
         async with cls.make_session() as session:
             query = (
                 update(VocabularySet)

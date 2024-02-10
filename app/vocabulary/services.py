@@ -120,7 +120,7 @@ class VocabularyService:
 
     @classmethod
     async def disable_vocabulary(cls, vocabulary_id: int) -> None:
-        disabled_vocabulary = await VocabularySetDAL.make_unactive(vocabulary_id)
+        disabled_vocabulary = await VocabularySetDAL.make_inactive(vocabulary_id)
         return disabled_vocabulary
 
 
