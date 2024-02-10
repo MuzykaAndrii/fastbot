@@ -5,7 +5,7 @@ from starlette_admin.fields import StringField
 from starlette_admin.contrib.sqla.ext.pydantic import ModelView
 from app.users.admin.schemas import UserAdminSchema
 from app.users.models import User
-from app.users.services.pwd import PWDService
+from app.pwd import PWDService
 
 
 class UserAdminView(ModelView):
