@@ -11,6 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 BOT_PREFIX = "bot"
 DB_URL_PATTERN="postgresql+asyncpg://{user}:{password}@{host}:{port}/{name}"
 TEMPLATES_DIR = BASE_DIR / "app/pages/templates"
+AUTH_TOKEN_NAME = "auth_token"
 
 env_file_path = BASE_DIR / ".env"
 

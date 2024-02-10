@@ -22,10 +22,11 @@ from app.jwt import Jwt
 from app.auth.schemas import UserLogin
 from app.auth import AuthService
 from app.users.services import UserService
+from app import config
 
 
 class AdminAuthProvider(AuthProvider):
-    token_name: str = "auth_token"
+    token_name: str = config.AUTH_TOKEN_NAME
 
     async def login(
         self,
