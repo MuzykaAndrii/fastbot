@@ -11,19 +11,15 @@ from starlette_admin.exceptions import (
     FormValidationError,
     LoginFailed,
 )
-from app.auth.exceptions import UserInvalidPassword
 
+from app.auth.exceptions import InvalidUserIdError, UserInvalidPassword, UserNotFoundError
 from app.jwt.exceptions import (
     JWTExpiredError,
     JwtMissingError,
     JwtNotValidError,
 )
 from app.jwt import Jwt
-from app.users.exceptions import (
-    InvalidUserIdError,
-    UserNotFoundError,
-)
-from app.users.schemas import UserLogin
+from app.auth.schemas import UserLogin
 from app.auth import AuthService
 from app.users.services import UserService
 
@@ -62,7 +58,7 @@ class AdminAuthProvider(AuthProvider):
         token: str = request.session.get(self.token_name)
 
         try:
-            current_user = await UserService.get_user_from_token(token)
+            current_user = await AuthService.get_user_from_token(token)
         except (
             JwtMissingError,
             JwtNotValidError,
