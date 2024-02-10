@@ -11,6 +11,7 @@ from starlette_admin.exceptions import (
     FormValidationError,
     LoginFailed,
 )
+from app.auth.exceptions import UserInvalidPassword
 
 from app.jwt.exceptions import (
     JWTExpiredError,
@@ -20,12 +21,11 @@ from app.jwt.exceptions import (
 from app.jwt import Jwt
 from app.users.exceptions import (
     InvalidUserIdError,
-    UserInvalidPassword,
     UserNotFoundError,
 )
 from app.users.schemas import UserLogin
-from app.users.services.auth import AuthService
-from app.users.services.user import UserService
+from app.auth import AuthService
+from app.users.services import UserService
 
 
 class AdminAuthProvider(AuthProvider):

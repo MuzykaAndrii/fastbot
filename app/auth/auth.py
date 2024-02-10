@@ -1,8 +1,8 @@
-from app.users.exceptions import UserInvalidPassword, UserNotFoundError
+from .exceptions import UserInvalidPassword, UserNotFoundError
 from app.users.models import User
 from app.users.schemas import UserLogin
 from app.pwd import PWDService
-from app.users.services.user import UserService
+from app.users.services import UserService
 
 
 class AuthService:
