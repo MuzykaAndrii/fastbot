@@ -7,6 +7,7 @@ from app.config import settings
 from app.bot.main import bot
 from app.users.services.user import UserService
 from app.vocabulary.routes import router as vocabulary_router
+from app.pages.routes import router as pages_router
 from app.logger import logger
 from app.admin.admin import admin
 
@@ -48,4 +49,5 @@ async def ping():
 
 
 app.include_router(vocabulary_router)
+app.include_router(pages_router)
 admin.mount_to(app)
