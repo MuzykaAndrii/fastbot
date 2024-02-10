@@ -15,17 +15,21 @@
             
             <div class="vocabulary-data col-8">
                 <div class="input-group input-group-lg mb-3">
-                    <input value="Vocabulary name" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg">
+                    <input value="{{ current_vocabulary.name }}" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg">
                   </div>
 
                 <div class="lang-pairs">
-                    <div class="lang-pair-item input-group mb-3">
+                    {% for lp in current_vocabulary.language_pairs %}
+
+                    <div class="lang-pair-item input-group input-group-sm mb-1">
                         <span class="input-group-text">Word</span>
-                        <input type="text" class="form-control" placeholder="Foreign language" aria-label="Username">
+                        <input value="{{ lp.word }}" type="text" class="form-control" placeholder="Foreign language" aria-label="Username">
                         <span class="input-group-text">Translation</span>
-                        <input type="text" class="form-control" placeholder="Native language" aria-label="Server">
+                        <input value="{{ lp.translation }}" type="text" class="form-control" placeholder="Native language" aria-label="Server">
                         <button type="button" class="btn btn-outline-danger" onclick="deleteInput(this)">X</button>
                     </div>
+                    
+                    {% endfor %}
                 </div>
                 <div class="vocabulary-btns d-flex justify-content-between">
                     <div>
@@ -43,32 +47,19 @@
 
             <div class="vocabularies col-4">
                 <h4>You're vocabularies:</h4>
+                {% if vocabularies %}
                 <ul class="list-group">
-                    <a href="" class="list-group-item d-flex justify-content-between align-items-center">
-                        Vocabulary
-                        <span class="badge bg-primary rounded-pill">14 words</span>
+                    {% for vocabulary in vocabularies %}
+                    <a href="" class="list-group-item d-flex justify-content-between align-items-center {% if vocabulary.id == current_vocabulary.id %}active{% endif %}">
+                        {{ vocabulary.name }}
+                        <span class="badge bg-secondary rounded-pill">14 words</span>
                     </a>
-                    <a href="" class="list-group-item d-flex justify-content-between align-items-center">
-                        Vocabulary
-                        <span class="badge bg-primary rounded-pill">14 words</span>
-                    </a>
-                    <a href="" class="list-group-item d-flex justify-content-between align-items-center">
-                        Vocabulary
-                        <span class="badge bg-primary rounded-pill">14 words</span>
-                    </a>
-                    <a href="" class="list-group-item d-flex justify-content-between align-items-center">
-                        Vocabulary
-                        <span class="badge bg-primary rounded-pill">14 words</span>
-                    </a>
-                    <a href="" class="list-group-item d-flex justify-content-between align-items-center">
-                        Vocabulary
-                        <span class="badge bg-primary rounded-pill">14 words</span>
-                    </a>
-                    <a href="" class="list-group-item d-flex justify-content-between align-items-center">
-                        Vocabulary
-                        <span class="badge bg-primary rounded-pill">14 words</span>
-                    </a>
+                    {% endfor %}
                 </ul>
+                {% else %}
+                    You're haven't any vocabulary
+                {% endif %}
+                
             </div>
         </div>
     </div>
@@ -85,7 +76,7 @@
         function addRow() {
             var vocabularyData = document.querySelector('.lang-pairs');
             var newRow = document.createElement('div');
-            newRow.className = 'lang-pair-item input-group mb-3';
+            newRow.className = 'lang-pair-item input-group input-group-sm mb-3';
             newRow.innerHTML = `
             <span class="input-group-text">Word</span>
             <input type="text" class="form-control" placeholder="Foreign language" aria-label="Username">
