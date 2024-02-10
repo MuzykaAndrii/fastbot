@@ -8,8 +8,9 @@ router = APIRouter(
     tags=["Frontend"],
 )
 
-@router.get("/dashboard")
-def dashboard(request: Request):
+@router.get("/dashboard/{vocabulary_id}")
+async def dashboard(request: Request, vocabulary_id: int):
+
     return template_engine.TemplateResponse(
         name="dashboard.html",
         context={"request": request},
