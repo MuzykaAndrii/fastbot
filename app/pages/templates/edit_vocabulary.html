@@ -16,12 +16,14 @@
             <div class="vocabulary-data col-8">
                 <div class="input-group input-group-lg mb-3">
                     <input value="{{ current_vocabulary.name }}" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg">
-                  </div>
+                </div>
+                <input value="{{ current_vocabulary.id }}" type="hidden" name="vocabulary_id">
 
                 <div class="lang-pairs">
                     {% for lp in current_vocabulary.language_pairs %}
 
                     <div class="lang-pair-item input-group input-group-sm mb-1">
+                        <input class="input-group-text" type="hidden" name="language_pair_id" value="{{ lp.id }}">
                         <span class="input-group-text">Word</span>
                         <input value="{{ lp.word }}" type="text" class="form-control" placeholder="Foreign language" aria-label="Username">
                         <span class="input-group-text">Translation</span>

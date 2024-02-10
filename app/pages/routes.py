@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import HTMLResponse
 from app.shared.exceptions import UserIsNotOwnerOfVocabulary, VocabularyDoesNotExist
 
 from app.users.models import User
@@ -12,8 +13,8 @@ router = APIRouter(
     tags=["Frontend"],
 )
 
-@router.get("/dashboard/{vocabulary_id}")
-async def dashboard(
+@router.get("/vocabulary/{vocabulary_id}/edit", response_class=HTMLResponse)
+async def edit_vocabulary(
     request: Request,
     vocabulary_id: int,
     user: User = Depends(get_current_user)
@@ -28,6 +29,6 @@ async def dashboard(
     vocabularies = await VocabularyService.get_all_user_vocabularies(user.id)
 
     return template_engine.TemplateResponse(
-        name="dashboard.html",
+        name="edit_vocabulary.html",
         context={"request": request, "current_vocabulary": vocabulary, "vocabularies": vocabularies},
     )
