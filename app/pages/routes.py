@@ -44,6 +44,22 @@ async def disable_vocabulary(
     return RedirectResponse(request.url_for("edit_vocabulary", vocabulary_id=vocabulary.id))
 
 
+@router.get("/vocabulary/{vocabulary_id}/delete", response_class=RedirectResponse)
+async def delete_vocabulary(
+    request: Request,
+    vocabulary_id: int,
+    user: User = Depends(get_current_user),
+):  
+    try:
+        vocabulary = await VocabularyService.delete_vocabulary(user.id, vocabulary_id)
+    except VocabularyDoesNotExist:
+        raise HTTPException(404, "Vocabulary does not exist")
+    except UserIsNotOwnerOfVocabulary:
+        raise HTTPException(403, "Permission denied")
+    
+    return RedirectResponse(request.url_for("edit_vocabulary", vocabulary_id=vocabulary.id))
+
+
 @router.get("/vocabulary/{vocabulary_id}/edit", response_class=HTMLResponse)
 async def edit_vocabulary(
     request: Request,
