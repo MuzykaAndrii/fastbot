@@ -37,8 +37,11 @@
                     <div>
                         <button type="button" class="btn btn-sm btn-primary add-btn">Save</button>
                         <button type="button" class="btn btn-sm btn-danger add-btn">Delete vocabulary</button>
-                        <button type="button" class="btn btn-sm btn-info add-btn">Make active</button>
-                        <button type="button" class="btn btn-sm btn-warning add-btn">Make inactive</button>
+                        {% if current_vocabulary.is_active %}
+                        <a href="{{ url_for('disable_vocabulary', vocabulary_id=current_vocabulary.id) }}" type="button" class="btn btn-sm btn-warning add-btn">Make inactive</a>
+                        {% else %}
+                        <a href="{{ url_for('activate_vocabulary', vocabulary_id=current_vocabulary.id) }}" type="button" class="btn btn-sm btn-info add-btn">Make active</a>
+                        {% endif %}
                     </div>
                     <div>
                         <button type="button" class="btn btn-sm btn-success add-btn" onclick="addRow()">Add
@@ -52,14 +55,14 @@
                 {% if vocabularies %}
                 <ul class="list-group">
                     {% for vocabulary in vocabularies %}
-                    <a href="" class="list-group-item d-flex justify-content-between align-items-center {% if vocabulary.id == current_vocabulary.id %}active{% endif %}">
+                    <a href="{{ url_for('edit_vocabulary', vocabulary_id=vocabulary.id) }}" class="list-group-item d-flex justify-content-between align-items-center {% if vocabulary.id == current_vocabulary.id %}active{% endif %}">
                         {{ vocabulary.name }}
-                        <span class="badge bg-secondary rounded-pill">14 words</span>
+                        <span class="badge rounded-pill {% if vocabulary.is_active %} text-bg-success {% else %} bg-secondary {% endif %}">{{ vocabulary.language_pairs|count }} words</span>
                     </a>
                     {% endfor %}
                 </ul>
                 {% else %}
-                    You're haven't any vocabulary
+                    You're haven't any vocabulary yet
                 {% endif %}
                 
             </div>
@@ -78,7 +81,7 @@
         function addRow() {
             var vocabularyData = document.querySelector('.lang-pairs');
             var newRow = document.createElement('div');
-            newRow.className = 'lang-pair-item input-group input-group-sm mb-3';
+            newRow.className = 'lang-pair-item input-group input-group-sm mb-1';
             newRow.innerHTML = `
             <span class="input-group-text">Word</span>
             <input type="text" class="form-control" placeholder="Foreign language" aria-label="Username">

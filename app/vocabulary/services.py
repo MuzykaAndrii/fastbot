@@ -120,6 +120,7 @@ class VocabularyService:
 
     @classmethod
     async def disable_vocabulary(cls, vocabulary_id: int) -> None:
+        # TODO: add user check
         disabled_vocabulary = await VocabularySetDAL.make_inactive(vocabulary_id)
         return disabled_vocabulary
 
