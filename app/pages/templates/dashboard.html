@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 
 <head>
     <meta charset="UTF-8">
@@ -11,17 +11,20 @@
 
 <body>
     <div class="container mt-5">
-        <h1 class="text-center">Vocabulary name</h1>
         <div class="row">
-
+            
             <div class="vocabulary-data col-8">
+                <div class="input-group input-group-lg mb-3">
+                    <input value="Vocabulary name" type="text" class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg">
+                  </div>
+
                 <div class="lang-pairs">
                     <div class="lang-pair-item input-group mb-3">
                         <span class="input-group-text">Word</span>
                         <input type="text" class="form-control" placeholder="Foreign language" aria-label="Username">
                         <span class="input-group-text">Translation</span>
                         <input type="text" class="form-control" placeholder="Native language" aria-label="Server">
-                        <button type="button" class="btn btn-danger" onclick="deleteInput(this)">X</button>
+                        <button type="button" class="btn btn-outline-danger" onclick="deleteInput(this)">X</button>
                     </div>
                 </div>
                 <div class="vocabulary-btns d-flex justify-content-between">
@@ -32,13 +35,40 @@
                         <button type="button" class="btn btn-sm btn-warning add-btn">Make inactive</button>
                     </div>
                     <div>
-                        <button type="button" class="btn btn-sm btn-success add-btn" onclick="addRow()">Add more</button>
+                        <button type="button" class="btn btn-sm btn-success add-btn" onclick="addRow()">Add
+                            more</button>
                     </div>
                 </div>
             </div>
 
             <div class="vocabularies col-4">
-
+                <h4>You're vocabularies:</h4>
+                <ul class="list-group">
+                    <a href="" class="list-group-item d-flex justify-content-between align-items-center">
+                        Vocabulary
+                        <span class="badge bg-primary rounded-pill">14 words</span>
+                    </a>
+                    <a href="" class="list-group-item d-flex justify-content-between align-items-center">
+                        Vocabulary
+                        <span class="badge bg-primary rounded-pill">14 words</span>
+                    </a>
+                    <a href="" class="list-group-item d-flex justify-content-between align-items-center">
+                        Vocabulary
+                        <span class="badge bg-primary rounded-pill">14 words</span>
+                    </a>
+                    <a href="" class="list-group-item d-flex justify-content-between align-items-center">
+                        Vocabulary
+                        <span class="badge bg-primary rounded-pill">14 words</span>
+                    </a>
+                    <a href="" class="list-group-item d-flex justify-content-between align-items-center">
+                        Vocabulary
+                        <span class="badge bg-primary rounded-pill">14 words</span>
+                    </a>
+                    <a href="" class="list-group-item d-flex justify-content-between align-items-center">
+                        Vocabulary
+                        <span class="badge bg-primary rounded-pill">14 words</span>
+                    </a>
+                </ul>
             </div>
         </div>
     </div>
@@ -61,7 +91,7 @@
             <input type="text" class="form-control" placeholder="Foreign language" aria-label="Username">
             <span class="input-group-text">Translation</span>
             <input type="text" class="form-control" placeholder="Native language" aria-label="Server">
-            <button type="button" class="btn btn-danger" onclick="deleteInput(this)">X</button>
+            <button type="button" class="btn btn-outline-danger" onclick="deleteInput(this)">X</button>
         `;
             vocabularyData.appendChild(newRow);
         }
