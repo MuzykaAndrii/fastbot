@@ -1,7 +1,10 @@
-from app.jwt import jwt
+from fastapi import Response
+
+from .cookie import AuthCookieManager
+from app.jwt import Jwt
 from app.jwt.exceptions import JWTExpiredError, JwtNotValidError
 from app.users.dal import UserDAL
-from .exceptions import InvalidUserIdError, UserInvalidPassword, UserNotFoundError
+from .exceptions import InvalidUserIdError, UserInvalidPassword, UserLoginError, UserNotFoundError
 from app.users.models import User
 from .schemas import UserLogin
 from app.pwd import PWDService
@@ -28,7 +31,7 @@ class AuthService:
     @classmethod
     async def get_user_from_token(cls, token: str) -> User | None:
         try:
-            payload: dict = jwt.read_token(token)
+            payload = Jwt.read_token(token)
         except JwtNotValidError:
             raise JwtNotValidError
         except JWTExpiredError:
@@ -45,17 +48,22 @@ class AuthService:
 
         return user
     
-    # @classmethod
-    # async def login_user(cls, response_obj: Response, user_in: UserLogin) -> Response:
-    #     try:
-    #         user = await cls.authenticate_user(user_in)
-    #     except UserLoginError as error:
-    #         raise error
+    @classmethod
+    def set_auth_cookie(response_obj: Response, user_id: int) -> str:
+        auth_token = Jwt.create_token(str(user_id))
+        AuthCookieManager().set_cookie(response_obj, auth_token)
 
-    #     login_response = set_auth_cookie(response_obj, user.id)
+        return auth_token
+    
+    @classmethod
+    async def login_user(cls, response_obj: Response, user_in: UserLogin) -> Response:
+        try:
+            user = await cls.authenticate_user(user_in)
+        except UserLoginError as error:
+            raise error
 
-    #     return login_response
+        cls.set_auth_cookie(response_obj, user.id)
 
 
-    # async def logout_user(response: Response) -> Response:
-    #     return AuthCookieManager().delete_cookie(response)
+    def logout_user(response: Response) -> Response:
+        return AuthCookieManager().delete_cookie(response)
