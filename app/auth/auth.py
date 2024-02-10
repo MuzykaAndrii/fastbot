@@ -1,12 +1,12 @@
 from fastapi import Response
 
 from .cookie import AuthCookieManager
-from app.jwt import Jwt
-from app.jwt.exceptions import JWTExpiredError, JwtNotValidError
-from app.users.dal import UserDAL
-from .exceptions import AuthenticationError, InvalidUserIdError, UserInvalidPassword, UserNotFoundError
-from app.users.models import User
 from .schemas import UserLogin
+from .exceptions import AuthenticationError, InvalidUserIdError, UserInvalidPassword, UserNotFoundError
+from app.jwt import Jwt
+from app.jwt.exceptions import MyJwtError
+from app.users.dal import UserDAL
+from app.users.models import User
 from app.pwd import PWDService
 from app.users.services import UserService
 
@@ -32,10 +32,8 @@ class AuthService:
     async def get_user_from_token(cls, token: str) -> User | None:
         try:
             payload = Jwt.read_token(token)
-        except JwtNotValidError:
-            raise JwtNotValidError
-        except JWTExpiredError:
-            raise JWTExpiredError
+        except MyJwtError as e:
+            raise e
 
         try:
             user_id = int(payload.get("sub"))
