@@ -12,15 +12,3 @@ class UserNotFoundError(AuthenticationError):
 
 class UserInvalidPassword(AuthenticationError):
     pass
-
-
-class UserLoginError(Exception):
-    pass
-
-
-class UserNotFoundError(UserLoginError):
-    pass
-
-
-class UserInvalidPassword(UserLoginError):
-    pass

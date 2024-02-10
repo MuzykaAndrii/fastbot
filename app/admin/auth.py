@@ -11,6 +11,7 @@ from starlette_admin.exceptions import (
     FormValidationError,
     LoginFailed,
 )
+from app.auth.cookie import AuthCookieManager
 
 from app.auth.exceptions import InvalidUserIdError, UserInvalidPassword, UserNotFoundError
 from app.jwt.exceptions import (
@@ -18,16 +19,12 @@ from app.jwt.exceptions import (
     JwtMissingError,
     JwtNotValidError,
 )
-from app.jwt import Jwt
 from app.auth.schemas import UserLogin
 from app.auth import AuthService
 from app.users.services import UserService
-from app import config
 
 
 class AdminAuthProvider(AuthProvider):
-    token_name: str = config.AUTH_TOKEN_NAME
-
     async def login(
         self,
         username: str,
@@ -45,18 +42,16 @@ class AdminAuthProvider(AuthProvider):
             raise FormValidationError({"failed": "Invalid input data"})
 
         try:
-            user = await AuthService.authenticate_user(credentials)
+            await AuthService.login_user(response, credentials)
         except UserNotFoundError:
             raise LoginFailed("Invalid email")
         except UserInvalidPassword:
             raise LoginFailed("Invalid password")
 
-        auth_token = Jwt.create_token(str(user.id))
-        request.session.update({self.token_name: auth_token})
         return response
 
     async def is_authenticated(self, request: Request) -> bool:
-        token: str = request.session.get(self.token_name)
+        token = AuthCookieManager().get_cookie(request)
 
         try:
             current_user = await AuthService.get_user_from_token(token)
@@ -81,5 +76,5 @@ class AdminAuthProvider(AuthProvider):
         return AdminUser(username=user.username)
 
     async def logout(self, request: Request, response: Response) -> Response:
-        request.session.clear()
+        AuthService.logout_user(response)
         return response

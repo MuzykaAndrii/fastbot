@@ -4,7 +4,7 @@ from .cookie import AuthCookieManager
 from app.jwt import Jwt
 from app.jwt.exceptions import JWTExpiredError, JwtNotValidError
 from app.users.dal import UserDAL
-from .exceptions import InvalidUserIdError, UserInvalidPassword, UserLoginError, UserNotFoundError
+from .exceptions import AuthenticationError, InvalidUserIdError, UserInvalidPassword, UserNotFoundError
 from app.users.models import User
 from .schemas import UserLogin
 from app.pwd import PWDService
@@ -49,21 +49,24 @@ class AuthService:
         return user
     
     @classmethod
-    def set_auth_cookie(response_obj: Response, user_id: int) -> str:
+    def set_auth_cookie(cls, response_obj: Response, user_id: int) -> str:
         auth_token = Jwt.create_token(str(user_id))
         AuthCookieManager().set_cookie(response_obj, auth_token)
 
         return auth_token
     
     @classmethod
-    async def login_user(cls, response_obj: Response, user_in: UserLogin) -> Response:
+    async def login_user(cls, response_obj: Response, user_in: UserLogin) -> User:
         try:
             user = await cls.authenticate_user(user_in)
-        except UserLoginError as error:
+        except AuthenticationError as error:
             raise error
 
         cls.set_auth_cookie(response_obj, user.id)
 
+        return user
 
-    def logout_user(response: Response) -> Response:
+
+    @classmethod
+    def logout_user(cls, response: Response) -> Response:
         return AuthCookieManager().delete_cookie(response)
