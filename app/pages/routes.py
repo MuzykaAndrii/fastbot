@@ -4,6 +4,7 @@ from app.shared.exceptions import UserIsNotOwnerOfVocabulary, VocabularyDoesNotE
 
 from app.users.models import User
 from app.auth.dependencies import get_current_user
+from app.vocabulary.dependencies import user_vocabularies_list
 from app.vocabulary.services import VocabularyService
 from .template_engine import engine as template_engine
 
@@ -86,6 +87,7 @@ async def show_vocabulary(
     request: Request,
     vocabulary_id: int,
     user: User = Depends(get_current_user),
+    user_vocabularies = Depends(user_vocabularies_list, use_cache=True),
 ):
     try:
         vocabulary = await VocabularyService.get_vocabulary(user.id, vocabulary_id)
@@ -98,6 +100,7 @@ async def show_vocabulary(
         name="vocabulary.html",
         context={
             "request": request,
-            "vocabulary": vocabulary,
+            "current_vocabulary": vocabulary,
+            "vocabularies": user_vocabularies,
         }
     )
