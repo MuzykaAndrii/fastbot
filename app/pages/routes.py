@@ -41,7 +41,7 @@ async def disable_vocabulary(
 ):  
     vocabulary = await VocabularyService.disable_vocabulary(vocabulary_id)
     
-    return RedirectResponse(request.url_for("edit_vocabulary", vocabulary_id=vocabulary.id))
+    return RedirectResponse(request.url_for("show_vocabulary", vocabulary_id=vocabulary.id))
 
 
 @router.get("/vocabulary/{vocabulary_id}/delete", response_class=RedirectResponse)
@@ -78,4 +78,26 @@ async def edit_vocabulary(
     return template_engine.TemplateResponse(
         name="edit_vocabulary.html",
         context={"request": request, "current_vocabulary": vocabulary, "vocabularies": vocabularies},
+    )
+
+
+@router.get("/vocabulary/{vocabulary_id}/", response_class=HTMLResponse)
+async def show_vocabulary(
+    request: Request,
+    vocabulary_id: int,
+    user: User = Depends(get_current_user),
+):
+    try:
+        vocabulary = await VocabularyService.get_vocabulary(user.id, vocabulary_id)
+    except VocabularyDoesNotExist:
+        raise HTTPException(404, "Vocabulary does not exist")
+    except UserIsNotOwnerOfVocabulary:
+        raise HTTPException(403, "Permission denied")
+    
+    return template_engine.TemplateResponse(
+        name="vocabulary.html",
+        context={
+            "request": request,
+            "vocabulary": vocabulary,
+        }
     )
