@@ -30,7 +30,7 @@ async def activate_vocabulary(
     except VocabularyIsAlreadyActive:
         pass
     
-    return RedirectResponse(request.url_for("edit_vocabulary", vocabulary_id=vocabulary.id))
+    return RedirectResponse(request.url_for("show_vocabulary", vocabulary_id=vocabulary.id))
 
 
 
@@ -58,11 +58,11 @@ async def delete_vocabulary(
     except UserIsNotOwnerOfVocabulary:
         raise HTTPException(403, "Permission denied")
     
-    return RedirectResponse(request.url_for("edit_vocabulary", vocabulary_id=vocabulary.id))
+    return RedirectResponse(request.url_for("show_vocabulary", vocabulary_id=vocabulary.id))
 
 
 @router.get("/vocabulary/{vocabulary_id}/edit", response_class=HTMLResponse)
-async def edit_vocabulary(
+async def edit_vocabulary_page(
     request: Request,
     vocabulary_id: int,
     user: User = Depends(get_current_user),
