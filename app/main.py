@@ -38,7 +38,7 @@ async def handle_tg_response(update: types.Update):
 
 @app.get("/ping", status_code=200)
 async def ping():
-    from app.db.session import async_session_maker
+    from app.backend.db.session import async_session_maker
     from sqlalchemy import select
 
     async with async_session_maker() as db_session:

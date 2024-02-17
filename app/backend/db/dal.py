@@ -10,7 +10,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.exc import NoResultFound
 
-from app.db.session import async_session_maker
+from app.backend.db.session import async_session_maker
 
 
 class BaseDAL:

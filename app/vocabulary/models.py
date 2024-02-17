@@ -7,7 +7,7 @@ from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.orm import mapped_column as mc
 from sqlalchemy.sql import func
 
-from app.db.base import Base
+from app.backend.db.base import Base
 if TYPE_CHECKING:
     from app.users.models import User
 

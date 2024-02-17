@@ -1,6 +1,6 @@
 from typing import Iterable
 
-from app.db.dal import BaseDAL
+from app.backend.db.dal import BaseDAL
 from app.users.models import User
 
 

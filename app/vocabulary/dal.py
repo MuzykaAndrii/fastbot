@@ -1,6 +1,6 @@
 from sqlalchemy import and_, select, update
 
-from app.db.dal import BaseDAL
+from app.backend.db.dal import BaseDAL
 from app.vocabulary.models import VocabularySet, LanguagePair
 
 

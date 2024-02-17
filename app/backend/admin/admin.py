@@ -3,7 +3,7 @@ from starlette_admin.contrib.sqla import Admin
 from starlette.middleware.sessions import SessionMiddleware
 
 from app.config import settings
-from app.db.session import engine
+from app.backend.db.session import engine
 from .auth import AdminAuthProvider
 from app.users.admin.views import UserAdminView
 from app.vocabulary.admin.views import LanguagePairAdminView, VocabularyAdminView
