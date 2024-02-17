@@ -6,7 +6,7 @@ from app.config import settings
 from app.backend.db.session import engine
 from .auth import AdminAuthProvider
 from app.backend.users.admin.views import UserAdminView
-from app.vocabulary.admin.views import LanguagePairAdminView, VocabularyAdminView
+from app.backend.vocabulary.admin.views import LanguagePairAdminView, VocabularyAdminView
 
 
 admin = Admin(

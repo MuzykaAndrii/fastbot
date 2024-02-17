@@ -5,9 +5,9 @@ from starlette.requests import Request
 from starlette_admin.contrib.sqla.ext.pydantic import ModelView
 from app.shared.exceptions import VocabularyIsAlreadyActive
 
-from app.vocabulary.admin.schemas import LanguagePairAdminSchema, VocabularyAdminSchema
-from app.vocabulary.models import LanguagePair, VocabularySet
-from app.vocabulary.services import VocabularyService
+from app.backend.vocabulary.admin.schemas import LanguagePairAdminSchema, VocabularyAdminSchema
+from app.backend.vocabulary.models import LanguagePair, VocabularySet
+from app.backend.vocabulary.services import VocabularyService
 
 
 class VocabularyAdminView(ModelView):

@@ -2,7 +2,7 @@ from aiogram import types
 
 from app.bot.vocabulary.parsers import VocabularyParser
 from app.shared.schemas import VocabularyCreateSchema
-from app.vocabulary.services import VocabularyService
+from app.backend.vocabulary.services import VocabularyService
 
 
 async def create_vocabulary(message: types.Message, vocabulary_name: str):

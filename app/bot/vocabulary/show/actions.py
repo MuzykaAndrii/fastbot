@@ -2,7 +2,7 @@ from aiogram import types
 from aiogram import Bot
 
 from app.bot.vocabulary.keyboards import ActionsKeyboard
-from app.vocabulary.services import VocabularyService
+from app.backend.vocabulary.services import VocabularyService
 from app.shared.schemas import VocabularySchema
 
 from . import messages

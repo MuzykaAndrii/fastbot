@@ -9,7 +9,7 @@ from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.orm import mapped_column as mc
 
 from app.backend.db.base import Base
-from app.vocabulary.models import VocabularySet
+from app.backend.vocabulary.models import VocabularySet
 
 
 class User(Base):

@@ -4,7 +4,7 @@ from sqlalchemy import select
 
 from app.backend.users.models import User
 from app.backend.db.session import async_session_maker
-from app.vocabulary.models import LanguagePair, VocabularySet
+from app.backend.vocabulary.models import LanguagePair, VocabularySet
 
 async def save_user_data_to_shelve():
     async with async_session_maker() as session:

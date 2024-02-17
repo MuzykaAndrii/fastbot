@@ -7,8 +7,8 @@ from app.shared.exceptions import (
     VocabularyIsAlreadyActive
 )
 from app.shared.schemas import ExtendedLanguagePairSchema, LanguagePairsAppendSchema, VocabularyCreateSchema
-from app.vocabulary.dal import LanguagePairDAL, VocabularySetDAL
-from app.vocabulary.models import VocabularySet, LanguagePair
+from app.backend.vocabulary.dal import LanguagePairDAL, VocabularySetDAL
+from app.backend.vocabulary.models import VocabularySet, LanguagePair
 
 
 class VocabularyService:

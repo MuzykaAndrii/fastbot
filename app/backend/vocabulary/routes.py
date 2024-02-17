@@ -3,8 +3,8 @@ from fastapi import APIRouter, HTTPException
 from app.config import settings
 from app.backend.text_generator.text_generator import generate_sentence_from_word
 from app.shared.schemas import ExtendedLanguagePairSchema
-from app.vocabulary.schemas import AuthorizationSchema
-from app.vocabulary.services import VocabularyService
+from app.backend.vocabulary.schemas import AuthorizationSchema
+from app.backend.vocabulary.services import VocabularyService
 from app.bot.vocabulary.notifications import tasks  # emulation of api request to bot service
 
 
