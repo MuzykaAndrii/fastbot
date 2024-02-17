@@ -11,12 +11,12 @@ from starlette_admin.exceptions import (
     FormValidationError,
     LoginFailed,
 )
-from app.auth.cookie import AuthCookieManager
+from app.backend.auth.auth import AuthService
+from app.backend.auth.cookie import AuthCookieManager
+from app.backend.auth.exceptions import AuthenticationError, UserInvalidPassword, UserNotFoundError
+from app.backend.auth.schemas import UserLogin
 
-from app.auth.exceptions import AuthenticationError, UserInvalidPassword, UserNotFoundError
 from app.jwt.exceptions import MyJwtError
-from app.auth.schemas import UserLogin
-from app.auth import AuthService
 from app.users.services import UserService
 
 
