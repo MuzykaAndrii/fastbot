@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
 from app.config import settings
-from app.text_generator.text_generator import generate_sentence_from_word
+from app.backend.text_generator.text_generator import generate_sentence_from_word
 from app.shared.schemas import ExtendedLanguagePairSchema
 from app.vocabulary.schemas import AuthorizationSchema
 from app.vocabulary.services import VocabularyService

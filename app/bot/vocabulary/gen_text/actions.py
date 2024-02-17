@@ -1,7 +1,8 @@
 from aiogram import types
 
+
 from . import messages
-from app.text_generator.text_generator import generate_text_from_words
+from app.backend.text_generator.text_generator import generate_text_from_words
 from app.vocabulary.services import VocabularyService
 
 
