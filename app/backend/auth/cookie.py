@@ -1,5 +1,5 @@
-from app.cookie.cookie import CookieManager
 from app import config
+from app.backend.cookie import CookieManager
 
 
 class AuthCookieManager(CookieManager):
