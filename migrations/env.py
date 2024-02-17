@@ -7,7 +7,7 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from app.config import settings
-from app.db.base import Base
+from app.backend.db.base import Base
 from app.backend.users.models import User
 from app.backend.vocabulary.models import VocabularySet, LanguagePair
 
