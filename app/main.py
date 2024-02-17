@@ -5,7 +5,7 @@ from fastapi import FastAPI
 
 from app.config import settings
 from app.bot.main import bot
-from app.users.services import UserService
+from app.backend.users.services import UserService
 from app.vocabulary.routes import router as vocabulary_router
 from app.logger import logger
 from app.backend.admin import admin

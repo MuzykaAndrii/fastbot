@@ -1,7 +1,7 @@
 from fastapi import Depends
 
 from app.backend.auth.dependencies import get_current_user
-from app.users.models import User
+from app.backend.users.models import User
 from app.vocabulary.services import VocabularyService
 
 

@@ -2,7 +2,7 @@ import shelve
 
 from sqlalchemy import select
 
-from app.users.models import User
+from app.backend.users.models import User
 from app.backend.db.session import async_session_maker
 from app.vocabulary.models import LanguagePair, VocabularySet
 

@@ -1,9 +1,9 @@
 from fastapi import Depends, HTTPException, Request
 from app.backend.jwt import Jwt
 from app.backend.jwt.exceptions import JWTExpiredError, JwtNotValidError
-from app.users.dal import UserDAL
+from app.backend.users.dal import UserDAL
 
-from app.users.models import User
+from app.backend.users.models import User
 from .cookie import AuthCookieManager
 
 

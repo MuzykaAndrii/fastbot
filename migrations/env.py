@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from app.config import settings
 from app.db.base import Base
-from app.users.models import User
+from app.backend.users.models import User
 from app.vocabulary.models import VocabularySet, LanguagePair
 
 # this is the Alembic Config object, which provides

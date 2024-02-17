@@ -9,7 +9,7 @@ from sqlalchemy.sql import func
 
 from app.backend.db.base import Base
 if TYPE_CHECKING:
-    from app.users.models import User
+    from app.backend.users.models import User
 
 
 class VocabularySet(Base):

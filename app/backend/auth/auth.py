@@ -6,10 +6,10 @@ from app.backend.jwt.exceptions import MyJwtError
 from .cookie import AuthCookieManager
 from .schemas import UserLogin
 from .exceptions import AuthenticationError, InvalidUserIdError, UserInvalidPassword, UserNotFoundError
-from app.users.dal import UserDAL
-from app.users.models import User
+from app.backend.users.dal import UserDAL
+from app.backend.users.models import User
 from app.backend.pwd import PWDService
-from app.users.services import UserService
+from app.backend.users.services import UserService
 
 
 class AuthService:

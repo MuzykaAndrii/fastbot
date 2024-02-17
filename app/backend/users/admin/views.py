@@ -4,8 +4,8 @@ from fastapi import Request
 from starlette_admin.fields import StringField
 from starlette_admin.contrib.sqla.ext.pydantic import ModelView
 
-from app.users.admin.schemas import UserAdminSchema
-from app.users.models import User
+from app.backend.users.admin.schemas import UserAdminSchema
+from app.backend.users.models import User
 from app.backend.pwd import PWDService
 
 

@@ -17,7 +17,7 @@ from app.backend.auth.exceptions import AuthenticationError, UserInvalidPassword
 from app.backend.auth.schemas import UserLogin
 from app.backend.jwt.exceptions import MyJwtError
 
-from app.users.services import UserService
+from app.backend.users.services import UserService
 
 
 class AdminAuthProvider(AuthProvider):

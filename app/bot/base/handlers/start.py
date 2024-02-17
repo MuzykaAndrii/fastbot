@@ -2,7 +2,7 @@ from aiogram import types, Router
 from aiogram.filters import CommandStart, Command
 
 from app.bot.base.messages import BaseMessages
-from app.users.services import UserService
+from app.backend.users.services import UserService
 
 
 router = Router()
