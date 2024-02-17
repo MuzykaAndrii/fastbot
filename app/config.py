@@ -13,11 +13,11 @@ DB_URL_PATTERN="postgresql+asyncpg://{user}:{password}@{host}:{port}/{name}"
 TEMPLATES_DIR = BASE_DIR / "app/pages/templates"
 AUTH_TOKEN_NAME = "auth_token"
 
-env_file_path = BASE_DIR / ".env"
+ENV_FILE_PATH = BASE_DIR / ".env"
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=env_file_path, env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(env_file=ENV_FILE_PATH, env_file_encoding="utf-8")
 
     DEBUG: bool
     BOT_TOKEN: str
