@@ -1,7 +1,7 @@
 from typing import Iterable
 
 from .prompts import Prompts
-from app.gpt.gpt import GPT
+from app.backend.gpt import GPT
 
 
 class TextGenerator:
