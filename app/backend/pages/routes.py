@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
+
 from app.backend.auth.dependencies import get_current_user
 from app.shared.exceptions import UserIsNotOwnerOfVocabulary, VocabularyDoesNotExist, VocabularyIsAlreadyActive
-
 from app.backend.users.models import User
 from app.backend.vocabulary.dependencies import user_vocabularies_list
 from app.backend.vocabulary.services import VocabularyService

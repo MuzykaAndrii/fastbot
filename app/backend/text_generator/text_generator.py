@@ -1,6 +1,6 @@
 from typing import Iterable
 
-from .prompts import Prompts
+from . import prompts
 from app.backend.gpt import GPT
 
 
@@ -9,7 +9,7 @@ class TextGenerator:
         self.gpt = gpt
 
     async def get_sentence_from_keyword(self, keyword: str, format: bool = True) -> str | None:
-        prompt = Prompts.sentence_from_word.format(word=keyword)
+        prompt = prompts.sentence_from_word.format(word=keyword)
         sentence = await self.gpt.get_answer(prompt)
         
         if format:
@@ -19,7 +19,7 @@ class TextGenerator:
     
     async def get_text_from_keywords(self, *keywords) -> str | None:
         # TODO: add randomness to text length calculating
-        prompt = Prompts.text_from_words.format(
+        prompt = prompts.text_from_words.format(
             text_length=len(keywords) // 4,
             keywords=", ".join(keywords),
         )
