@@ -50,7 +50,7 @@ async def ping():
 app.include_router(vocabulary_router)
 
 if settings.DEBUG:
-    from app.pages.routes import router as pages_router
+    from app.backend.pages.routes import router as pages_router
     app.include_router(pages_router)
 
 admin.mount_to(app)
