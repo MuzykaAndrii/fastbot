@@ -1,7 +1,7 @@
+from app.backend.pwd import PWDService
 from app.config import settings
 from app.users.dal import UserDAL
 from app.users.models import User
-from app.pwd import PWDService
 
 
 class UserService:

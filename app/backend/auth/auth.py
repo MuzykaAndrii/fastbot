@@ -8,7 +8,7 @@ from .schemas import UserLogin
 from .exceptions import AuthenticationError, InvalidUserIdError, UserInvalidPassword, UserNotFoundError
 from app.users.dal import UserDAL
 from app.users.models import User
-from app.pwd import PWDService
+from app.backend.pwd import PWDService
 from app.users.services import UserService
 
 
