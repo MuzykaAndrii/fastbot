@@ -7,13 +7,10 @@ from jose import (
     JWTError,
     jwt,
 )
+from .exceptions import JWTExpiredError, JwtMissingError, JwtNotValidError
 
 from app.config import settings
-from app.jwt.exceptions import (
-    JWTExpiredError,
-    JwtMissingError,
-    JwtNotValidError,
-)
+
 
 
 class Jwt:

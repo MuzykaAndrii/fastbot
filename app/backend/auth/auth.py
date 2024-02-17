@@ -1,10 +1,11 @@
 from fastapi import Response
 
+
+from app.backend.jwt import Jwt
+from app.backend.jwt.exceptions import MyJwtError
 from .cookie import AuthCookieManager
 from .schemas import UserLogin
 from .exceptions import AuthenticationError, InvalidUserIdError, UserInvalidPassword, UserNotFoundError
-from app.jwt import Jwt
-from app.jwt.exceptions import MyJwtError
 from app.users.dal import UserDAL
 from app.users.models import User
 from app.pwd import PWDService

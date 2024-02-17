@@ -15,8 +15,8 @@ from app.backend.auth.auth import AuthService
 from app.backend.auth.cookie import AuthCookieManager
 from app.backend.auth.exceptions import AuthenticationError, UserInvalidPassword, UserNotFoundError
 from app.backend.auth.schemas import UserLogin
+from app.backend.jwt.exceptions import MyJwtError
 
-from app.jwt.exceptions import MyJwtError
 from app.users.services import UserService
 
 
