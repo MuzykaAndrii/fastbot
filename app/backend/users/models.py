@@ -1,7 +1,6 @@
 from fastapi import Request
 from sqlalchemy import (
     Boolean,
-    Integer,
     String,
     LargeBinary,
 )
@@ -15,7 +14,6 @@ from app.backend.vocabulary.models import VocabularySet
 class User(Base):
     __tablename__ = "users"
 
-    id: Mapped[int] = mc(Integer, primary_key=True)
     username: Mapped[str] = mc(String(length=50), nullable=True)
     email: Mapped[str] = mc(String, unique=True, nullable=True)
     password_hash: Mapped[bytes] = mc(LargeBinary, nullable=True)

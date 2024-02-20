@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 from datetime import datetime
 from fastapi import Request
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String
+from sqlalchemy import Boolean, DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.orm import mapped_column as mc
 from sqlalchemy.sql import func
@@ -14,7 +14,6 @@ if TYPE_CHECKING:
 
 class VocabularySet(Base):
     __tablename__ = 'vocabulary_sets'
-    id: Mapped[int] = mc(Integer, primary_key=True)
 
     owner_id: Mapped[int] = mc(ForeignKey("users.id"), nullable=False)
     owner: Mapped["User"] = relationship(
@@ -45,7 +44,6 @@ class VocabularySet(Base):
 
 class LanguagePair(Base):
     __tablename__ = 'language_pairs'
-    id: Mapped[int] = mc(Integer, primary_key=True)
     
     vocabulary_id: Mapped[int] = mc(ForeignKey("vocabulary_sets.id", ondelete="CASCADE"), nullable=False)
     vocabulary: Mapped[VocabularySet] = relationship(

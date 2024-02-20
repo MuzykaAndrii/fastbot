@@ -4,7 +4,7 @@ from app.backend.db.dal import BaseDAL
 from app.backend.users.models import User
 
 
-class UserDAL(BaseDAL):
+class UserDAL(BaseDAL[User]):
     model = User
 
     @classmethod
