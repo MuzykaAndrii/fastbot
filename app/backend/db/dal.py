@@ -1,24 +1,30 @@
+from abc import ABC
 from typing import (
     Any,
+    Generic,
     Iterable,
     Mapping,
+    TypeVar,
 )
 
 from sqlalchemy import (
     delete,
     select,
 )
-from sqlalchemy.exc import NoResultFound
 
 from .session import async_session_maker
+from .base import Base
 
 
-class BaseDAL:
-    model = None
+T = TypeVar("T", bound=Base)
+
+
+class BaseDAL(Generic[T], ABC):
+    model: type[T]
     make_session = async_session_maker
 
     @classmethod
-    async def get_by_id(cls, id: int) -> Any | None:
+    async def get_by_id(cls, id: int) -> T | None:
         async with cls.make_session() as session:
             result = await session.get(cls.model, id)
 
@@ -27,7 +33,7 @@ class BaseDAL:
             return result
 
     @classmethod
-    async def create(cls, **fields: Mapping):
+    async def create(cls, **fields: Mapping) -> T:
         async with cls.make_session() as session:
             instance = cls.model(**fields)
 
@@ -47,7 +53,7 @@ class BaseDAL:
             await session.commit()
 
     @classmethod
-    async def delete_by_id(cls, id: int) -> Any | NoResultFound:
+    async def delete_by_id(cls, id: int) -> T:
         async with cls.make_session() as session:
             stmt = delete(cls.model).where(cls.model.id == id).returning(cls.model)
 
@@ -56,7 +62,7 @@ class BaseDAL:
             return deleted_instance.unique().scalar_one()
 
     @classmethod
-    async def get_all(cls, offset: int = 0, limit: int = 50) -> Iterable[Any] | None:
+    async def get_all(cls, offset: int = 0, limit: int = 50) -> Iterable[T] | None:
         async with cls.make_session() as session:
             stmt = select(cls.model).offset(offset).limit(limit)
 
@@ -64,7 +70,7 @@ class BaseDAL:
             return instances.scalars().all()
 
     @classmethod
-    async def filter_by(cls, **filter_criteria: Mapping) -> Iterable[Any] | None:
+    async def filter_by(cls, **filter_criteria: Mapping) -> Iterable[T] | None:
         async with cls.make_session() as session:
             stmt = select(cls.model).filter_by(**filter_criteria)
 
@@ -72,7 +78,7 @@ class BaseDAL:
             return filter_result.unique().all()
     
     @classmethod
-    async def get_one(cls, **filter_criteria: Mapping) -> Any | None:
+    async def get_one(cls, **filter_criteria: Mapping) -> T | None:
         # TODO: refactor with previous method to reduce duplication
         async with cls.make_session() as session:
             stmt = select(cls.model).filter_by(**filter_criteria)
@@ -81,7 +87,7 @@ class BaseDAL:
             return filter_result.unique().scalar_one_or_none()
     
     @classmethod
-    async def get_or_create(cls, **filter_criteria: Mapping) -> Any:
+    async def get_or_create(cls, **filter_criteria: Mapping) -> T:
         instance = await cls.get_one(**filter_criteria)
 
         if not instance:
