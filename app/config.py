@@ -45,17 +45,17 @@ class Settings(BaseSettings):
     BASE_ADMIN_PASS: str
 
 
-    @computed_field
+    @computed_field # type: ignore[misc]
     @property
     def WEBHOOK_PATH(self) -> str:
         return f"/{BOT_PREFIX}{self.BOT_TOKEN}"
     
-    @computed_field
+    @computed_field  # type: ignore[misc]
     @property
     def WEBHOOK_URL(self) -> str:
         return f"{self.HOST_URL}{self.WEBHOOK_PATH}"
     
-    @computed_field
+    @computed_field  # type: ignore[misc]
     @property
     def DATABASE_URL(self) -> str:
         return DB_URL_PATTERN.format(
@@ -66,4 +66,4 @@ class Settings(BaseSettings):
             name=self.DB_NAME,
         )
 
-settings = Settings()
+settings = Settings()  # type: ignore[call-arg]
