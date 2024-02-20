@@ -1,0 +1,15 @@
+
+
+<h3 class="mb-3">You're vocabularies:</h3>
+{% if vocabularies %}
+<ul class="list-group">
+    {% for vocabulary in vocabularies %}
+    <a href="{{ url_for('show_vocabulary', vocabulary_id=vocabulary.id) }}" class="list-group-item d-flex justify-content-between align-items-center {% if vocabulary.id == current_vocabulary.id %}active{% endif %}">
+        {{ vocabulary.name }}
+        <span class="badge rounded-pill {% if vocabulary.is_active %} text-bg-success {% else %} bg-secondary {% endif %}">{{ vocabulary.language_pairs|count }} words</span>
+    </a>
+    {% endfor %}
+</ul>
+{% else %}
+    You're haven't any vocabulary yet
+{% endif %}

@@ -4,7 +4,7 @@ from app.bot.vocabulary.messages import VocabularyMessages
 from app.bot.vocabulary.show.actions import show_vocabulary_in_existing_msg
 from . import messages
 from app.shared.exceptions import NoVocabulariesFound
-from app.vocabulary.services import VocabularyService
+from app.backend.vocabulary.services import VocabularyService
 
 
 async def delete_vocabulary(

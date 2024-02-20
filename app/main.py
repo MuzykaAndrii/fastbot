@@ -5,10 +5,10 @@ from fastapi import FastAPI
 
 from app.config import settings
 from app.bot.main import bot
-from app.users.services.user import UserService
-from app.vocabulary.routes import router as vocabulary_router
-from app.logger import logger
-from app.admin.admin import admin
+from app.backend.users.services import UserService
+from app.backend.vocabulary.routes import router as vocabulary_router
+from app.backend.logger import logger
+from app.backend.admin import admin
 
 
 @asynccontextmanager
@@ -38,7 +38,7 @@ async def handle_tg_response(update: types.Update):
 
 @app.get("/ping", status_code=200)
 async def ping():
-    from app.db.session import async_session_maker
+    from app.backend.db.session import async_session_maker
     from sqlalchemy import select
 
     async with async_session_maker() as db_session:
@@ -48,4 +48,9 @@ async def ping():
 
 
 app.include_router(vocabulary_router)
+
+if settings.DEBUG:
+    from app.backend.pages.routes import router as pages_router
+    app.include_router(pages_router)
+
 admin.mount_to(app)

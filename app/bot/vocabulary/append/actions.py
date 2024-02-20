@@ -1,6 +1,6 @@
 from app.bot.vocabulary.parsers import VocabularyParser
 from app.shared.schemas import LanguagePairsAppendSchema
-from app.vocabulary.services import VocabularyService
+from app.backend.vocabulary.services import VocabularyService
 
 
 async def append_lang_pairs_to_vocabulary(user_id: int, vocabulary_id: int, raw_language_pairs: str) -> None:

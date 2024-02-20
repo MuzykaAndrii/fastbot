@@ -10,12 +10,14 @@ from pydantic import EmailStr, computed_field
 BASE_DIR = Path(__file__).resolve().parent.parent
 BOT_PREFIX = "bot"
 DB_URL_PATTERN="postgresql+asyncpg://{user}:{password}@{host}:{port}/{name}"
+TEMPLATES_DIR = BASE_DIR / "app/pages/templates"
+AUTH_TOKEN_NAME = "auth_token"
 
-env_file_path = BASE_DIR / ".env"
+ENV_FILE_PATH = BASE_DIR / ".env"
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=env_file_path, env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(env_file=ENV_FILE_PATH, env_file_encoding="utf-8")
 
     DEBUG: bool
     BOT_TOKEN: str
@@ -43,17 +45,17 @@ class Settings(BaseSettings):
     BASE_ADMIN_PASS: str
 
 
-    @computed_field
+    @computed_field # type: ignore[misc]
     @property
     def WEBHOOK_PATH(self) -> str:
         return f"/{BOT_PREFIX}{self.BOT_TOKEN}"
     
-    @computed_field
+    @computed_field  # type: ignore[misc]
     @property
     def WEBHOOK_URL(self) -> str:
         return f"{self.HOST_URL}{self.WEBHOOK_PATH}"
     
-    @computed_field
+    @computed_field  # type: ignore[misc]
     @property
     def DATABASE_URL(self) -> str:
         return DB_URL_PATTERN.format(
@@ -64,4 +66,4 @@ class Settings(BaseSettings):
             name=self.DB_NAME,
         )
 
-settings = Settings()
+settings = Settings()  # type: ignore[call-arg]
