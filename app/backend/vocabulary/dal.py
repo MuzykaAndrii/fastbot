@@ -1,10 +1,12 @@
+from typing import Any, Callable
+
 from sqlalchemy import and_, select, update
 
 from app.backend.db.dal import BaseDAL
 from app.backend.vocabulary.models import VocabularySet, LanguagePair
 
 
-class VocabularySetDAL(BaseDAL):
+class VocabularySetDAL(BaseDAL[VocabularySet]):
     model = VocabularySet
 
     @classmethod
@@ -58,7 +60,7 @@ class VocabularySetDAL(BaseDAL):
             return latest_vocabulary.unique().scalar_one_or_none()
     
     @classmethod
-    async def _get_vocabulary_by_condition(cls, vocabulary_id: int, order_by: str, comparison_op: callable) -> VocabularySet | None:
+    async def _get_vocabulary_by_condition(cls, vocabulary_id: int, order_by: Any, comparison_op: Callable) -> VocabularySet | None:
         async with cls.make_session() as session:
             given_vocabulary_stmt = (
                 select(VocabularySet)
@@ -89,5 +91,5 @@ class VocabularySetDAL(BaseDAL):
 
 
 
-class LanguagePairDAL(BaseDAL):
+class LanguagePairDAL(BaseDAL[LanguagePair]):
     model = LanguagePair
