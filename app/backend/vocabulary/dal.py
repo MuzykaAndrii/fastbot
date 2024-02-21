@@ -62,14 +62,8 @@ class VocabularySetDAL(BaseDAL[VocabularySet]):
     @classmethod
     async def _get_vocabulary_by_condition(cls, vocabulary_id: int, order_by: UnaryExpression, comparison_op: Callable) -> VocabularySet | None:
         async with cls.make_session() as session:
-            given_vocabulary_stmt = (
-                select(VocabularySet)
-                .where(VocabularySet.id == vocabulary_id)
-            )
-            given_vocabulary = await session.execute(given_vocabulary_stmt)
-            given_vocabulary = given_vocabulary.unique().scalar_one_or_none()
+            given_vocabulary = await session.get_one(VocabularySet, vocabulary_id)
 
-            # TODO: change where clause to filter_by
             stmt = (
                 select(VocabularySet)
                 .order_by(order_by)
