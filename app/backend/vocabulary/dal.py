@@ -36,12 +36,12 @@ class VocabularySetDAL(BaseDAL[VocabularySet]):
     @classmethod
     async def make_inactive(cls, vocabulary_id: int) -> VocabularySet:
         async with cls.make_session() as session:
-            query = (
+            stmt = (
                 update(VocabularySet)
                 .where(VocabularySet.id == vocabulary_id)
                 .values(is_active=False)
             )
-            await session.execute(query)
+            await session.execute(stmt)
             await session.commit()
             return await session.get_one(VocabularySet, vocabulary_id)
 

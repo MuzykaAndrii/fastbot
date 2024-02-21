@@ -26,11 +26,8 @@ class BaseDAL(Generic[T], ABC):
     @classmethod
     async def get_by_id(cls, id: int) -> T | None:
         async with cls.make_session() as session:
-            result = await session.get(cls.model, id)
+            return await session.get(cls.model, id)
 
-            if not result:
-                return None
-            return result
 
     @classmethod
     async def create(cls, **fields: Mapping) -> T:
@@ -45,11 +42,10 @@ class BaseDAL(Generic[T], ABC):
     
     @classmethod
     async def bulk_create(cls, instances: list[Mapping[str, Any]]) -> None:
-        async with cls.make_session() as session:
-            for fields in instances:
-                instance = cls.model(**fields)
-                session.add(instance)
-            
+        async with cls.make_session() as session:            
+            instances = [cls.model(**fields) for fields in instances]
+            session.add_all(instances)
+
             await session.commit()
 
     @classmethod
