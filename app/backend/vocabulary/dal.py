@@ -1,6 +1,6 @@
 from typing import Any, Callable
 
-from sqlalchemy import and_, select, update
+from sqlalchemy import UnaryExpression, and_, select, update
 
 from app.backend.db.dal import BaseDAL
 from app.backend.vocabulary.models import VocabularySet, LanguagePair
@@ -30,7 +30,7 @@ class VocabularySetDAL(BaseDAL[VocabularySet]):
             )
             await session.execute(query)
             await session.commit()
-            return await session.get(VocabularySet, vocabulary_id)
+            return await session.get_one(VocabularySet, vocabulary_id)
     
 
     @classmethod
@@ -43,7 +43,7 @@ class VocabularySetDAL(BaseDAL[VocabularySet]):
             )
             await session.execute(query)
             await session.commit()
-            return await session.get(VocabularySet, vocabulary_id)
+            return await session.get_one(VocabularySet, vocabulary_id)
 
     
     @classmethod
@@ -60,7 +60,7 @@ class VocabularySetDAL(BaseDAL[VocabularySet]):
             return latest_vocabulary.unique().scalar_one_or_none()
     
     @classmethod
-    async def _get_vocabulary_by_condition(cls, vocabulary_id: int, order_by: Any, comparison_op: Callable) -> VocabularySet | None:
+    async def _get_vocabulary_by_condition(cls, vocabulary_id: int, order_by: UnaryExpression, comparison_op: Callable) -> VocabularySet | None:
         async with cls.make_session() as session:
             given_vocabulary_stmt = (
                 select(VocabularySet)
@@ -69,6 +69,7 @@ class VocabularySetDAL(BaseDAL[VocabularySet]):
             given_vocabulary = await session.execute(given_vocabulary_stmt)
             given_vocabulary = given_vocabulary.unique().scalar_one_or_none()
 
+            # TODO: change where clause to filter_by
             stmt = (
                 select(VocabularySet)
                 .order_by(order_by)
@@ -87,7 +88,7 @@ class VocabularySetDAL(BaseDAL[VocabularySet]):
 
     @classmethod
     async def get_vocabulary_that_earliest_than_given(cls, vocabulary_id: int) -> VocabularySet | None:
-        return await cls._get_vocabulary_by_condition(vocabulary_id, VocabularySet.created_at, lambda x, y: x > y)
+        return await cls._get_vocabulary_by_condition(vocabulary_id, VocabularySet.created_at.asc(), lambda x, y: x > y)
 
 
 
