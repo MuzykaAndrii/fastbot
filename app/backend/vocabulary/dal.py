@@ -1,6 +1,7 @@
 from typing import Any, Callable
 
 from sqlalchemy import UnaryExpression, and_, select, update
+from sqlalchemy.orm import selectinload
 
 from app.backend.db.dal import BaseDAL
 from app.backend.vocabulary.models import VocabularySet, LanguagePair
@@ -12,51 +13,50 @@ class VocabularySetDAL(BaseDAL[VocabularySet]):
     @classmethod
     async def disable_user_active_vocabulary(cls, user_id: int):
         async with cls.make_session() as session:
-            query = (
+            stmt = (
                 update(VocabularySet)
                 .where(and_(VocabularySet.owner_id == user_id, VocabularySet.is_active == True))
                 .values(is_active=False)
             )
-            await session.execute(query)
+            await session.execute(stmt)
             await session.commit()
-
-    @classmethod
-    async def make_active(cls, vocabulary_id: int) -> VocabularySet:
-        async with cls.make_session() as session:
-            query = (
-                update(VocabularySet)
-                .where(VocabularySet.id == vocabulary_id)
-                .values(is_active=True)
-            )
-            await session.execute(query)
-            await session.commit()
-            return await session.get_one(VocabularySet, vocabulary_id)
     
 
     @classmethod
+    async def make_active(cls, vocabulary_id: int) -> VocabularySet:
+        return await cls._change_status(vocabulary_id, active=True)
+
+    @classmethod
     async def make_inactive(cls, vocabulary_id: int) -> VocabularySet:
+        return await cls._change_status(vocabulary_id, active=False)
+
+    @classmethod
+    async def _change_status(cls, vocabulary_id: int, active: bool) -> VocabularySet:
         async with cls.make_session() as session:
             stmt = (
                 update(VocabularySet)
                 .where(VocabularySet.id == vocabulary_id)
-                .values(is_active=False)
+                .options(selectinload(VocabularySet.language_pairs))
+                .values(is_active=active)
+                .returning(VocabularySet)
             )
-            await session.execute(stmt)
-            await session.commit()
-            return await session.get_one(VocabularySet, vocabulary_id)
 
+            vocabulary = await session.execute(stmt)
+            await session.commit()
+
+            return vocabulary.unique().scalar_one()
     
     @classmethod
     async def get_latest_user_vocabulary(cls, user_id: int) -> VocabularySet | None:
         async with cls.make_session() as session:
-            stmt = (
+            query = (
                 select(VocabularySet)
                 .where(VocabularySet.owner_id == user_id)
                 .order_by(VocabularySet.created_at.desc())
                 .limit(1)
             )
 
-            latest_vocabulary = await session.execute(stmt)
+            latest_vocabulary = await session.execute(query)
             return latest_vocabulary.unique().scalar_one_or_none()
     
     @classmethod
