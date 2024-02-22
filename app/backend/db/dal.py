@@ -62,8 +62,8 @@ class BaseDAL(Generic[T], ABC):
         async with cls.make_session() as session:
             stmt = select(cls.model).offset(offset).limit(limit)
 
-            instances = await session.execute(stmt)
-            return instances.scalars().all()
+            instances = await session.scalars(stmt)
+            return instances.unique().all()
 
     @classmethod
     async def filter_by(cls, **filter_criteria: Mapping) -> Iterable[T] | None:
