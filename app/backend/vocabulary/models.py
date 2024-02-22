@@ -16,10 +16,7 @@ class VocabularySet(Base):
     __tablename__ = 'vocabulary_sets'
 
     owner_id: Mapped[int] = mc(ForeignKey("users.id"), nullable=False)
-    owner: Mapped["User"] = relationship(
-        back_populates="vocabulary_sets",
-        lazy="selectin",
-    )
+    owner: Mapped["User"] = relationship(back_populates="vocabulary_sets")
 
     name: Mapped[str] = mc(String(50), nullable=False)
     created_at: Mapped[datetime] = mc(DateTime(timezone=True), server_default=func.now())
@@ -28,7 +25,7 @@ class VocabularySet(Base):
     language_pairs: Mapped[list["LanguagePair"]] = relationship(
         back_populates="vocabulary",
         cascade="all, delete-orphan",
-        lazy="joined",
+        lazy="selectin",
     )
 
     def __str__(self) -> str:

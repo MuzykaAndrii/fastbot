@@ -36,7 +36,6 @@ class VocabularySetDAL(BaseDAL[VocabularySet]):
             stmt = (
                 update(VocabularySet)
                 .where(VocabularySet.id == vocabulary_id)
-                .options(selectinload(VocabularySet.language_pairs))
                 .values(is_active=active)
                 .returning(VocabularySet)
             )
@@ -60,29 +59,30 @@ class VocabularySetDAL(BaseDAL[VocabularySet]):
             return latest_vocabulary.unique().scalar_one_or_none()
     
     @classmethod
-    async def _get_vocabulary_by_condition(cls, vocabulary_id: int, order_by: UnaryExpression, comparison_op: Callable) -> VocabularySet | None:
+    async def _get_vocabulary_by_condition(cls, user_id: int, vocabulary_id: int, order_by: UnaryExpression, comparison_op: Callable) -> VocabularySet | None:
         async with cls.make_session() as session:
-            given_vocabulary = await session.get_one(VocabularySet, vocabulary_id)
+            query = select(VocabularySet.created_at).filter_by(id=vocabulary_id)
+            given_vocabulary_created_at = await session.scalar(query)
 
             query = (
                 select(VocabularySet)
                 .order_by(order_by)
                 .limit(1)
                 .where(
-                    VocabularySet.owner_id == given_vocabulary.owner_id,
-                    comparison_op(VocabularySet.created_at, given_vocabulary.created_at)
+                    VocabularySet.owner_id == user_id,
+                    comparison_op(VocabularySet.created_at, given_vocabulary_created_at)
                 )
             )
             result_vocabulary = await session.execute(query)
             return result_vocabulary.unique().scalar_one_or_none()
 
     @classmethod
-    async def get_vocabulary_that_latest_than_given(cls, vocabulary_id: int) -> VocabularySet | None:
-        return await cls._get_vocabulary_by_condition(vocabulary_id, VocabularySet.created_at.desc(), lambda x, y: x < y)
+    async def get_vocabulary_that_latest_than_given(cls, user_id: int,  vocabulary_id: int) -> VocabularySet | None:
+        return await cls._get_vocabulary_by_condition(user_id, vocabulary_id, VocabularySet.created_at.desc(), lambda x, y: x < y)
 
     @classmethod
-    async def get_vocabulary_that_earliest_than_given(cls, vocabulary_id: int) -> VocabularySet | None:
-        return await cls._get_vocabulary_by_condition(vocabulary_id, VocabularySet.created_at.asc(), lambda x, y: x > y)
+    async def get_vocabulary_that_earliest_than_given(cls, user_id: int,  vocabulary_id: int) -> VocabularySet | None:
+        return await cls._get_vocabulary_by_condition(user_id, vocabulary_id, VocabularySet.created_at.asc(), lambda x, y: x > y)
 
 
 

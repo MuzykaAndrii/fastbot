@@ -42,7 +42,7 @@ class VocabularyService:
     
     @classmethod
     async def get_next_vocabulary(cls, user_id: int, vocabulary_id: int) -> VocabularySet:
-        next_vocabulary = await VocabularySetDAL.get_vocabulary_that_latest_than_given(vocabulary_id)
+        next_vocabulary = await VocabularySetDAL.get_vocabulary_that_latest_than_given(user_id, vocabulary_id)
 
         cls._validate_user_vocabulary(user_id, next_vocabulary)
 
@@ -51,7 +51,7 @@ class VocabularyService:
 
     @classmethod
     async def get_previous_vocabulary(cls, user_id: int, vocabulary_id: int) -> VocabularySet:
-        previous_vocabulary = await VocabularySetDAL.get_vocabulary_that_earliest_than_given(vocabulary_id)
+        previous_vocabulary = await VocabularySetDAL.get_vocabulary_that_earliest_than_given(user_id, vocabulary_id)
 
         cls._validate_user_vocabulary(user_id, previous_vocabulary)
 
@@ -85,7 +85,7 @@ class VocabularyService:
             random_lang_pairs.append(ExtendedLanguagePairSchema(
                 word=random_lang_pair.word,
                 translation=random_lang_pair.translation,
-                owner_id=vocabulary.owner.id,
+                owner_id=vocabulary.owner_id,
             ))
 
         return random_lang_pairs
