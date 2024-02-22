@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 from datetime import datetime
-from fastapi import Request
 
+from fastapi import Request
 from sqlalchemy import Boolean, DateTime, ForeignKey, String
 from sqlalchemy.orm import Mapped, relationship
 from sqlalchemy.orm import mapped_column as mc

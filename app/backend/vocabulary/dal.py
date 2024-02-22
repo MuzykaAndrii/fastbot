@@ -64,7 +64,7 @@ class VocabularySetDAL(BaseDAL[VocabularySet]):
         async with cls.make_session() as session:
             given_vocabulary = await session.get_one(VocabularySet, vocabulary_id)
 
-            stmt = (
+            query = (
                 select(VocabularySet)
                 .order_by(order_by)
                 .limit(1)
@@ -73,7 +73,7 @@ class VocabularySetDAL(BaseDAL[VocabularySet]):
                     comparison_op(VocabularySet.created_at, given_vocabulary.created_at)
                 )
             )
-            result_vocabulary = await session.execute(stmt)
+            result_vocabulary = await session.execute(query)
             return result_vocabulary.unique().scalar_one_or_none()
 
     @classmethod
