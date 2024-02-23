@@ -7,12 +7,10 @@ from typing import (
     TypeVar,
 )
 
-from sqlalchemy import (
-    delete,
-    select,
-)
+from sqlalchemy import delete, select
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from .session import async_session_maker
+
 from .base import Base
 
 
@@ -21,72 +19,61 @@ T = TypeVar("T", bound=Base)
 
 class BaseDAL(Generic[T], ABC):
     model: type[T]
-    make_session = async_session_maker
 
-    @classmethod
-    async def get_by_id(cls, id: int) -> T | None:
-        async with cls.make_session() as session:
-            return await session.get(cls.model, id)
-
-
-    @classmethod
-    async def create(cls, **fields: Mapping) -> T:
-        async with cls.make_session() as session:
-            instance = cls.model(**fields)
-
-            session.add(instance)
-            await session.commit()
-            await session.refresh(instance)
-
-            return instance
+    def __init__(self, session: AsyncSession) -> None:
+        self.session = session
     
-    @classmethod
-    async def bulk_create(cls, instances: list[Mapping[str, Any]]) -> None:
-        async with cls.make_session() as session:            
-            instances = [cls.model(**fields) for fields in instances]
-            session.add_all(instances)
+    async def get_by_id(self, id: int) -> T | None:
+        return await self.session.get(self.model, id)
 
-            await session.commit()
-
-    @classmethod
-    async def delete_by_id(cls, id: int) -> T:
-        async with cls.make_session() as session:
-            stmt = delete(cls.model).where(cls.model.id == id).returning(cls.model)
-
-            deleted_instance = await session.execute(stmt)
-            await session.commit()
-            return deleted_instance.unique().scalar_one()
-
-    @classmethod
-    async def get_all(cls, offset: int = 0, limit: int = 50) -> Iterable[T] | None:
-        async with cls.make_session() as session:
-            stmt = select(cls.model).offset(offset).limit(limit)
-
-            instances = await session.scalars(stmt)
-            return instances.unique().all()
-
-    @classmethod
-    async def filter_by(cls, **filter_criteria: Mapping) -> Iterable[T] | None:
-        async with cls.make_session() as session:
-            stmt = select(cls.model).filter_by(**filter_criteria)
-
-            filter_result = await session.scalars(stmt)
-            return filter_result.unique().all()
     
-    @classmethod
-    async def get_one(cls, **filter_criteria: Mapping) -> T | None:
+    async def create(self, **fields: Mapping) -> T:
+        instance = self.model(**fields)
+
+        self.session.add(instance)
+        await self.session.flush()
+
+        return instance
+    
+    
+    async def bulk_create(self, instances: list[Mapping[str, Any]]) -> None:
+        instances = [self.model(**fields) for fields in instances]
+        self.session.add_all(instances)
+
+    
+    async def delete_by_id(self, id: int) -> T:
+        stmt = delete(self.model).where(self.model.id == id).returning(self.model)
+
+        deleted_instance = await self.session.execute(stmt)
+        return deleted_instance.unique().scalar_one()
+
+    
+    async def get_all(self) -> Iterable[T] | None:
+        stmt = select(self.model)
+
+        instances = await self.session.scalars(stmt)
+        return instances.unique().all()
+
+    
+    async def filter_by(self, **filter_criteria: Mapping) -> Iterable[T] | None:
+        stmt = select(self.model).filter_by(**filter_criteria)
+
+        filter_result = await self.session.scalars(stmt)
+        return filter_result.unique().all()
+    
+    
+    async def get_one(self, **filter_criteria: Mapping) -> T | None:
         # TODO: refactor with previous method to reduce duplication
-        async with cls.make_session() as session:
-            stmt = select(cls.model).filter_by(**filter_criteria)
-            
-            filter_result = await session.execute(stmt)
-            return filter_result.unique().scalar_one_or_none()
+        stmt = select(self.model).filter_by(**filter_criteria)
+        
+        filter_result = await self.session.execute(stmt)
+        return filter_result.unique().scalar_one_or_none()
     
-    @classmethod
-    async def get_or_create(cls, **filter_criteria: Mapping) -> T:
-        instance = await cls.get_one(**filter_criteria)
+    
+    async def get_or_create(self, **filter_criteria: Mapping) -> T:
+        instance = await self.get_one(**filter_criteria)
 
         if not instance:
-            instance = await cls.create(**filter_criteria)
+            instance = await self.create(**filter_criteria)
         
         return instance
