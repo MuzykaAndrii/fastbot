@@ -9,13 +9,13 @@ from .exceptions import AuthenticationError, InvalidUserIdError, UserInvalidPass
 from app.backend.users.dal import UserDAL
 from app.backend.users.models import User
 from app.backend.pwd import PWDService
-from app.backend.users.services import UserService
+from app.backend.components.services import users_service
 
 
 class AuthService:
     @classmethod
     async def authenticate_user(cls, user_in: UserLogin) -> User:
-        user = await UserService.get_by_email(user_in.email)
+        user = await users_service.get_by_email(user_in.email)
 
         if not user:
             raise UserNotFoundError

@@ -6,7 +6,7 @@ from fastapi import FastAPI
 from app.config import settings
 from app.bot.main import bot
 from app.backend.db.utils import ping_db
-from app.backend.users.services import UserService
+from app.backend.components.services import users_service
 from app.backend.vocabulary.routes import router as vocabulary_router
 from app.backend.logger import logger
 from app.backend.admin import admin
@@ -15,7 +15,7 @@ from app.backend.admin import admin
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # on startup
-    await UserService.ensure_admin_exists()
+    await users_service.ensure_admin_exists()
 
     await bot.start_bot(drop_pending_updates=settings.DEBUG)
     logger.info("App started")
