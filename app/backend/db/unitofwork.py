@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Self, TypeVar
+from typing import Any, Callable, Self, TypeVar
 
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from .dal import BaseDAL
 
@@ -30,7 +30,7 @@ class UnitOfWorkInterface(ABC):
 R = TypeVar("R", bound=BaseDAL)
 
 class BaseUnitOfWork(UnitOfWorkInterface):
-    def __init__(self, session_factory: async_sessionmaker) -> None:
+    def __init__(self, session_factory: Callable[[], AsyncSession]) -> None:
         self._session_factory = session_factory
 
     async def __aenter__(self) -> Self:
