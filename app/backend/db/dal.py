@@ -37,8 +37,7 @@ class BaseDAL(Generic[T], ABC):
     
     
     async def bulk_create(self, instances: list[Mapping[str, Any]]) -> None:
-        instances = [self.model(**fields) for fields in instances]
-        self.session.add_all(instances)
+        self.session.add_all((self.model(**fields) for fields in instances))
 
     
     async def delete_by_id(self, id: int) -> T:
@@ -55,7 +54,7 @@ class BaseDAL(Generic[T], ABC):
         return instances.unique().all()
 
     
-    async def filter_by(self, **filter_criteria: Mapping) -> Iterable[T] | None:
+    async def filter_by(self, **filter_criteria: Any) -> Iterable[T] | None:
         stmt = select(self.model).filter_by(**filter_criteria)
 
         filter_result = await self.session.scalars(stmt)
