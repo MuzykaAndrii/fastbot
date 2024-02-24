@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from types import TracebackType
 from typing import Any, Callable, Self, TypeVar
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -34,7 +35,7 @@ class BaseUnitOfWork(UnitOfWorkInterface):
         self._session_factory = session_factory
 
     async def __aenter__(self) -> Self:
-        self.session: AsyncSession = self._session_factory()
+        self.session = self._session_factory()
         self._init_repos()
 
         return self
@@ -58,7 +59,12 @@ class BaseUnitOfWork(UnitOfWorkInterface):
     def _register_repo(self, repo: type[R]) -> R:
         return repo(self.session)
         
-    async def __aexit__(self, type, value, traceback):
+    async def __aexit__(
+        self,
+        type: type[BaseException] | None,
+        value: BaseException | None,
+        traceback: TracebackType | None,
+    ) -> None:
         if type is None:
             await self.session.commit()
         else:
