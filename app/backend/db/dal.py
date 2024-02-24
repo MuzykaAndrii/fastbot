@@ -27,7 +27,7 @@ class BaseDAL(Generic[T], ABC):
         return await self.session.get(self.model, id)
 
     
-    async def create(self, **fields: Mapping) -> T:
+    async def create(self, **fields: Any) -> T:
         instance = self.model(**fields)
 
         self.session.add(instance)
@@ -61,7 +61,7 @@ class BaseDAL(Generic[T], ABC):
         return filter_result.unique().all()
     
     
-    async def get_one(self, **filter_criteria: Mapping) -> T | None:
+    async def get_one(self, **filter_criteria: Any) -> T | None:
         # TODO: refactor with previous method to reduce duplication
         stmt = select(self.model).filter_by(**filter_criteria)
         
@@ -69,7 +69,7 @@ class BaseDAL(Generic[T], ABC):
         return filter_result.unique().scalar_one_or_none()
     
     
-    async def get_or_create(self, **filter_criteria: Mapping) -> T:
+    async def get_or_create(self, **filter_criteria: Any) -> T:
         instance = await self.get_one(**filter_criteria)
 
         if not instance:
