@@ -2,7 +2,7 @@ from aiogram import types
 
 from app.bot.vocabulary.parsers import VocabularyParser
 from app.shared.schemas import VocabularyCreateSchema
-from app.backend.vocabulary.services import VocabularyService
+from app.backend.components.services import vocabularies_service
 
 
 async def create_vocabulary(message: types.Message, vocabulary_name: str):
@@ -14,5 +14,5 @@ async def create_vocabulary(message: types.Message, vocabulary_name: str):
         language_pairs=language_lairs,
     )
 
-    await VocabularyService.create_vocabulary(vocabulary)
+    await vocabularies_service.create_vocabulary(vocabulary)
     await message.answer("Vocabulary saved successfully! 🎉 Check it out using /my command!")

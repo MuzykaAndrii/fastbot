@@ -3,11 +3,11 @@ from aiogram import types
 
 from . import messages
 from app.backend.text_generator.text_generator import generate_text_from_words
-from app.backend.vocabulary.services import VocabularyService
+from app.backend.components.services import vocabularies_service
 
 
 async def gen_text_from_vocabulary(message: types.Message, user_id: int, vocabulary_id: int):
-    vocabulary = await VocabularyService.get_vocabulary(user_id, vocabulary_id)
+    vocabulary = await vocabularies_service.get_vocabulary(user_id, vocabulary_id)
     text = await generate_text_from_words(lang_pair.word for lang_pair in vocabulary.language_pairs)
 
     if text:

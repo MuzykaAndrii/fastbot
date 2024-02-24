@@ -17,7 +17,7 @@ from app.backend.auth.exceptions import AuthenticationError, UserInvalidPassword
 from app.backend.auth.schemas import UserLogin
 from app.backend.jwt.exceptions import MyJwtError
 
-from app.backend.users.services import UserService
+from app.backend.components.services import users_service
 
 
 class AdminAuthProvider(AuthProvider):
@@ -54,7 +54,7 @@ class AdminAuthProvider(AuthProvider):
         except (MyJwtError, AuthenticationError):
             return False
 
-        if not UserService.user_is_admin(current_user):
+        if not users_service.user_is_admin(current_user):
             return False
 
         request.state.user = current_user

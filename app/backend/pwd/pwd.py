@@ -4,7 +4,7 @@ import bcrypt
 class PWDService:
 
     @classmethod
-    def get_password_hash(cls, password: str) -> str:
+    def get_password_hash(cls, password: str) -> bytes:
         salt = bcrypt.gensalt()
         pwd_bytes: bytes = password.encode()
         return bcrypt.hashpw(pwd_bytes, salt)

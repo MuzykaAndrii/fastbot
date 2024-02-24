@@ -8,8 +8,8 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from app.config import settings
 from app.backend.db.base import Base
-from app.backend.users.models import User
-from app.backend.vocabulary.models import VocabularySet, LanguagePair
+from app.backend.users.models import User  # noqa
+from app.backend.vocabulary.models import VocabularySet, LanguagePair  # noqa
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
