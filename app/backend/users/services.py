@@ -1,44 +1,45 @@
+from app.backend.components.unitofwork import UnitOfWork
 from app.backend.pwd import PWDService
 from app.config import settings
-from app.backend.users.dal import UserDAL
 from app.backend.users.models import User
 
 
 class UserService:
+    def __init__(self, uow: UnitOfWork) -> None:
+        self._uow = uow
 
-    @staticmethod
-    async def get_or_create_by_id(id: int) -> User:
-        user = await UserDAL.get_or_create(id=id)
+    async def get_or_create_by_id(self, id: int) -> User:
+        async with self._uow as uow:
+            user = await uow.users.get_or_create(id=id)
 
         return user
     
-    @staticmethod
-    async def get_by_id(id: int) -> User:
-        user = await UserDAL.get_one(id=id)
+    async def get_by_id(self, id: int) -> User | None:
+        async with self._uow as uow:
+            user = await uow.users.get_one(id=id)
+
         return user
     
-    @staticmethod
-    async def get_by_email(email: str) -> User:
-        return await UserDAL.get_one(email=email)
+    async def get_by_email(self, email: str) -> User | None:
+        async with self._uow as uow:
+            return await uow.users.get_one(email=email)
 
-    @classmethod
-    async def ensure_admin_exists(cls) -> None:
+    async def ensure_admin_exists(self) -> None:
         """Ensures the existence of at least one admin user in the system.
         If no admin users are found, creates a base admin user
         """
-        admin_users = await UserDAL.get_admin_users()
+        async with self._uow as uow:
+            admin_users = await uow.users.get_admin_users()
 
-        if not admin_users:
-            await cls._create_base_admin_user()
-
-
+            if not admin_users:
+                await self._create_base_admin_user(uow)
+    
     @staticmethod
     def user_is_admin(user: User) -> bool:
         return user.is_superuser
     
-    @classmethod
-    async def _create_base_admin_user(cls) -> None:
-        await UserDAL.create(
+    async def _create_base_admin_user(self, uow: UnitOfWork) -> None:
+        await uow.users.create(
             email=settings.BASE_ADMIN_EMAIL,
             password_hash=PWDService.get_password_hash(settings.BASE_ADMIN_PASS),
             is_superuser=True,
