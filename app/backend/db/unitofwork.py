@@ -60,11 +60,11 @@ class BaseUnitOfWork(UnitOfWorkInterface):
         
     async def __aexit__(self, type, value, traceback):
         if type is None:
-            self.session.commit()
+            await self.session.commit()
         else:
-            self.session.rollback()
+            await self.session.rollback()
 
-        self.session.close()
+        await self.session.close()
 
     async def save(self):
         await self.session.commit()

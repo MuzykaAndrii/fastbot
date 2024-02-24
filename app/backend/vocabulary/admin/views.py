@@ -7,7 +7,7 @@ from app.shared.exceptions import VocabularyIsAlreadyActive
 
 from app.backend.vocabulary.admin.schemas import LanguagePairAdminSchema, VocabularyAdminSchema
 from app.backend.vocabulary.models import LanguagePair, VocabularySet
-from app.backend.vocabulary.services import VocabularyService
+from app.backend.components.services import vocabularies_service
 
 
 class VocabularyAdminView(ModelView):
@@ -39,7 +39,7 @@ class VocabularyAdminView(ModelView):
 
     async def _disable_user_active_vocabulary_if_given_ought_be_enabled(self, vocabulary: VocabularySet) -> None:
         if vocabulary.is_active:
-            await VocabularyService.disable_user_active_vocabulary(vocabulary.owner_id)
+            await vocabularies_service.disable_user_active_vocabulary(vocabulary.owner_id)
 
 
 class LanguagePairAdminView(ModelView):

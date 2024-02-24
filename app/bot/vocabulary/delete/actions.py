@@ -4,7 +4,7 @@ from app.bot.vocabulary.messages import VocabularyMessages
 from app.bot.vocabulary.show.actions import show_vocabulary_in_existing_msg
 from . import messages
 from app.shared.exceptions import NoVocabulariesFound
-from app.backend.vocabulary.services import VocabularyService
+from app.backend.components.services import vocabularies_service
 
 
 async def delete_vocabulary(
@@ -12,10 +12,10 @@ async def delete_vocabulary(
     target_vocabulary_id: int,
     query: CallbackQuery,
 ):
-    await VocabularyService.delete_vocabulary(from_user, target_vocabulary_id)
+    await vocabularies_service.delete_vocabulary(from_user, target_vocabulary_id)
 
     try:
-        latest_vocabulary = await VocabularyService.get_recent_user_vocabulary(from_user)
+        latest_vocabulary = await vocabularies_service.get_recent_user_vocabulary(from_user)
     
     except NoVocabulariesFound:
         await query.message.edit_text(VocabularyMessages.user_havent_any_vocabularies)

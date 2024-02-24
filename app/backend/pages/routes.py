@@ -5,7 +5,7 @@ from app.backend.auth.dependencies import get_current_user
 from app.shared.exceptions import UserIsNotOwnerOfVocabulary, VocabularyDoesNotExist, VocabularyIsAlreadyActive
 from app.backend.users.models import User
 from app.backend.vocabulary.dependencies import user_vocabularies_list
-from app.backend.vocabulary.services import VocabularyService
+from app.backend.components.services import vocabularies_service
 from .template_engine import engine as template_engine
 
 
@@ -22,7 +22,7 @@ async def activate_vocabulary(
     user: User = Depends(get_current_user),
 ):
     try:
-        vocabulary = await VocabularyService.disable_active_vocabulary_and_enable_given(user.id, vocabulary_id)
+        vocabulary = await vocabularies_service.disable_active_vocabulary_and_enable_given(user.id, vocabulary_id)
     except VocabularyDoesNotExist:
         raise HTTPException(404, "Vocabulary does not exist")
     except UserIsNotOwnerOfVocabulary:
@@ -40,7 +40,7 @@ async def disable_vocabulary(
     vocabulary_id: int,
     user: User = Depends(get_current_user),
 ):  
-    vocabulary = await VocabularyService.disable_vocabulary(vocabulary_id)
+    vocabulary = await vocabularies_service.disable_vocabulary(vocabulary_id)
     
     return RedirectResponse(request.url_for("show_vocabulary", vocabulary_id=vocabulary.id))
 
@@ -52,7 +52,7 @@ async def delete_vocabulary(
     user: User = Depends(get_current_user),
 ):  
     try:
-        vocabulary = await VocabularyService.delete_vocabulary(user.id, vocabulary_id)
+        vocabulary = await vocabularies_service.delete_vocabulary(user.id, vocabulary_id)
     except VocabularyDoesNotExist:
         raise HTTPException(404, "Vocabulary does not exist")
     except UserIsNotOwnerOfVocabulary:
@@ -68,13 +68,13 @@ async def edit_vocabulary_page(
     user: User = Depends(get_current_user),
 ):
     try:
-        vocabulary = await VocabularyService.get_vocabulary(user.id, vocabulary_id)
+        vocabulary = await vocabularies_service.get_vocabulary(user.id, vocabulary_id)
     except VocabularyDoesNotExist:
         raise HTTPException(404, "Vocabulary does not exist")
     except UserIsNotOwnerOfVocabulary:
         raise HTTPException(403, "Permission denied")
     
-    vocabularies = await VocabularyService.get_all_user_vocabularies(user.id)
+    vocabularies = await vocabularies_service.get_all_user_vocabularies(user.id)
 
     return template_engine.TemplateResponse(
         name="edit_vocabulary.html",
@@ -90,7 +90,7 @@ async def show_vocabulary(
     user_vocabularies = Depends(user_vocabularies_list, use_cache=True),
 ):
     try:
-        vocabulary = await VocabularyService.get_vocabulary(user.id, vocabulary_id)
+        vocabulary = await vocabularies_service.get_vocabulary(user.id, vocabulary_id)
     except VocabularyDoesNotExist:
         raise HTTPException(404, "Vocabulary does not exist")
     except UserIsNotOwnerOfVocabulary:
