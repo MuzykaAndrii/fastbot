@@ -5,6 +5,7 @@ from fastapi import FastAPI
 
 from app.config import settings
 from app.bot.main import bot
+from app.backend.db.utils import ping_db
 from app.backend.users.services import UserService
 from app.backend.vocabulary.routes import router as vocabulary_router
 from app.backend.logger import logger
@@ -38,12 +39,7 @@ async def handle_tg_response(update: types.Update):
 
 @app.get("/ping", status_code=200)
 async def ping():
-    from app.backend.db.session import async_session_maker
-    from sqlalchemy import select
-
-    async with async_session_maker() as db_session:
-        await db_session.execute(select(1))
-        
+    await ping_db()
     return {"detail": "pong"}
 
 
