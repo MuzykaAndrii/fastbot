@@ -2,9 +2,6 @@ from abc import ABC, abstractmethod
 from typing import Self, TypeVar
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
-from app.backend.users.dal import UserDAL
-
-from app.backend.vocabulary.dal import LanguagePairDAL, VocabularySetDAL
 
 from .dal import BaseDAL
 
@@ -30,7 +27,7 @@ class UnitOfWorkInterface(ABC):
     async def undo(self):
         pass
 
-T = TypeVar("T", bound=BaseDAL)
+R = TypeVar("R", bound=BaseDAL)
 
 class BaseUnitOfWork(UnitOfWorkInterface):
     def __init__(self, session_factory: async_sessionmaker) -> None:
@@ -58,7 +55,7 @@ class BaseUnitOfWork(UnitOfWorkInterface):
         """
         pass
 
-    def _register_repo(self, repo: type[BaseDAL]) -> BaseDAL:
+    def _register_repo(self, repo: type[R]) -> R:
         return repo(self.session)
         
     async def __aexit__(self, type, value, traceback):
