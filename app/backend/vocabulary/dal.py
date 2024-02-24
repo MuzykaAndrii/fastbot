@@ -59,10 +59,10 @@ class VocabularySetDAL(BaseDAL[VocabularySet]):
     ) -> VocabularySet | None:
         # TODO: refactor to receive created_at as param
 
-        query = select(VocabularySet.created_at).filter_by(id=vocabulary_id)
-        given_vocabulary_created_at = await self.session.scalar(query)
+        query_1 = select(VocabularySet.created_at).filter_by(id=vocabulary_id)
+        given_vocabulary_created_at = await self.session.scalar(query_1)
 
-        query = (
+        query_2 = (
             select(VocabularySet)
             .order_by(order_by)
             .limit(1)
@@ -71,7 +71,7 @@ class VocabularySetDAL(BaseDAL[VocabularySet]):
                 comparison_op(VocabularySet.created_at, given_vocabulary_created_at)
             )
         )
-        result_vocabulary = await self.session.execute(query)
+        result_vocabulary = await self.session.execute(query_2)
         return result_vocabulary.unique().scalar_one_or_none()
 
     
