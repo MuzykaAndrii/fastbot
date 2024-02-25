@@ -61,14 +61,15 @@ class BaseUnitOfWork(UnitOfWorkInterface):
         
     async def __aexit__(
         self,
-        type: type[BaseException] | None,
+        exception: type[BaseException] | None,
         value: BaseException | None,
         traceback: TracebackType | None,
     ) -> None:
-        if type is None:
-            await self.session.commit()
-        else:
+        if exception:
+            print(exception)
             await self.session.rollback()
+        else:
+            await self.session.commit()
 
         await self.session.close()
 
