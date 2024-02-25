@@ -17,6 +17,6 @@ def get_auth_token(request: Request) -> str:
 
 async def get_current_user(token: str = Depends(get_auth_token)) -> User:    
     try:
-        return AuthService.get_user_from_token(token)
+        return await AuthService.get_user_from_token(token)
     except (MyJwtError, InvalidUserIdError, UserNotFoundError):
         raise HTTPException(status_code=401)
