@@ -54,7 +54,7 @@ class AdminAuthProvider(AuthProvider):
         except (MyJwtError, AuthenticationError):
             return False
 
-        if not users_service.user_is_admin(current_user):
+        if not users_service().user_is_admin(current_user):
             return False
 
         request.state.user = current_user

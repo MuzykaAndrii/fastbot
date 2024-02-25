@@ -13,7 +13,7 @@ from app.backend.components.services import users_service
 class AuthService:
     @classmethod
     async def authenticate_user(cls, user_in: UserLogin) -> User:
-        user = await users_service.get_by_email(user_in.email)
+        user = await users_service().get_by_email(user_in.email)
 
         if not user:
             raise UserNotFoundError
@@ -39,7 +39,7 @@ class AuthService:
         except ValueError:
             raise InvalidUserIdError
 
-        user = await users_service.get_by_id(user_id)
+        user = await users_service().get_by_id(user_id)
         if not user:
             raise UserNotFoundError
 
