@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from types import TracebackType
-from typing import Any, Callable, Self, TypeVar
+from typing import Callable, Self, TypeVar
 
 from sqlalchemy.ext.asyncio import AsyncSession
 

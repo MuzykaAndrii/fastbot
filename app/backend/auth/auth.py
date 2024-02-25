@@ -1,12 +1,10 @@
 from fastapi import Response
 
-
 from app.backend.jwt import Jwt
 from app.backend.jwt.exceptions import MyJwtError
 from .cookie import AuthCookieManager
 from .schemas import UserLogin
 from .exceptions import AuthenticationError, InvalidUserIdError, UserInvalidPassword, UserNotFoundError
-from app.backend.users.dal import UserDAL
 from app.backend.users.models import User
 from app.backend.pwd import PWDService
 from app.backend.components.services import users_service
@@ -41,7 +39,7 @@ class AuthService:
         except ValueError:
             raise InvalidUserIdError
 
-        user: User = await UserDAL.get_by_id(user_id)
+        user = await users_service.get_by_id(user_id)
         if not user:
             raise UserNotFoundError
 
