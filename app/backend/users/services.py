@@ -16,7 +16,7 @@ class UserService:
     
     async def get_by_id(self, id: int) -> User | None:
         async with self._uow as uow:
-            user = await uow.users.get_one(id=id)
+            user = await uow.users.get_by_id(id)
 
         return user
     

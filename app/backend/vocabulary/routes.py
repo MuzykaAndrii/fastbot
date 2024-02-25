@@ -15,7 +15,7 @@ async def send_notifications(auth: AuthorizationSchema):
     if auth.api_key != settings.API_KEY:
         raise HTTPException(403, detail="Invalid API key")
     
-    lang_pairs_to_send: list[ExtendedLanguagePairSchema] = await vocabularies_service.get_random_lang_pair_from_every_active_vocabulary()
+    lang_pairs_to_send: list[ExtendedLanguagePairSchema] = await vocabularies_service().get_random_lang_pair_from_every_active_vocabulary()
 
     if not lang_pairs_to_send:
         raise HTTPException(204, detail="No active vocabularies")

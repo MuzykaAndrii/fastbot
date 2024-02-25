@@ -1,10 +1,10 @@
 from fastapi import Depends, HTTPException, Request
-from app.backend.jwt import Jwt
-from app.backend.jwt.exceptions import JWTExpiredError, JwtNotValidError
-from app.backend.users.dal import UserDAL
 
+from app.backend.jwt.exceptions import MyJwtError
 from app.backend.users.models import User
+from .auth import AuthService
 from .cookie import AuthCookieManager
+from .exceptions import InvalidUserIdError, UserNotFoundError
 
 
 def get_auth_token(request: Request) -> str:
@@ -15,16 +15,8 @@ def get_auth_token(request: Request) -> str:
     return auth_token
 
 
-async def get_current_user(token: str = Depends(get_auth_token)) -> User:
+async def get_current_user(token: str = Depends(get_auth_token)) -> User:    
     try:
-        payload = Jwt.read_token(token)
-        user_id = int(payload.get("sub"))
-        user = await UserDAL.get_by_id(user_id)
-
-    except (JwtNotValidError, JWTExpiredError, ValueError):
+        return await AuthService.get_user_from_token(token)
+    except (MyJwtError, InvalidUserIdError, UserNotFoundError):
         raise HTTPException(status_code=401)
-
-    if not user:
-        raise HTTPException(status_code=401)
-
-    return user

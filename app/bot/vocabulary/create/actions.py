@@ -14,5 +14,5 @@ async def create_vocabulary(message: types.Message, vocabulary_name: str):
         language_pairs=language_lairs,
     )
 
-    await vocabularies_service.create_vocabulary(vocabulary)
+    await vocabularies_service().create_vocabulary(vocabulary)
     await message.answer("Vocabulary saved successfully! 🎉 Check it out using /my command!")

@@ -15,7 +15,7 @@ from app.backend.admin import admin
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # on startup
-    await users_service.ensure_admin_exists()
+    await users_service().ensure_admin_exists()
 
     await bot.start_bot(drop_pending_updates=settings.DEBUG)
     logger.info("App started")
