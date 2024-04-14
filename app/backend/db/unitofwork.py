@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import asyncio
 from types import TracebackType
 from typing import Callable, Self, TypeVar
 
@@ -66,12 +67,11 @@ class BaseUnitOfWork(UnitOfWorkInterface):
         traceback: TracebackType | None,
     ) -> None:
         if exception:
-            print(exception)
             await self.session.rollback()
         else:
             await self.session.commit()
 
-        await self.session.close()
+        await asyncio.shield(self.session.close())
 
     async def save(self):
         await self.session.commit()

@@ -15,7 +15,7 @@ RUN $POETRY_VENV/bin/pip install poetry==${POETRY_VERSION}
 
 ENV PATH="${PATH}:${POETRY_VENV}/bin"
 
-COPY poetry.lock pyproject.toml .
+COPY poetry.lock pyproject.toml ./
 RUN poetry config virtualenvs.create false
 RUN poetry install --no-interaction --no-root
 
