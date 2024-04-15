@@ -1,0 +1,65 @@
+version: "3.8"
+services:
+
+  db:
+    image: postgres:15.6-alpine
+    container_name: tgbot_pgdb_container
+    restart: always
+    ports:
+      - 5432:5432
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "pg_isready", "-q", "-d", "${POSTGRES_DB}", "-U", "${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 80s
+    volumes:
+      - fastbot-pgdb-data:/var/lib/postgresql/data
+    networks:
+      - fastbot-network
+  
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: tg_bot_pgadmin4_container
+    restart: always
+    ports:
+      - "5050:80"
+    env_file:
+      - .env
+    volumes:
+      - fastbot-pgadmin-data:/var/lib/pgadmin
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - fastbot-network
+  
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile-prod
+    container_name: fastbot-app
+    restart: always
+    ports:
+      - 8000:8000
+    healthcheck:
+      test: curl --fail http://localhost:8000/ping || exit 1
+      interval: 10s
+      timeout: 10s
+      start_period: 10s
+      retries: 3
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - fastbot-network
+
+networks:
+  fastbot-network:
+    driver: bridge
+
+volumes:
+  fastbot-pgadmin-data:
+  fastbot-pgdb-data:
