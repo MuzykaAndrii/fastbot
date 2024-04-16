@@ -55,6 +55,14 @@ services:
         condition: service_healthy
     networks:
       - fastbot-network
+  
+  tunnel:
+    build:
+      context: ./ngrok/
+    container_name: ngrok-tunnel
+    restart: unless-stopped
+    networks:
+      - fastbot-network
 
 networks:
   fastbot-network:
