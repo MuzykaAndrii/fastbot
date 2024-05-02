@@ -4,7 +4,7 @@ from app.bot.modules.string_matcher.string_matcher import StringMatcher
 
 
 class TranslationChecker:
-    def __init__(self, text: str, accuracy: float = .95) -> None:
+    def __init__(self, text: str, accuracy: float = 95.0) -> None:
         self.accuracy = accuracy
         self._variants = self._split_variants(text)
 
