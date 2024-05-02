@@ -1,0 +1,8 @@
+version: 2
+authtoken: token here
+
+tunnels:
+  application:
+    addr: app:8000
+    proto: http
+    hostname: hostname from ngrok dashboard

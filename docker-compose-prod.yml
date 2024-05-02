@@ -1,0 +1,31 @@
+version: "3.8"
+services:
+  
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile-prod
+    container_name: fastbot-app
+    restart: always
+    ports:
+      - 80:8000
+    healthcheck:
+      test: curl --fail http://localhost:8000/ping || exit 1
+      interval: 10s
+      timeout: 10s
+      start_period: 10s
+      retries: 3
+    networks:
+      - fastbot-network
+  
+  tunnel:
+    build:
+      context: ./ngrok/
+    container_name: ngrok-tunnel
+    restart: unless-stopped
+    networks:
+      - fastbot-network
+
+networks:
+  fastbot-network:
+    driver: bridge
