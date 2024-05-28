@@ -25,6 +25,12 @@ async def lifespan(app: FastAPI):
     await bot.stop_bot()
     logger.info("App stopped")
 
+
+if not settings.DEBUG:
+    from app.backend.sentry.setup import setup_sentry
+    setup_sentry(settings.SENTRY_DSN)
+
+
 app = FastAPI(
     title='Language bot',
     debug=settings.DEBUG,
