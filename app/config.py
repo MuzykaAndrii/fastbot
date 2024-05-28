@@ -4,7 +4,7 @@ from pydantic_settings import (
     BaseSettings,
     SettingsConfigDict,
 )
-from pydantic import EmailStr, computed_field
+from pydantic import EmailStr, computed_field, AnyUrl
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -47,6 +47,8 @@ class Settings(BaseSettings):
 
     BASE_ADMIN_EMAIL: EmailStr
     BASE_ADMIN_PASS: str
+
+    SENTRY_DSN: AnyUrl
 
 
     @computed_field # type: ignore[misc]
