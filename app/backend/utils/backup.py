@@ -3,7 +3,7 @@ import shelve
 from sqlalchemy import select
 
 from app.backend.users.models import User
-from app.backend.db.session import async_session_maker
+from app.backend.components.db import async_session_maker
 from app.backend.vocabulary.models import LanguagePair, VocabularySet
 
 async def save_user_data_to_shelve():

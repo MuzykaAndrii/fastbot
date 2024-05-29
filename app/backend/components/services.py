@@ -1,5 +1,5 @@
 from app.backend.components.unitofwork import UnitOfWork
-from app.backend.db.session import async_session_maker
+from app.backend.components.db import async_session_maker
 from app.backend.users.services import UserService
 from app.backend.vocabulary.services import VocabularyService
 

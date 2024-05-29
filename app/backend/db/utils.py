@@ -1,6 +1,6 @@
 from sqlalchemy import select
 
-from .session import async_session_maker
+from app.backend.components.db import async_session_maker
 
 
 async def ping_db() -> None:
