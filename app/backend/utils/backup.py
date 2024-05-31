@@ -3,11 +3,11 @@ import shelve
 from sqlalchemy import select
 
 from app.backend.users.models import User
-from app.backend.components.db import async_session_maker
+from app.backend.components.db import database
 from app.backend.vocabulary.models import LanguagePair, VocabularySet
 
 async def save_user_data_to_shelve():
-    async with async_session_maker() as session:
+    async with database.session_maker() as session:
         stmt = select(User)
         instances = await session.execute(stmt)
         users = instances.scalars().all()
@@ -24,7 +24,7 @@ async def save_user_data_to_shelve():
                 }
 
 async def save_vocabulary_set_data_to_shelve():
-    async with async_session_maker() as session:
+    async with database.session_maker() as session:
         stmt = select(VocabularySet)
         instances = await session.scalars(stmt)
         vocabulary_sets = instances.unique().all()
@@ -41,7 +41,7 @@ async def save_vocabulary_set_data_to_shelve():
                 }
 
 async def save_language_pair_data_to_shelve():
-    async with async_session_maker() as session:
+    async with database.session_maker() as session:
         stmt = select(LanguagePair)
         instances = await session.scalars(stmt)
         language_pairs = instances.unique().all()
@@ -64,7 +64,7 @@ async def save_db_data_to_shelve():
 
 
 async def save_data_from_shelve_to_db():
-    async with async_session_maker() as session:
+    async with database.session_maker() as session:
         # Save users data from shelve
         with shelve.open('backups/user_data') as db:
             for key in db:

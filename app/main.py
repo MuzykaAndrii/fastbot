@@ -5,7 +5,7 @@ from fastapi import FastAPI
 
 from app.config import settings
 from app.bot.main import bot
-from app.backend.db.utils import ping_db
+from app.backend.components.db import database
 from app.backend.components.services import users_service
 from app.backend.vocabulary.routes import router as vocabulary_router
 from app.backend.logger import logger
@@ -45,7 +45,7 @@ async def handle_tg_response(update: types.Update):
 
 @app.get("/ping", status_code=200)
 async def ping():
-    await ping_db()
+    await database.ping()
     return {"detail": "pong"}
 
 

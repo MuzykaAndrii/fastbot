@@ -3,14 +3,14 @@ from starlette_admin.contrib.sqla import Admin
 from starlette.middleware.sessions import SessionMiddleware
 
 from app.config import settings
-from app.backend.db.session import engine
+from app.backend.components.db import database
 from .auth import AdminAuthProvider
 from app.backend.users.admin.views import UserAdminView
 from app.backend.vocabulary.admin.views import LanguagePairAdminView, VocabularyAdminView
 
 
 admin = Admin(
-    engine=engine,
+    engine=database.engine,
     title="Admin panel",
     debug=settings.DEBUG,
     auth_provider=AdminAuthProvider(),

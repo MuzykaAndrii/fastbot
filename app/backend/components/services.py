@@ -1,11 +1,11 @@
 from app.backend.components.unitofwork import UnitOfWork
-from app.backend.components.db import async_session_maker
+from app.backend.components.db import database
 from app.backend.users.services import UserService
 from app.backend.vocabulary.services import VocabularyService
 
 
 def users_service():
-    return UserService(UnitOfWork(async_session_maker))
+    return UserService(UnitOfWork(database.session_maker))
 
 def vocabularies_service():
-    return VocabularyService(UnitOfWork(async_session_maker))
+    return VocabularyService(UnitOfWork(database.session_maker))

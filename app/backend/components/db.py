@@ -1,5 +1,5 @@
-from app.backend.db.session import get_session_maker
 from app.backend.components.config import db_settings
+from app.backend.db.session import DataBase
 
 
-async_session_maker = get_session_maker(db_settings)
+database = DataBase(db_settings)
