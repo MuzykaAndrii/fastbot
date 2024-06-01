@@ -1,9 +1,5 @@
-from typing import Any
-from contextlib import suppress
-
 from starlette.requests import Request
 from starlette_admin.contrib.sqla.ext.pydantic import ModelView
-from app.shared.exceptions import VocabularyIsAlreadyActive
 
 from app.backend.vocabulary.admin.schemas import LanguagePairAdminSchema, VocabularyAdminSchema
 from app.backend.vocabulary.models import LanguagePair, VocabularySet

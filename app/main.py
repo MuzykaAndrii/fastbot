@@ -9,7 +9,7 @@ from app.backend.components.db import database
 from app.backend.components.services import users_service
 from app.backend.vocabulary.routes import router as vocabulary_router
 from app.backend.logger import logger
-from app.backend.admin import admin
+from app.backend.components.admin import admin
 
 
 @asynccontextmanager

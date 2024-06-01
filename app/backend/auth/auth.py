@@ -11,8 +11,7 @@ from app.backend.components.services import users_service
 
 
 class AuthService:
-    @classmethod
-    async def authenticate_user(cls, user_in: UserLogin) -> User:
+    async def authenticate_user(self, user_in: UserLogin) -> User:
         user = await users_service().get_by_email(user_in.email)
 
         if not user:
@@ -27,8 +26,7 @@ class AuthService:
 
         return user
     
-    @classmethod
-    async def get_user_from_token(cls, token: str) -> User | None:
+    async def get_user_from_token(self, token: str) -> User | None:
         try:
             payload = Jwt.read_token(token)
         except MyJwtError as e:
@@ -45,25 +43,22 @@ class AuthService:
 
         return user
     
-    @classmethod
-    def set_auth_cookie(cls, response_obj: Response, user_id: int) -> str:
+    def set_auth_cookie(self, response_obj: Response, user_id: int) -> str:
         auth_token = Jwt.create_token(str(user_id))
         AuthCookieManager().set_cookie(response_obj, auth_token)
 
         return auth_token
     
-    @classmethod
-    async def login_user(cls, response_obj: Response, user_in: UserLogin) -> User:
+    async def login_user(self, response_obj: Response, user_in: UserLogin) -> User:
         try:
-            user = await cls.authenticate_user(user_in)
+            user = await self.authenticate_user(user_in)
         except AuthenticationError as error:
             raise error
 
-        cls.set_auth_cookie(response_obj, user.id)
+        self.set_auth_cookie(response_obj, user.id)
 
         return user
 
 
-    @classmethod
-    def logout_user(cls, response: Response) -> Response:
+    def logout_user(self, response: Response) -> Response:
         return AuthCookieManager().delete_cookie(response)

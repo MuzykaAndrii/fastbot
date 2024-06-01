@@ -11,7 +11,7 @@ from starlette_admin.exceptions import (
     FormValidationError,
     LoginFailed,
 )
-from app.backend.auth.auth import AuthService
+from .protocols import AuthServiceProtocol
 from app.backend.auth.cookie import AuthCookieManager
 from app.backend.auth.exceptions import AuthenticationError, UserInvalidPassword, UserNotFoundError
 from app.backend.auth.schemas import UserLogin
@@ -21,6 +21,10 @@ from app.backend.components.services import users_service
 
 
 class AdminAuthProvider(AuthProvider):
+    def __init__(self, auth_service: AuthServiceProtocol, *args, **kwargs):
+        self.auth_service = auth_service
+        super().__init__(*args, **kwargs)
+
     async def login(
         self,
         username: str,
@@ -38,7 +42,7 @@ class AdminAuthProvider(AuthProvider):
             raise FormValidationError({"failed": "Invalid input data"})
 
         try:
-            await AuthService.login_user(response, credentials)
+            await self.auth_service.login_user(response, credentials)
         except UserNotFoundError:
             raise LoginFailed("user not found")
         except UserInvalidPassword:
@@ -50,7 +54,7 @@ class AdminAuthProvider(AuthProvider):
         token = AuthCookieManager().get_cookie(request)
 
         try:
-            current_user = await AuthService.get_user_from_token(token)
+            current_user = await self.auth_service.get_user_from_token(token)
         except (MyJwtError, AuthenticationError):
             return False
 
@@ -66,5 +70,5 @@ class AdminAuthProvider(AuthProvider):
         return AdminUser(username=user.username)
 
     async def logout(self, request: Request, response: Response) -> Response:
-        AuthService.logout_user(response)
+        self.auth_service.logout_user(response)
         return response
