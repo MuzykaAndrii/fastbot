@@ -6,6 +6,7 @@ from .auth import AuthService
 from .cookie import AuthCookieManager
 from .exceptions import InvalidUserIdError, UserNotFoundError
 
+# FIX: NEED TO BE FIXED
 
 def get_auth_token(request: Request) -> str:
     auth_token = AuthCookieManager().get_cookie(request)

@@ -50,6 +50,8 @@ services:
       timeout: 10s
       start_period: 10s
       retries: 3
+    volumes:
+      - ./app:/code/app
     depends_on:
       db:
         condition: service_healthy
