@@ -2,6 +2,7 @@ from fastapi import Response
 
 from app.backend.jwt import Jwt
 from app.backend.jwt.exceptions import MyJwtError
+from app.backend.jwt.interface import IJwt
 from .cookie import AuthCookieManager
 from .schemas import UserLogin
 from .exceptions import AuthenticationError, InvalidUserIdError, UserInvalidPassword, UserNotFoundError
@@ -9,8 +10,18 @@ from app.backend.users.models import User
 from app.backend.pwd import PWDService
 from app.backend.components.services import users_service
 
+"""
+dependencies:
+- jwt access token
+- users service
+- password manager
+- cookie manager
+"""
 
 class AuthService:
+    def __init__(self, jwt: IJwt) -> None:
+        self.jwt = jwt
+
     async def authenticate_user(self, user_in: UserLogin) -> User:
         user = await users_service().get_by_email(user_in.email)
 
@@ -28,12 +39,12 @@ class AuthService:
     
     async def get_user_from_token(self, token: str) -> User | None:
         try:
-            payload = Jwt.read_token(token)
+            payload = self.jwt.read(token)
         except MyJwtError as e:
             raise e
 
         try:
-            user_id = int(payload.get("sub"))
+            user_id = int(payload.sub)
         except ValueError:
             raise InvalidUserIdError
 
@@ -44,7 +55,7 @@ class AuthService:
         return user
     
     def set_auth_cookie(self, response_obj: Response, user_id: int) -> str:
-        auth_token = Jwt.create_token(str(user_id))
+        auth_token = self.jwt.create(str(user_id))
         AuthCookieManager().set_cookie(response_obj, auth_token)
 
         return auth_token
