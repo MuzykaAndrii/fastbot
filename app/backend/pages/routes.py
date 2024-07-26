@@ -5,7 +5,7 @@ from app.backend.auth.dependencies import get_current_user
 from app.shared.exceptions import UserIsNotOwnerOfVocabulary, VocabularyDoesNotExist, VocabularyIsAlreadyActive
 from app.backend.users.models import User
 from app.backend.vocabulary.dependencies import user_vocabularies_list
-from app.backend.components.services import vocabularies_service
+from app.backend.components import vocabularies_service
 from .template_engine import engine as template_engine
 
 

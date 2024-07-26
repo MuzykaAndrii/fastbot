@@ -3,7 +3,7 @@ from starlette_admin.contrib.sqla.ext.pydantic import ModelView
 
 from app.backend.vocabulary.admin.schemas import LanguagePairAdminSchema, VocabularyAdminSchema
 from app.backend.vocabulary.models import LanguagePair, VocabularySet
-from app.backend.components.services import vocabularies_service
+from app.backend.components import vocabularies_service
 
 
 class VocabularyAdminView(ModelView):

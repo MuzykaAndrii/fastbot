@@ -2,7 +2,7 @@ from fastapi import Depends
 
 from app.backend.auth.dependencies import get_current_user
 from app.backend.users.models import User
-from app.backend.components.services import vocabularies_service
+from app.backend.components import vocabularies_service
 
 
 async def user_vocabularies_list(user: User = Depends(get_current_user)):

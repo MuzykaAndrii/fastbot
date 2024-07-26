@@ -6,7 +6,7 @@ from app.backend.users.admin.views import UserAdminView
 from app.backend.vocabulary.admin.views import LanguagePairAdminView, VocabularyAdminView
 from app.config import settings
 from app.backend.components.db import database
-from app.backend.components.auth import admin_auth_provider
+from app.backend.components import admin_auth_provider
 from app.backend.components.config import auth_settings
 
 

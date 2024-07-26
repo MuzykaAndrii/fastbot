@@ -19,7 +19,7 @@ from .keyboards import SelectQuizTypeKeyboard, get_quiz_keyboard
 from . import messages
 from app.bot.vocabulary.quiz.question_manager import VocabularyQuestionManager
 from app.shared.schemas import LanguagePairSchema
-from app.backend.components.services import vocabularies_service
+from app.backend.components import vocabularies_service
 
 
 router = Router()

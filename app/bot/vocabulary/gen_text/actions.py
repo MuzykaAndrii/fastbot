@@ -3,7 +3,7 @@ from aiogram import types
 
 from . import messages
 from app.backend.text_generator.text_generator import generate_text_from_words
-from app.backend.components.services import vocabularies_service
+from app.backend.components import vocabularies_service
 
 
 async def gen_text_from_vocabulary(message: types.Message, user_id: int, vocabulary_id: int):

@@ -3,7 +3,7 @@ from aiogram import Bot, types
 from app.shared.schemas import ExtendedLanguagePairSchema, VocabularySchema
 
 from . import messages
-from app.backend.components.services import vocabularies_service
+from app.backend.components import vocabularies_service
 
 
 async def enable_vocabulary(message: types.Message, user_id: int, vocabulary_id: int) -> VocabularySchema:

@@ -4,7 +4,7 @@ from app.config import settings
 from app.backend.text_generator.text_generator import generate_sentence_from_word
 from app.shared.schemas import ExtendedLanguagePairSchema
 from app.backend.vocabulary.schemas import AuthorizationSchema
-from app.backend.components.services import vocabularies_service
+from app.backend.components import vocabularies_service
 from app.bot.vocabulary.notifications import tasks  # emulation of api request to bot service
 
 
