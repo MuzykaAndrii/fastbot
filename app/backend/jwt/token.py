@@ -3,16 +3,16 @@ from typing import Any
 
 
 class Token:
-    def __init__(self, sub: Any, expire: datetime) -> None:
+    def __init__(self, sub: Any, exp: datetime) -> None:
         self.sub = sub
-        self.expire = expire
+        self.exp = exp
     
     @property
     def is_expired(self):
-        return self.expire < datetime.now(UTC).timestamp()
+        return self.exp < datetime.now(UTC).timestamp()
     
     def as_dict(self):
         return {
             "sub": self.sub,
-            "exp": self.expire,
+            "exp": self.exp,
         }
