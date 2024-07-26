@@ -49,7 +49,7 @@ class Jwt(IJwt):
     def create(self, sub: Any) -> str:
         token = Token(
             sub=sub,
-            expire=self._get_expire_time(),
+            exp=self._get_expire_time(),
         )
 
         return self._encoder.encode(token.as_dict())
