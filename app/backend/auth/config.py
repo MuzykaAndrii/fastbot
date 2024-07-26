@@ -9,7 +9,8 @@ class AuthSettings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore",
     )
-    
+
+    TOKEN_NAME: str = "auth_token"
     TOKEN_KEY: str
     ACCESS_TOKEN_LIFETIME_MINUTES: int
     REFRESH_TOKEN_LIFETIME_MINUTES: int
