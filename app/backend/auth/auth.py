@@ -7,8 +7,7 @@ from .cookie import AuthCookieManager
 from .schemas import UserLogin
 from .exceptions import AuthenticationError, InvalidUserIdError, UserInvalidPassword, UserNotFoundError
 from app.backend.users.models import User
-from app.backend.pwd import PWDService
-from .protocols import UserServiceProtocol
+from .protocols import PasswordServiceProtocol, UserServiceProtocol
 
 """
 dependencies:
@@ -23,9 +22,11 @@ class AuthService:
         self,
         jwt: IJwt,
         users_service: Callable[[], UserServiceProtocol],
+        pwd_service: PasswordServiceProtocol,
     ) -> None:
         self.jwt = jwt
         self.users_service = users_service
+        self.pwd_service = pwd_service
 
     async def authenticate_user(self, user_in: UserLogin) -> User:
         user = await self.users_service().get_by_email(user_in.email)
@@ -33,8 +34,9 @@ class AuthService:
         if not user:
             raise UserNotFoundError
 
-        pass_matching = PWDService.verify_password(
-            raw_password=user_in.password, hashed_password=user.password_hash
+        pass_matching = self.pwd_service.verify(
+            raw_password=user_in.password,
+            hashed_password=user.password_hash
         )
 
         if not pass_matching:
