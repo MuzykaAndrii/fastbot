@@ -1,6 +1,5 @@
 from fastapi import Response
 
-from app.backend.jwt import Jwt
 from app.backend.jwt.exceptions import MyJwtError
 from app.backend.jwt.interface import IJwt
 from .cookie import AuthCookieManager
