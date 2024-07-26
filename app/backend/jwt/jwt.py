@@ -1,7 +1,10 @@
+from abc import ABC, abstractmethod
 from datetime import (
     datetime,
     timedelta,
+    UTC,
 )
+from typing import Any
 
 from jose import (
     JWTError,
@@ -9,65 +12,93 @@ from jose import (
 )
 from .exceptions import JWTExpiredError, JwtMissingError, JwtNotValidError
 
-from app.config import settings
 
-
-
-class Jwt:
-    @staticmethod
-    def _get_expire_time(exp_minutes=settings.JWT_EXPIRE_MINUTES) -> datetime:
-        return datetime.utcnow() + timedelta(minutes=int(exp_minutes))
-
-    @staticmethod
-    def _get_token_pattern() -> dict:
-        # TODO: rebuild to pydantic schema
+class Token:
+    def __init__(self, sub: Any, expire: datetime) -> None:
+        self.sub = sub
+        self.expire = expire
+    
+    @property
+    def is_expired(self):
+        return self.expire < datetime.now(UTC).timestamp()
+    
+    def as_dict(self):
         return {
-            "expire": None,
-            "sub": None,
+            "sub": self.sub,
+            "exp": self.expire,
         }
 
-    @staticmethod
-    def _is_token_expired(payload: dict) -> bool:
-        expire_at = payload.get("exp")
 
-        if expire_at < datetime.utcnow().timestamp():
-            return True
-        return False
+class IJwtEncoder(ABC):
+    @abstractmethod
+    def encode(self, payload: dict) -> str:
+        pass
 
-    @classmethod
-    def create_token(cls, data: str, expire: datetime | None = None) -> str:
-        if not expire:
-            expire: datetime = cls._get_expire_time()
+    @abstractmethod
+    def decode(self, raw_token: str) -> dict:
+        pass
 
-        token_data: dict = cls._get_token_pattern()
 
-        token_data.update({"exp": expire})
-        token_data.update({"sub": data})
-
-        encoded_token: str = jwt.encode(
-            token_data,
-            settings.JWT_SECRET,
-            "HS256",
+class JoseEncoder(IJwtEncoder):
+    def __init__(self, key: str, alg: str = "HS256") -> None:
+        self.key = key
+        self.alg = alg
+    
+    def encode(self, payload: dict) -> str:
+        return jwt.encode(
+            payload,
+            self.key,
+            self.alg,
         )
-
-        return encoded_token
-
-    @classmethod
-    def read_token(cls, token: str) -> dict:
-        if not token:
-            raise JwtMissingError
-
+    
+    def decode(self, raw_token: str) -> dict:
         try:
-            payload = jwt.decode(
-                token,
-                settings.JWT_SECRET,
-                "HS256",
+            decoded = jwt.decode(
+                raw_token,
+                self.key,
+                self.alg,
             )
         except JWTError:
             raise JwtNotValidError
+        
+        return decoded
 
-        expired = cls._is_token_expired(payload)
-        if expired:
+
+class IJwt(ABC):
+    @abstractmethod
+    def create(self, sub: Any) -> str:
+        pass
+
+    @abstractmethod
+    def read(self, encoded_token: str) -> Any:
+        pass
+
+
+class Jwt(IJwt):
+    def __init__(self, encoder: IJwtEncoder, lifetime_minutes: datetime) -> None:
+        self.lifetime_minutes = lifetime_minutes
+        self._encoder = encoder
+    
+    def create(self, sub: Any) -> str:
+        token = Token(
+            sub=sub,
+            expire=self._get_expire_time(),
+        )
+
+        return self._encoder.encode(token.as_dict())
+
+
+    def _get_expire_time(self) -> datetime:
+        return datetime.now(UTC) + timedelta(minutes=int(self.lifetime_minutes))
+
+    def read(self, encoded_token: str) -> Token:
+        if not encoded_token:
+            raise JwtMissingError
+
+        decoded = self._encoder.decode(encoded_token)
+        token = Token(**decoded)
+        
+        if token.is_expired:
             raise JWTExpiredError
-
-        return payload
+        
+        return token
