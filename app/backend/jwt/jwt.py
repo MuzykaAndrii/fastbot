@@ -1,4 +1,3 @@
-from abc import ABC, abstractmethod
 from datetime import (
     datetime,
     timedelta,
@@ -10,6 +9,8 @@ from jose import (
     JWTError,
     jwt,
 )
+
+from app.backend.jwt.interface import IJwt, IJwtEncoder
 from .exceptions import JWTExpiredError, JwtMissingError, JwtNotValidError
 
 
@@ -27,16 +28,6 @@ class Token:
             "sub": self.sub,
             "exp": self.expire,
         }
-
-
-class IJwtEncoder(ABC):
-    @abstractmethod
-    def encode(self, payload: dict) -> str:
-        pass
-
-    @abstractmethod
-    def decode(self, raw_token: str) -> dict:
-        pass
 
 
 class JoseEncoder(IJwtEncoder):
@@ -62,16 +53,6 @@ class JoseEncoder(IJwtEncoder):
             raise JwtNotValidError
         
         return decoded
-
-
-class IJwt(ABC):
-    @abstractmethod
-    def create(self, sub: Any) -> str:
-        pass
-
-    @abstractmethod
-    def read(self, encoded_token: str) -> Any:
-        pass
 
 
 class Jwt(IJwt):
