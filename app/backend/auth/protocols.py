@@ -1,5 +1,7 @@
 from typing import Protocol
 
+from fastapi import Request, Response
+
 
 class UserProtocol(Protocol):
     id: int
@@ -20,4 +22,15 @@ class PasswordServiceProtocol(Protocol):
         pass
 
     def verify(self, raw_password: str, hashed_password: bytes) -> bool:
+        pass
+
+
+class CookieManagerProtocol(Protocol):
+    def set_cookie(self, response_obj: Response, data: str) -> Response:
+        pass
+
+    def get_cookie(self, request: Request) -> str | None:
+        pass
+
+    def delete_cookie(self, response: Response) -> Response:
         pass

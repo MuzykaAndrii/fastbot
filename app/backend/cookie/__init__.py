@@ -1,4 +1,4 @@
-from .cookie import CookieManager
+from .cookie import FastAPICookieManager
 
 
-__all__ = ("CookieManager", )
+__all__ = ("FastAPICookieManager", )

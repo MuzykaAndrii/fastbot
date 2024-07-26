@@ -1,5 +1,6 @@
 from app.backend.components.unitofwork import UnitOfWork
 from app.backend.components.db import database
+from app.backend.cookie.cookie import FastAPICookieManager
 from app.backend.users.services import UserService
 from app.backend.vocabulary.services import VocabularyService
 from app.backend.auth import AuthService
@@ -26,9 +27,15 @@ def users_service():
 def vocabularies_service():
     return VocabularyService(UnitOfWork(database.session_maker))
 
+auth_cookie_manager = FastAPICookieManager(auth_settings.TOKEN_NAME)
+
 auth_service = AuthService(
     jwt=access_jwt_manager,
     users_service=users_service,
     pwd_service=pwd_service,
+    cookie_manager=auth_cookie_manager,
 )
-admin_auth_provider = AdminAuthProvider(auth_service)
+admin_auth_provider = AdminAuthProvider(
+    auth_service=auth_service,
+    auth_cookie_manager=auth_cookie_manager,
+)

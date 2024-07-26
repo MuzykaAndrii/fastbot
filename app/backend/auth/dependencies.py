@@ -3,13 +3,13 @@ from fastapi import Depends, HTTPException, Request
 from app.backend.jwt.exceptions import MyJwtError
 from app.backend.users.models import User
 from .auth import AuthService
-from .cookie import AuthCookieManager
+from app.backend.components import auth_cookie_manager
 from .exceptions import InvalidUserIdError, UserNotFoundError
 
 # FIX: NEED TO BE FIXED
 
 def get_auth_token(request: Request) -> str:
-    auth_token = AuthCookieManager().get_cookie(request)
+    auth_token = auth_cookie_manager.get_cookie(request)
 
     if not auth_token:
         raise HTTPException(status_code=401)

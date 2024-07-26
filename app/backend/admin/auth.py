@@ -11,16 +11,18 @@ from starlette_admin.exceptions import (
     FormValidationError,
     LoginFailed,
 )
+
+from app.backend.auth.protocols import CookieManagerProtocol
 from .protocols import AuthServiceProtocol
-from app.backend.auth.cookie import AuthCookieManager
 from app.backend.auth.exceptions import AuthenticationError, UserInvalidPassword, UserNotFoundError
 from app.backend.auth.schemas import UserLogin
 from app.backend.jwt.exceptions import MyJwtError
 
 
 class AdminAuthProvider(AuthProvider):
-    def __init__(self, auth_service: AuthServiceProtocol, *args, **kwargs):
+    def __init__(self, auth_service: AuthServiceProtocol, auth_cookie_manager: CookieManagerProtocol, *args, **kwargs):
         self.auth_service = auth_service
+        self.auth_cookie_manager = auth_cookie_manager
         super().__init__(*args, **kwargs)
 
     async def login(
@@ -49,7 +51,7 @@ class AdminAuthProvider(AuthProvider):
         return response
 
     async def is_authenticated(self, request: Request) -> bool:
-        token = AuthCookieManager().get_cookie(request)
+        token = self.auth_cookie_manager.get_cookie(request)
 
         try:
             current_user = await self.auth_service.get_user_from_token(token)

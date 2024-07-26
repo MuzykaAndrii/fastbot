@@ -3,19 +3,11 @@ from fastapi import Response
 
 from app.backend.jwt.exceptions import MyJwtError
 from app.backend.jwt.interface import IJwt
-from .cookie import AuthCookieManager
 from .schemas import UserLogin
 from .exceptions import AuthenticationError, InvalidUserIdError, UserInvalidPassword, UserNotFoundError
 from app.backend.users.models import User
-from .protocols import PasswordServiceProtocol, UserServiceProtocol
+from .protocols import CookieManagerProtocol, PasswordServiceProtocol, UserServiceProtocol
 
-"""
-dependencies:
-- jwt access token
-- users service
-- password manager
-- cookie manager
-"""
 
 class AuthService:
     def __init__(
@@ -23,10 +15,12 @@ class AuthService:
         jwt: IJwt,
         users_service: Callable[[], UserServiceProtocol],
         pwd_service: PasswordServiceProtocol,
+        cookie_manager: CookieManagerProtocol,
     ) -> None:
         self.jwt = jwt
         self.users_service = users_service
         self.pwd_service = pwd_service
+        self.cookie_manager = cookie_manager
 
     async def authenticate_user(self, user_in: UserLogin) -> User:
         user = await self.users_service().get_by_email(user_in.email)
@@ -63,7 +57,7 @@ class AuthService:
     
     def set_auth_cookie(self, response_obj: Response, user_id: int) -> str:
         auth_token = self.jwt.create(str(user_id))
-        AuthCookieManager().set_cookie(response_obj, auth_token)
+        self.cookie_manager.set_cookie(response_obj, auth_token)
 
         return auth_token
     
@@ -79,4 +73,4 @@ class AuthService:
 
 
     def logout_user(self, response: Response) -> Response:
-        return AuthCookieManager().delete_cookie(response)
+        return self.cookie_manager.delete_cookie(response)
