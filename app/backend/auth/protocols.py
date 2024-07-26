@@ -8,8 +8,8 @@ class UserProtocol(Protocol):
 
 
 class UserServiceProtocol(Protocol):
-    def get_by_email(self, email: str) -> UserProtocol:
+    async def get_by_email(self, email: str) -> UserProtocol:
         pass
 
-    def get_by_id(self, id: int) -> UserProtocol:
+    async def get_by_id(self, id: int) -> UserProtocol:
         pass

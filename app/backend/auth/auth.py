@@ -7,7 +7,7 @@ from .schemas import UserLogin
 from .exceptions import AuthenticationError, InvalidUserIdError, UserInvalidPassword, UserNotFoundError
 from app.backend.users.models import User
 from app.backend.pwd import PWDService
-from app.backend.components.services import users_service
+from .protocols import UserServiceProtocol
 
 """
 dependencies:
@@ -18,11 +18,16 @@ dependencies:
 """
 
 class AuthService:
-    def __init__(self, jwt: IJwt) -> None:
+    def __init__(
+        self,
+        jwt: IJwt,
+        users_service: UserServiceProtocol,
+    ) -> None:
         self.jwt = jwt
+        self.users_service = users_service
 
     async def authenticate_user(self, user_in: UserLogin) -> User:
-        user = await users_service().get_by_email(user_in.email)
+        user = await self.users_service.get_by_email(user_in.email)
 
         if not user:
             raise UserNotFoundError
@@ -47,7 +52,7 @@ class AuthService:
         except ValueError:
             raise InvalidUserIdError
 
-        user = await users_service().get_by_id(user_id)
+        user = await self.users_service.get_by_id(user_id)
         if not user:
             raise UserNotFoundError
 
