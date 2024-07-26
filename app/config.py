@@ -32,8 +32,6 @@ class Settings(BaseSettings):
     PGADMIN_DEFAULT_PASSWORD: str
 
     API_KEY: str
-    JWT_SECRET: str
-    JWT_EXPIRE_MINUTES: int
 
     BASE_ADMIN_EMAIL: EmailStr
     BASE_ADMIN_PASS: str
