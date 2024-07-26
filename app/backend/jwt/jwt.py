@@ -12,22 +12,8 @@ from jose import (
 
 from app.backend.jwt.interface import IJwt, IJwtEncoder
 from .exceptions import JWTExpiredError, JwtMissingError, JwtNotValidError
+from .token import Token
 
-
-class Token:
-    def __init__(self, sub: Any, expire: datetime) -> None:
-        self.sub = sub
-        self.expire = expire
-    
-    @property
-    def is_expired(self):
-        return self.expire < datetime.now(UTC).timestamp()
-    
-    def as_dict(self):
-        return {
-            "sub": self.sub,
-            "exp": self.expire,
-        }
 
 
 class JoseEncoder(IJwtEncoder):

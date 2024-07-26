@@ -1,6 +1,8 @@
 from typing import Any
 from abc import ABC, abstractmethod
 
+from .token import Token
+
 
 class IJwtEncoder(ABC):
     @abstractmethod
@@ -18,5 +20,5 @@ class IJwt(ABC):
         pass
 
     @abstractmethod
-    def read(self, encoded_token: str) -> Any:
+    def read(self, encoded_token: str) -> Token:
         pass
