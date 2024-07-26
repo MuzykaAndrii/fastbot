@@ -7,6 +7,7 @@ from app.backend.vocabulary.admin.views import LanguagePairAdminView, Vocabulary
 from app.config import settings
 from app.backend.components.db import database
 from app.backend.components.auth import admin_auth_provider
+from app.backend.components.config import auth_settings
 
 
 admin = Admin(
@@ -14,7 +15,7 @@ admin = Admin(
     title="Admin panel",
     debug=settings.DEBUG,
     auth_provider=admin_auth_provider,
-    middlewares=[Middleware(SessionMiddleware, secret_key=settings.JWT_SECRET)],
+    middlewares=[Middleware(SessionMiddleware, secret_key=auth_settings.TOKEN_KEY)],
 )
 
 
