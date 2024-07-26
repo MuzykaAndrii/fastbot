@@ -16,6 +16,6 @@ access_jwt_manager = Jwt(
 
 auth_service = AuthService(
     jwt=access_jwt_manager,
-    users_service=users_service(),
+    users_service=users_service,
 )
 admin_auth_provider = AdminAuthProvider(auth_service)
