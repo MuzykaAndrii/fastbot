@@ -4,6 +4,7 @@ from aiogram import types
 from fastapi import FastAPI
 
 from app.config import settings
+from app.backend.components.config import sentry_settings
 from app.bot.main import bot
 from app.backend.components.db import database
 from app.backend.components import users_service
@@ -28,7 +29,7 @@ async def lifespan(app: FastAPI):
 
 if not settings.DEBUG:
     from app.backend.sentry.setup import setup_sentry
-    setup_sentry(settings.SENTRY_DSN)
+    setup_sentry(sentry_settings.dsn)
 
 
 app = FastAPI(
