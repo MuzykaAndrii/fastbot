@@ -26,7 +26,7 @@ async def lifespan(app: FastAPI):
     logger.info("App stopped")
 
 
-if app_settings.DEBUG:
+if not app_settings.DEBUG:
     from app.backend.sentry.setup import setup_sentry
     setup_sentry(sentry_settings.dsn)
 
