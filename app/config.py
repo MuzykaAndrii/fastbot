@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Literal
 
 from pydantic_settings import (
     BaseSettings,
@@ -8,9 +9,7 @@ from pydantic import EmailStr, computed_field
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-BOT_PREFIX = "bot"
 TEMPLATES_DIR = BASE_DIR / "app/backend/pages/templates"
-AUTH_TOKEN_NAME = "auth_token"
 
 ENV_FILE_PATH = BASE_DIR / ".env"
 
@@ -22,14 +21,11 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    # MODE: Literal["DEV", "TEST", "PROD"]
+    MODE: Literal["DEV", "TEST", "PROD"]
     DEBUG: bool
     BOT_TOKEN: str
 
     HOST_URL: str
-
-    PGADMIN_DEFAULT_EMAIL: str
-    PGADMIN_DEFAULT_PASSWORD: str
 
     API_KEY: str
 
@@ -40,7 +36,7 @@ class Settings(BaseSettings):
     @computed_field # type: ignore[misc]
     @property
     def WEBHOOK_PATH(self) -> str:
-        return f"/{BOT_PREFIX}{self.BOT_TOKEN}"
+        return f"/bot{self.BOT_TOKEN}"
     
     @computed_field  # type: ignore[misc]
     @property
