@@ -1,6 +1,6 @@
 from fastapi.templating import Jinja2Templates
 
-from app import config
+from app.backend.components.config import TEMPLATES_DIR
 
 
-engine = Jinja2Templates(directory=config.TEMPLATES_DIR)
+engine = Jinja2Templates(directory=TEMPLATES_DIR)
