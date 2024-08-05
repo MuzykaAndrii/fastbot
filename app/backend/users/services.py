@@ -1,6 +1,6 @@
 from app.backend.auth.protocols import PasswordServiceProtocol
 from app.backend.components.unitofwork import UnitOfWork
-from app.config import settings
+from app.backend.components.config import app_settings
 from app.backend.users.models import User
 
 
@@ -41,7 +41,7 @@ class UserService:
     
     async def _create_base_admin_user(self, uow: UnitOfWork) -> None:
         await uow.users.create(
-            email=settings.BASE_ADMIN_EMAIL,
-            password_hash=self._pwd_service.get_hash(settings.BASE_ADMIN_PASS),
+            email=app_settings.BASE_ADMIN_EMAIL,
+            password_hash=self._pwd_service.get_hash(app_settings.BASE_ADMIN_PASS),
             is_superuser=True,
         )

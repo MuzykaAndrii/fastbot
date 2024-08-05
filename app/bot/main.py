@@ -6,7 +6,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.utils.chat_action import ChatActionMiddleware
 from aiogram.fsm.storage.memory import SimpleEventIsolation
 
-from app.config import settings
+from app.backend.components.config import bot_settings
 from app.bot.base.handlers.start import router as start_router
 from app.bot.vocabulary import router as vocabulary_router
 
@@ -49,7 +49,7 @@ class TelegramBot:
         await self._bot.session.close()
 
 
-bot = TelegramBot(token=settings.BOT_TOKEN, webhook_url=settings.WEBHOOK_URL)
+bot = TelegramBot(token=bot_settings.BOT_TOKEN, webhook_url=bot_settings.WEBHOOK_URL)
 
 bot.dispatcher.message.middleware(ChatActionMiddleware())
 bot.dispatcher.callback_query.middleware(ChatActionMiddleware())

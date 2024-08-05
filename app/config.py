@@ -8,10 +8,6 @@ from pydantic_settings import (
 from pydantic import EmailStr
 
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-TEMPLATES_DIR = BASE_DIR / "app/backend/pages/templates"
-
-
 class AppModes(str, Enum):
     DEV = "DEV"
     TEST = "TEST"

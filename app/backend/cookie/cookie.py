@@ -1,6 +1,6 @@
 from fastapi import Request, Response
 
-from app.config import settings
+from app.backend.components.config import app_settings
 
 
 class FastAPICookieManager:
@@ -13,7 +13,7 @@ class FastAPICookieManager:
             data,
             httponly=True,
             samesite="lax",
-            secure=not settings.DEBUG,
+            secure=not app_settings.DEBUG,
         )
 
         return response_obj
