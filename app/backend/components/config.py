@@ -12,9 +12,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 TEMPLATES_DIR = BASE_DIR / "app/backend/pages/templates"
 
 ENV_DIR = BASE_DIR / "secrets" / "environment"
-PROD_ENV_FILE_PATH = ENV_DIR / '.env.prod'
-DEV_ENV_FILE_PATH = ENV_DIR / '.env.dev'
-TEST_ENV_FILE_PATH = ENV_DIR / '.env.test'
+PROD_ENV_FILE_PATH = ENV_DIR / '.prod.env'
+DEV_ENV_FILE_PATH = ENV_DIR / '.dev.env'
+TEST_ENV_FILE_PATH = ENV_DIR / '.test.env'
 
 
 match os.getenv("MODE"):
