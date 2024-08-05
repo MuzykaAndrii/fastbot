@@ -10,6 +10,8 @@ class AuthSettings(BaseSettings):
         extra="ignore",
     )
 
+    API_KEY: str
+
     TOKEN_NAME: str = "auth_token"
     TOKEN_KEY: str
     ACCESS_TOKEN_LIFETIME_MINUTES: int

@@ -11,12 +11,9 @@ from pydantic import EmailStr, computed_field
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATES_DIR = BASE_DIR / "app/backend/pages/templates"
 
-ENV_FILE_PATH = BASE_DIR / ".env"
-
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=ENV_FILE_PATH,
         env_file_encoding="utf-8",
         extra="ignore",
     )
@@ -26,8 +23,6 @@ class Settings(BaseSettings):
     BOT_TOKEN: str
 
     HOST_URL: str
-
-    API_KEY: str
 
     BASE_ADMIN_EMAIL: EmailStr
     BASE_ADMIN_PASS: str
