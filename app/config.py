@@ -1,42 +1,31 @@
+from enum import Enum
 from pathlib import Path
-from typing import Literal
 
 from pydantic_settings import (
     BaseSettings,
     SettingsConfigDict,
 )
-from pydantic import EmailStr, computed_field
+from pydantic import EmailStr
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATES_DIR = BASE_DIR / "app/backend/pages/templates"
 
 
-class Settings(BaseSettings):
+class AppModes(str, Enum):
+    DEV = "DEV"
+    TEST = "TEST"
+    PROD = "PROD"
+
+
+class AppSettings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file_encoding="utf-8",
         extra="ignore",
     )
 
-    MODE: Literal["DEV", "TEST", "PROD"]
+    MODE: AppModes
     DEBUG: bool
-    BOT_TOKEN: str
-
-    HOST_URL: str
 
     BASE_ADMIN_EMAIL: EmailStr
     BASE_ADMIN_PASS: str
-
-
-    @computed_field # type: ignore[misc]
-    @property
-    def WEBHOOK_PATH(self) -> str:
-        return f"/bot{self.BOT_TOKEN}"
-    
-    @computed_field  # type: ignore[misc]
-    @property
-    def WEBHOOK_URL(self) -> str:
-        return f"{self.HOST_URL}{self.WEBHOOK_PATH}"
-
-
-settings = Settings()  # type: ignore[call-arg]
