@@ -1,5 +1,6 @@
 .vscode
 backups
+*.env
 
 **/ngrok.yml
 
