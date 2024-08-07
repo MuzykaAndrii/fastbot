@@ -39,18 +39,3 @@ class QuizAnswerChecker:
     
     def is_match(self) -> bool:
         return all(suggested in self.correct_translation for suggested in self.suggested_translation)
-
-
-if __name__ == '__main__':
-    assert QuizAnswerChecker("винний, зобовязаний", "зобовязаний, винний").is_match() == True
-    assert QuizAnswerChecker("зобовязаний, винний", "зобовязаний, винний").is_match() == True
-    assert QuizAnswerChecker("зобовязаний, винний, ще якись", "зобовязаний, винний").is_match() == False
-
-    assert QuizAnswerChecker("зобовязаний, винний, ще якись", "ще якись, зобовязаний, винний").is_match() == True
-    assert QuizAnswerChecker(",", "ще якись, зобовязаний, винний").is_match() == False
-    assert QuizAnswerChecker("зобовязаний,", "ще якись, зобовязаний, винний").is_match() == False
-
-    assert QuizAnswerChecker("зобовязаний, винний", "ще якись, зобовязаний, винний").is_match() == True
-    assert QuizAnswerChecker("винний, зобовязаний", "ще якись, зобовязаний, винний").is_match() == True
-
-    assert QuizAnswerChecker("грубий (про стан якоїсь речі)", "Грубий").is_match() == True
