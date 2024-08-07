@@ -63,6 +63,7 @@ services:
       retries: 3
     volumes:
       - ./app:/code/app
+      - ./tests:/code/tests
     depends_on:
       db:
         condition: service_healthy
