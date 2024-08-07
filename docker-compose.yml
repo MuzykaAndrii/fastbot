@@ -25,7 +25,7 @@ services:
     container_name: tgbot_pgdb_test_container
     restart: always
     ports:
-      - 5433:5433
+      - 5433:5432
     env_file:
       - ./secrets/environment/.test.env
     networks:
