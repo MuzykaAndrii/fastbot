@@ -27,6 +27,7 @@ rapidfuzz = "^3.8.1"
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.8.0"
 pytest = "^8.3.2"
+pytest-asyncio = "^0.23.8"
 
 
 [tool.poetry.group.prod.dependencies]
@@ -36,3 +37,9 @@ sentry-sdk = {extras = ["fastapi"], version = "^2.3.1"}
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.pytest.ini_options]
+pythonpath = [".", "app"]
+asyncio_mode = "auto"
+python_files = ["*_test.py", "test_*.py"]
