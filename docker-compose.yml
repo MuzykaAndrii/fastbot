@@ -20,6 +20,17 @@ services:
     networks:
       - fastbot-network
   
+  test-db:
+    image: postgres:15.6-alpine
+    container_name: tgbot_pgdb_test_container
+    restart: always
+    ports:
+      - 5433:5433
+    env_file:
+      - ./secrets/environment/.test.env
+    networks:
+      - fastbot-network
+  
   pgadmin:
     image: dpage/pgadmin4
     container_name: tg_bot_pgadmin4_container
