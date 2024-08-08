@@ -6,6 +6,7 @@ from app.config import AppModes
 from app.backend.db.base import Base
 from app.backend.users.models import User  # noqa
 from app.backend.vocabulary.models import VocabularySet, LanguagePair  # noqa
+from tests.mocks import get_mock_users_data
 
 
 @pytest.fixture(autouse=True, scope="session")
@@ -16,3 +17,14 @@ async def prepare_db():
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
 
+
+
+@pytest.fixture(scope="function")
+async def session():
+    async with database.session_maker() as session:
+        yield session
+
+
+@pytest.fixture
+async def mock_users_data():
+    return get_mock_users_data()
