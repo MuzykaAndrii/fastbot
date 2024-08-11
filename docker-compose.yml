@@ -64,6 +64,7 @@ services:
     volumes:
       - ./app:/code/app
       - ./tests:/code/tests
+      - ./backups:/code/backups
     depends_on:
       db:
         condition: service_healthy
