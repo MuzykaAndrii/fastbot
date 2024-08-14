@@ -120,3 +120,18 @@ async def test_bulk_create_users(user_dal: UserDAL, session: AsyncSession):
         assert mock_user["email"] == db_user.email
 
 
+async def test_get_all_users(user_dal: UserDAL, session: AsyncSession):
+    """Test retrieving all users and verify with a direct database query."""
+    mock_users = [
+        {"username": "user1", "email": "user1@example.com", "password_hash": b"pwd1"},
+        {"username": "user2", "email": "user2@example.com", "password_hash": b"pwd2"},
+        {"username": "user3", "email": "user3@example.com", "password_hash": b"pwd3"},
+    ]
+    
+    for mock_user in mock_users:
+        stmt = insert(User).values(**mock_user).returning(User)
+        await session.execute(stmt)
+
+    db_users = await user_dal.get_all()
+
+    assert len(mock_users) == len(db_users)
