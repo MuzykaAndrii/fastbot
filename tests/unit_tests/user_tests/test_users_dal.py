@@ -2,7 +2,7 @@ import pytest
 
 from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.exc import IntegrityError, NoResultFound, InvalidRequestError
+from sqlalchemy.exc import IntegrityError, NoResultFound, InvalidRequestError, StatementError
 
 from app.backend.users.dal import UserDAL
 from app.backend.users.models import User
@@ -46,6 +46,27 @@ async def test_create_user_with_wrong_field_name(user_dal: UserDAL):
 
     with pytest.raises(TypeError):
         await user_dal.create(**invalid_user_data)
+
+
+@pytest.mark.parametrize(
+    "user_data, expected_exception",
+    [
+        # Invalid type for 'username'
+        ({"username": 123, "email": "valid_user@example.com", "password_hash": b"validpassword", "is_superuser": False}, StatementError),
+        # Invalid type for 'email'
+        ({"username": "valid_user", "email": 123, "password_hash": b"validpassword", "is_superuser": False}, StatementError),
+        # Invalid type for 'password_hash'
+        ({"username": "valid_user", "email": "valid_user@example.com", "password_hash": "string_instead_of_bytes", "is_superuser": False}, StatementError),
+        # Invalid type for 'is_superuser'
+        ({"username": "valid_user", "email": "valid_user@example.com", "password_hash": b"validpassword", "is_superuser": "not_a_boolean"}, StatementError),
+    ]
+)
+async def test_create_user_with_wrong_field_type(user_dal: UserDAL, user_data: dict, expected_exception: Exception):
+    """Test creating a user with incorrect field types."""
+    
+    # Attempt to create a user with invalid field types and expect the specified exception
+    with pytest.raises(expected_exception):
+        await user_dal.create(**user_data)
 
 
 async def test_get_user_by_id(user_dal: UserDAL, session: AsyncSession):
