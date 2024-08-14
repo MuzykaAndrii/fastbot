@@ -2,7 +2,7 @@ import pytest
 
 from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, NoResultFound
 
 from app.backend.users.dal import UserDAL
 from app.backend.users.models import User
@@ -88,6 +88,14 @@ async def test_delete_user_by_id(user_dal: UserDAL, session: AsyncSession):
     stmt = select(User).where(User.id == user.id)
     result = await session.execute(stmt)
     assert result.scalar_one_or_none() is None
+
+
+async def test_delete_user_by_non_existent_id(user_dal: UserDAL):
+    """Test deleting a user by a non-existent ID raises an exception."""
+    non_existent_id = 99999
+
+    with pytest.raises(NoResultFound):
+        await user_dal.delete_by_id(non_existent_id)
 
 
 async def test_filter_users_by_criteria(user_dal: UserDAL, session: AsyncSession):
