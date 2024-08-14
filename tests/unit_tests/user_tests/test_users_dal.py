@@ -14,7 +14,6 @@ async def test_create_user(user_dal: UserDAL):
         "is_superuser": False,
     }
     user = await user_dal.create(**new_user)
-    await user_dal.session.commit()
 
     assert user.id is not None
     assert user.username == new_user["username"]
@@ -27,7 +26,6 @@ async def test_get_user_by_id(user_dal: UserDAL, session: AsyncSession):
     vals = {"username": "testuser1", "email": "test1@example.com", "password_hash": b"hashed_pwd"}
     stmt = insert(User).values(**vals).returning(User)
     result = await session.execute(stmt)
-    await session.commit()
     user = result.scalar_one()
 
     fetched_user = await user_dal.get_by_id(user.id)
@@ -36,3 +34,21 @@ async def test_get_user_by_id(user_dal: UserDAL, session: AsyncSession):
     assert fetched_user.username == vals["username"]
     assert fetched_user.email == vals["email"]
     assert fetched_user.password_hash == vals["password_hash"]
+
+
+async def test_bulk_create_users(user_dal: UserDAL, session: AsyncSession):
+    """Test bulk creating users."""
+    mock_users = [
+        {"username": "user1", "email": "user1@example.com", "password_hash": b"pwd1"},
+        {"username": "user2", "email": "user2@example.com", "password_hash": b"pwd2"},
+    ]
+    
+    for mock_user in mock_users:
+        stmt = insert(User).values(**mock_user).returning(User)
+        await session.execute(stmt)
+
+
+    users = await user_dal.get_all()
+    assert len(users) == 2
+    assert users[0].username == "user1"
+    assert users[1].username == "user2"
