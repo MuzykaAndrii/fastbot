@@ -35,6 +35,19 @@ async def test_create_user_duplicate_email(user_dal: UserDAL, session: AsyncSess
         await user_dal.create(**mock_user)
 
 
+async def test_create_user_with_wrong_field_name(user_dal: UserDAL):
+    """Test creating a user with a field name that doesn't exist."""
+    invalid_user_data = {
+        "username": "invalid_user",
+        "email": "invalid_user@example.com",
+        "password_hash": b"somehashedpassword",
+        "non_existent_field": "some_value",  # Incorrect field name
+    }
+
+    with pytest.raises(TypeError):
+        await user_dal.create(**invalid_user_data)
+
+
 async def test_get_user_by_id(user_dal: UserDAL, session: AsyncSession):
     vals = {"username": "testuser1", "email": "test1@example.com", "password_hash": b"hashed_pwd"}
     stmt = insert(User).values(**vals).returning(User)
