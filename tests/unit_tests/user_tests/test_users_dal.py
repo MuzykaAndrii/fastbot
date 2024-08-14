@@ -50,22 +50,35 @@ async def test_create_user_with_wrong_field_name(user_dal: UserDAL):
 
 @pytest.mark.parametrize(
     "user_data, expected_exception",
-    [
-        # Invalid type for 'username'
-        ({"username": 123, "email": "valid_user@example.com", "password_hash": b"validpassword", "is_superuser": False}, StatementError),
-        # Invalid type for 'email'
-        ({"username": "valid_user", "email": 123, "password_hash": b"validpassword", "is_superuser": False}, StatementError),
-        # Invalid type for 'password_hash'
-        ({"username": "valid_user", "email": "valid_user@example.com", "password_hash": "string_instead_of_bytes", "is_superuser": False}, StatementError),
-        # Invalid type for 'is_superuser'
-        ({"username": "valid_user", "email": "valid_user@example.com", "password_hash": b"validpassword", "is_superuser": "not_a_boolean"}, StatementError),
-    ]
+    [{
+        "username": 123,  # Invalid type
+        "email": "valid_user@example.com",
+        "password_hash": b"validpassword",
+        "is_superuser": False,
+    },
+    {
+        "username": "valid_user",
+        "email": 123,  # Invalid type
+        "password_hash": b"validpassword",
+        "is_superuser": False,
+    },
+    {
+        "username": "valid_user",
+        "email": "valid_user@example.com",
+        "password_hash": "string_instead_of_bytes",  # Invalid type
+        "is_superuser": False,
+    },
+    {
+        "username": "valid_user",
+        "email": "valid_user@example.com",
+        "password_hash": b"validpassword",
+        "is_superuser": "not_a_boolean",  # Invalid type
+    }]
 )
-async def test_create_user_with_wrong_field_type(user_dal: UserDAL, user_data: dict, expected_exception: Exception):
+async def test_create_user_with_wrong_field_type(user_dal: UserDAL, user_data: dict):
     """Test creating a user with incorrect field types."""
     
-    # Attempt to create a user with invalid field types and expect the specified exception
-    with pytest.raises(expected_exception):
+    with pytest.raises(StatementError):
         await user_dal.create(**user_data)
 
 
