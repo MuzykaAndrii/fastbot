@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import Field, computed_field
 from pydantic_settings import (
     BaseSettings,
@@ -14,6 +16,8 @@ class DbSettings(BaseSettings):
         extra="ignore",
     )
     
+    MODE: Literal["DEV", "TEST", "PROD"]
+
     DB_HOST: str
     DB_PORT: int
 

@@ -1,5 +1,6 @@
 from typing import Callable
 
+from sqlalchemy.pool import NullPool
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import (
     create_async_engine,
@@ -12,7 +13,12 @@ from .config import DbSettings
 
 class DataBase:
     def __init__(self, settings: DbSettings):
-        self._engine = create_async_engine(settings.DATABASE_URL)
+        if settings.MODE == "TEST":
+            engine_kwargs = {"poolclass": NullPool}
+        else:
+            engine_kwargs = {}
+
+        self._engine = create_async_engine(settings.DATABASE_URL, **engine_kwargs)
         self._session_maker = async_sessionmaker(self._engine, expire_on_commit=False)
     
     @property

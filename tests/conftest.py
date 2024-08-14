@@ -1,3 +1,4 @@
+import asyncio
 import pytest
 
 from app.backend.components.config import app_settings
@@ -6,7 +7,6 @@ from app.config import AppModes
 from app.backend.db.base import Base
 from app.backend.users.models import User  # noqa
 from app.backend.vocabulary.models import VocabularySet, LanguagePair  # noqa
-from tests.mocks import get_mock_users_data
 
 
 @pytest.fixture(autouse=True, scope="session")
@@ -18,6 +18,12 @@ async def prepare_db():
         await conn.run_sync(Base.metadata.create_all)
 
 
+@pytest.fixture(scope="session")
+def event_loop(request):
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
+
 
 @pytest.fixture(scope="function")
 async def session():
@@ -25,6 +31,3 @@ async def session():
         yield session
 
 
-@pytest.fixture
-async def mock_users_data():
-    return get_mock_users_data()
