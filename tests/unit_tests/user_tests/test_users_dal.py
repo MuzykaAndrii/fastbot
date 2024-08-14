@@ -114,6 +114,14 @@ async def test_filter_users_by_criteria(user_dal: UserDAL, session: AsyncSession
     assert len(found) == 1
 
 
+async def test_filter_users_by_no_match(user_dal: UserDAL):
+    """Test filtering users by criteria with no matches returns an empty list."""
+    non_existent_criteria = {"username": "nonexistent", "email": "nonexistent@example.com"}
+    users = await user_dal.filter_by(**non_existent_criteria)
+
+    assert len(users) == 0
+
+
 async def test_get_admin_users(user_dal: UserDAL, session: AsyncSession):
     """Test getting all admin users."""
     mock_users = [
