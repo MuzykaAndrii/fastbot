@@ -135,3 +135,23 @@ async def test_get_all_users(user_dal: UserDAL, session: AsyncSession):
     db_users = await user_dal.get_all()
 
     assert len(mock_users) == len(db_users)
+
+
+async def test_get_or_create_user(user_dal: UserDAL, session: AsyncSession):
+    """Test get_or_create method and verify."""
+    mock_user = {"username": "newuser", "email": "newuser@example.com", "password_hash": b"newpwd"}
+
+    db_user = await user_dal.get_or_create(**mock_user)
+
+    assert db_user is not None
+    assert db_user.username == mock_user["username"]
+    assert db_user.email == mock_user["email"]
+
+    existing_user = await user_dal.get_or_create(**mock_user)
+    assert existing_user.id == db_user.id
+
+    stmt = select(User).where(User.username == mock_user["username"])
+    result = await session.execute(stmt)
+    users_with_same_name = result.scalars().all()
+
+    assert len(users_with_same_name) == 1
