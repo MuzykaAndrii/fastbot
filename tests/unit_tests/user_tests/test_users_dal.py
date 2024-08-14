@@ -99,3 +99,21 @@ async def test_get_admin_users(user_dal: UserDAL, session: AsyncSession):
     admins = await user_dal.get_admin_users()
     assert len(admins) == 1
     assert admins[0].username == "admin"
+
+
+async def test_bulk_create_users(user_dal: UserDAL, session: AsyncSession):
+    """Test bulk creating users and verify with a direct database query."""
+    mock_users = [
+        {"username": "user1", "email": "user1@example.com", "password_hash": b"pwd1"},
+        {"username": "user2", "email": "user2@example.com", "password_hash": b"pwd2"},
+    ]
+    
+    await user_dal.bulk_create(mock_users)
+    
+    stmt = select(User).order_by(User.id)
+    result = await session.execute(stmt)
+    users = result.scalars().all()
+
+    assert len(users) == 2
+    assert users[0].username == "user1"
+    assert users[1].username == "user2"
