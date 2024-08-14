@@ -67,3 +67,19 @@ async def test_delete_user_by_id(user_dal: UserDAL, session: AsyncSession):
     stmt = select(User).where(User.id == user.id)
     result = await session.execute(stmt)
     assert result.scalar_one_or_none() is None
+
+
+async def test_filter_users_by_criteria(user_dal: UserDAL, session: AsyncSession):
+    """Test filtering users by criteria."""
+    users_list = [
+        {"username": "user1", "email": "user1@example.com", "password_hash": b"pwd1"},
+        {"username": "admin", "email": "admin@example.com", "password_hash": b"pwd2", "is_superuser": True},
+    ]
+    
+    for user in users_list:
+        stmt = insert(User).values(**user).returning(User)
+        await session.execute(stmt)
+
+
+    found = await user_dal.filter_by(**users_list[1])
+    assert len(found) == 1
