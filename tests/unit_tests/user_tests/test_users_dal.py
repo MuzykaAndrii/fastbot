@@ -83,3 +83,19 @@ async def test_filter_users_by_criteria(user_dal: UserDAL, session: AsyncSession
 
     found = await user_dal.filter_by(**users_list[1])
     assert len(found) == 1
+
+
+async def test_get_admin_users(user_dal: UserDAL, session: AsyncSession):
+    """Test getting all admin users."""
+    mock_users = [
+        {"username": "user1", "email": "user1@example.com", "password_hash": b"pwd1"},
+        {"username": "admin", "email": "admin@example.com", "password_hash": b"pwd2", "is_superuser": True},
+    ]
+    
+    for mock_user in mock_users:
+        stmt = insert(User).values(**mock_user).returning(User)
+        await session.execute(stmt)
+
+    admins = await user_dal.get_admin_users()
+    assert len(admins) == 1
+    assert admins[0].username == "admin"
