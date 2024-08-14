@@ -1,4 +1,4 @@
-from sqlalchemy import insert
+from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.backend.users.dal import UserDAL
@@ -37,7 +37,6 @@ async def test_get_user_by_id(user_dal: UserDAL, session: AsyncSession):
 
 
 async def test_bulk_create_users(user_dal: UserDAL, session: AsyncSession):
-    """Test bulk creating users."""
     mock_users = [
         {"username": "user1", "email": "user1@example.com", "password_hash": b"pwd1"},
         {"username": "user2", "email": "user2@example.com", "password_hash": b"pwd2"},
@@ -52,3 +51,19 @@ async def test_bulk_create_users(user_dal: UserDAL, session: AsyncSession):
     assert len(users) == 2
     assert users[0].username == "user1"
     assert users[1].username == "user2"
+
+
+async def test_delete_user_by_id(user_dal: UserDAL, session: AsyncSession):
+    vals = {"username": "testuser", "email": "test@example.com", "password_hash": b"hashed_pwd"}
+    stmt = insert(User).values(**vals).returning(User)
+    result = await session.execute(stmt)
+    user = result.scalar_one()
+
+    deleted_user = await user_dal.delete_by_id(user.id)
+
+    assert deleted_user.id == user.id
+
+    # Verify that the user no longer exists in the database
+    stmt = select(User).where(User.id == user.id)
+    result = await session.execute(stmt)
+    assert result.scalar_one_or_none() is None
