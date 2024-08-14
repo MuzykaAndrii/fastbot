@@ -112,8 +112,11 @@ async def test_bulk_create_users(user_dal: UserDAL, session: AsyncSession):
     
     stmt = select(User).order_by(User.id)
     result = await session.execute(stmt)
-    users = result.scalars().all()
+    db_users = result.scalars().all()
 
-    assert len(users) == 2
-    assert users[0].username == "user1"
-    assert users[1].username == "user2"
+    assert len(db_users) == len(mock_users)
+    for mock_user, db_user in zip(mock_users, db_users):
+        assert mock_user["username"] == db_user.username
+        assert mock_user["email"] == db_user.email
+
+
