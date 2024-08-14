@@ -2,7 +2,7 @@ import pytest
 
 from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.exc import IntegrityError, NoResultFound
+from sqlalchemy.exc import IntegrityError, NoResultFound, InvalidRequestError
 
 from app.backend.users.dal import UserDAL
 from app.backend.users.models import User
@@ -120,6 +120,13 @@ async def test_filter_users_by_no_match(user_dal: UserDAL):
     users = await user_dal.filter_by(**non_existent_criteria)
 
     assert len(users) == 0
+
+
+async def test_filter_users_by_wrong_filed(user_dal: UserDAL):
+    user_with_wrong_field = {"username": "someusername", "email": "someemail@example.com", "wrong_field": "some_data"}
+
+    with pytest.raises(InvalidRequestError):
+        await user_dal.filter_by(**user_with_wrong_field)
 
 
 async def test_get_admin_users(user_dal: UserDAL, session: AsyncSession):
