@@ -1,5 +1,8 @@
+import pytest
+
 from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import IntegrityError
 
 from app.backend.users.dal import UserDAL
 from app.backend.users.models import User
@@ -20,6 +23,16 @@ async def test_create_user(user_dal: UserDAL):
     assert user.email == new_user["email"]
     assert user.password_hash == new_user["password_hash"]
     assert user.is_superuser == new_user["is_superuser"]
+
+
+async def test_create_user_duplicate_email(user_dal: UserDAL, session: AsyncSession):
+    """Test creating a user with a duplicate email raises an exception."""
+    mock_user = {"username": "user1", "email": "duplicate@example.com", "password_hash": b"pwd1"}
+    stmt = insert(User).values(**mock_user).returning(User)
+    await session.execute(stmt)
+
+    with pytest.raises(IntegrityError):
+        await user_dal.create(**mock_user)
 
 
 async def test_get_user_by_id(user_dal: UserDAL, session: AsyncSession):
