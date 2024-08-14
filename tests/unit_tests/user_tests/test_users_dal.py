@@ -49,6 +49,14 @@ async def test_get_user_by_id(user_dal: UserDAL, session: AsyncSession):
     assert fetched_user.password_hash == vals["password_hash"]
 
 
+async def test_get_user_by_non_existent_id(user_dal: UserDAL):
+    """Test getting a user by a non-existent ID returns None."""
+    non_existent_id = 99999
+    user = await user_dal.get_by_id(non_existent_id)
+
+    assert user is None
+
+
 async def test_bulk_create_users(user_dal: UserDAL, session: AsyncSession):
     mock_users = [
         {"username": "user1", "email": "user1@example.com", "password_hash": b"pwd1"},
