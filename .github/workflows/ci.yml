@@ -10,13 +10,13 @@ jobs:
       postgres:
         image: postgres:15.6-alpine
         env:
-          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
         ports:
           - 5433:5432
         options: >-
-          --health-cmd="pg_isready -U ${{ secrets.POSTGRES_USER }} -d ${{ secrets.POSTGRES_DB }}"
+          --health-cmd="pg_isready -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }}"
           --health-interval=5s
           --health-timeout=10s
           --health-retries=5
@@ -43,8 +43,8 @@ jobs:
       - name: Run tests
         run: |
           docker run --network="host" \
-                     -e POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
-                     -e POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
-                     -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
+                     -e POSTGRES_DB=${{ env.POSTGRES_DB }} \
+                     -e POSTGRES_USER=${{ env.POSTGRES_USER }} \
+                     -e POSTGRES_PASSWORD=${{ env.POSTGRES_PASSWORD }} \
                      -e MODE="TEST" \
                      my-app:test
