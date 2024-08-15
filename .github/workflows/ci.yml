@@ -40,4 +40,4 @@ jobs:
         run: docker build -f Dockerfile.test -t my-app:test .
 
       - name: Run tests
-        run: docker run my-app:test
+        run: docker run --network=${{ job.services.test-db.network }} my-app:test
