@@ -25,7 +25,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install Docker Compose
+      - name: Install Docker
         run: sudo apt-get install docker -y
 
       - name: Create .test.env file from secret
