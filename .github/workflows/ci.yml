@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      postgres:
+      test-db:
         image: postgres:15.6-alpine
         env:
           POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
@@ -15,12 +15,11 @@ jobs:
           POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
         ports:
           - 5433:5432
-        # options: >-
-        #   --health-cmd="pg_isready -U ${{ secrets.POSTGRES_USER }} -d ${{ secrets.POSTGRES_DB }}"
-        #   --health-interval=5s
-        #   --health-timeout=10s
-        #   --health-retries=5
-        #   --health-start-period=80s
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - name: Checkout code
@@ -41,11 +40,4 @@ jobs:
         run: docker build -f Dockerfile.test -t my-app:test .
 
       - name: Run tests
-        # run: |
-        #   docker run --network="host" \
-        #              -e POSTGRES_DB=${{ secrets.POSTGRES_DB }} \
-        #              -e POSTGRES_USER=${{ secrets.POSTGRES_USER }} \
-        #              -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
-        #              -e MODE="TEST" \
-        #              my-app:test
         run: docker run my-app:test
