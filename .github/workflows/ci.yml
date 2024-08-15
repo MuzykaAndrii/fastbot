@@ -48,4 +48,4 @@ jobs:
         #              -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }} \
         #              -e MODE="TEST" \
         #              my-app:test
-          run: docker run my-app:test
+        run: docker run my-app:test
