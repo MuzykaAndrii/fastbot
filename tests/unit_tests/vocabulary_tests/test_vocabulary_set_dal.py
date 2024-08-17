@@ -34,3 +34,16 @@ async def test_get_latest_user_vocabulary(session: AsyncSession, vocabulary_dal:
     latest_vocabulary = await vocabulary_dal.get_latest_user_vocabulary(user_id=owner["id"])
 
     assert latest_vocabulary.name == mock_vocabularies[2]["name"]
+
+
+async def test_change_vocabulary_status(session: AsyncSession, vocabulary_dal: VocabularySetDAL, create_mock_users, mock_users_list: list[dict[str, Any]]):
+    owner = mock_users_list[2]
+    mock_vocabulary = {"id": 20, "owner_id": owner["id"], "name": "Test Vocabulary"}
+    stmt = insert(VocabularySet).values(**mock_vocabulary).returning(VocabularySet)
+    db_vocabulary = await session.scalar(stmt)
+
+    await vocabulary_dal.make_active(vocabulary_id=db_vocabulary.id)
+    assert db_vocabulary.is_active is True
+
+    await vocabulary_dal.make_inactive(vocabulary_id=db_vocabulary.id)
+    assert db_vocabulary.is_active is False
