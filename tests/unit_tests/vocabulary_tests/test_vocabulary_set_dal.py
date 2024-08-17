@@ -1,12 +1,14 @@
+from datetime import datetime, timedelta
 from typing import Any
 
 import pytest
+from sqlalchemy import insert
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.backend.vocabulary.dal import VocabularySetDAL
 from app.backend.vocabulary.models import VocabularySet
 
 
-@pytest.mark.asyncio
 async def test_create_vocabulary(vocabulary_dal: VocabularySetDAL, create_mock_users, mock_users_list: list[dict[str, Any]]):
     owner = mock_users_list[0]
     new_vocabulary = await vocabulary_dal.create(owner_id=owner["id"], name="Test Vocabulary", is_active=True)
@@ -15,3 +17,20 @@ async def test_create_vocabulary(vocabulary_dal: VocabularySetDAL, create_mock_u
     assert new_vocabulary.owner_id == owner["id"]
     assert new_vocabulary.name == "Test Vocabulary"
     assert new_vocabulary.is_active is True
+
+
+async def test_get_latest_user_vocabulary(session: AsyncSession, vocabulary_dal: VocabularySetDAL, create_mock_users, mock_users_list: list[dict[str, Any]]):
+    owner = mock_users_list[2]
+    mock_vocabularies = [
+        {"owner_id": owner["id"], "name": "First Vocabulary", "created_at": datetime.now()},
+        {"owner_id": owner["id"], "name": "Second Vocabulary", "created_at": datetime.now() + timedelta(seconds=1)},
+        {"owner_id": owner["id"], "name": "Third Vocabulary", "created_at": datetime.now() + timedelta(seconds=2)},
+    ]
+
+    for mock_vocabulary in mock_vocabularies:
+        stmt = insert(VocabularySet).values(**mock_vocabulary)
+        await session.execute(stmt)
+
+    latest_vocabulary = await vocabulary_dal.get_latest_user_vocabulary(user_id=owner["id"])
+
+    assert latest_vocabulary.name == mock_vocabularies[2]["name"]
