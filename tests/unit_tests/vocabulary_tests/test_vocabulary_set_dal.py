@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from typing import Any
 
 import pytest
-from sqlalchemy import insert
+from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.backend.vocabulary.dal import VocabularySetDAL
@@ -47,3 +47,25 @@ async def test_change_vocabulary_status(session: AsyncSession, vocabulary_dal: V
 
     await vocabulary_dal.make_inactive(vocabulary_id=db_vocabulary.id)
     assert db_vocabulary.is_active is False
+
+
+async def test_disable_user_active_vocabulary(
+    session: AsyncSession,
+    vocabulary_dal: VocabularySetDAL,
+    create_mock_users,
+    mock_users_list: list[dict[str, Any]]
+):
+    user = mock_users_list[0]
+    mock_vocabulary_1 = {"owner_id": user["id"], "name": "Active Vocabulary", "is_active": True}
+    mock_vocabulary_2 = {"owner_id": user["id"], "name": "Inactive Vocabulary", "is_active": False}
+
+    await session.execute(insert(VocabularySet).values(**mock_vocabulary_1))
+    await session.execute(insert(VocabularySet).values(**mock_vocabulary_2))
+
+    await vocabulary_dal.disable_user_active_vocabulary(user_id=user["id"])
+
+    stmt = select(VocabularySet).filter_by(owner_id=user['id'])
+    vocabularies = await session.scalars(stmt)
+
+    for vocab in vocabularies:
+        assert vocab.is_active is False
