@@ -69,3 +69,34 @@ async def test_disable_user_active_vocabulary(
 
     for vocab in vocabularies:
         assert vocab.is_active is False
+
+
+async def test_get_vocabulary_that_latest_than_given(
+    session: AsyncSession,
+    vocabulary_dal: VocabularySetDAL,
+    create_mock_users,
+    mock_users_list: list[dict[str, Any]]
+):
+    user = mock_users_list[3]
+    mock_vocabulary_1 = {
+        "id": 1,
+        "owner_id": user["id"],
+        "name": "Latest vocabulary",
+        "created_at": datetime.now(),
+        "is_active": False
+    }
+    mock_vocabulary_2 = {
+        "id": 2,
+        "owner_id": user["id"],
+        "name": "Earliest vocabulary",
+        "created_at": datetime.now() + timedelta(seconds=1),
+        "is_active": False
+    }
+    stmt1 = insert(VocabularySet).values(mock_vocabulary_1)
+    stmt2 = insert(VocabularySet).values(mock_vocabulary_2)
+    await session.execute(stmt1)
+    await session.execute(stmt2)
+
+    latest_vocabulary = await vocabulary_dal.get_vocabulary_that_latest_than_given(user_id=user["id"], vocabulary_id=mock_vocabulary_2["id"])
+    assert latest_vocabulary is not None
+    assert latest_vocabulary.name == mock_vocabulary_1["name"]
