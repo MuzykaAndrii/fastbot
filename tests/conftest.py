@@ -55,3 +55,12 @@ async def create_mock_users(session: AsyncSession, mock_users_list: list[dict[st
     for mock_user in mock_users_list:
         stmt = insert(User).values(**mock_user).returning(User)
         await session.execute(stmt)
+
+
+@pytest.fixture(scope="function")
+async def mock_vocabulary(session: AsyncSession, create_mock_users, mock_users_list: list[dict[str, Any]]) -> VocabularySet:
+    owner = mock_users_list[2]
+    mock_vocabulary = {"owner_id": owner["id"], "name": "Test Vocabulary", "is_active": False}
+    stmt = insert(VocabularySet).values(**mock_vocabulary).returning(VocabularySet)
+    result = await session.execute(stmt)
+    return result.scalar_one()
