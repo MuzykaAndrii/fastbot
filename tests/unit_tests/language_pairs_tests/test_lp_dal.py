@@ -1,7 +1,7 @@
 import pytest
 from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, NoResultFound
 
 from app.backend.vocabulary.dal import LanguagePairDAL
 from app.backend.vocabulary.models import LanguagePair, VocabularySet
@@ -77,3 +77,9 @@ async def test_delete_by_id_language_pair(session: AsyncSession, lp_dal: Languag
 
     unexist_lp = await session.scalar(select(LanguagePair).filter_by(id=language_pair.id))
     assert unexist_lp is None
+
+
+async def test_delete_non_existent_language_pair(lp_dal: LanguagePairDAL):
+    non_existent_id = 9999
+    with pytest.raises(NoResultFound):
+        await lp_dal.delete_by_id(non_existent_id)
