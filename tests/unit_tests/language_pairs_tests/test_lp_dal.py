@@ -48,4 +48,17 @@ async def test_bulk_create_language_pairs(session: AsyncSession, lp_dal: Languag
         assert created.vocabulary_id == mock["vocabulary_id"]
         assert created.word == mock["word"]
         assert created.translation == mock["translation"]
-    
+
+
+async def test_delete_by_id_language_pair(session: AsyncSession, lp_dal: LanguagePairDAL, mock_vocabulary: VocabularySet):
+    mock_language_pair = {"vocabulary_id": mock_vocabulary.id, "word": "hello", "translation": "hola"}
+    stmt = insert(LanguagePair).values(**mock_language_pair).returning(LanguagePair)
+    result = await session.execute(stmt)
+    language_pair = result.scalar_one()
+
+    deleted_lp = await lp_dal.delete_by_id(language_pair.id)
+
+    assert deleted_lp.id == language_pair.id
+
+    unexist_lp = await session.scalar(select(LanguagePair).filter_by(id=language_pair.id))
+    assert unexist_lp is None
