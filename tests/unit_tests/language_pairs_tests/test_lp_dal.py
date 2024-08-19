@@ -1,4 +1,4 @@
-from sqlalchemy import insert
+from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.backend.vocabulary.dal import LanguagePairDAL
@@ -30,3 +30,22 @@ async def test_get_by_id_language_pair(session: AsyncSession, lp_dal: LanguagePa
     assert fetched_pair.id == created_pair.id
     assert fetched_pair.word == mock_lp["word"]
     assert fetched_pair.translation == mock_lp["translation"]
+
+
+async def test_bulk_create_language_pairs(session: AsyncSession, lp_dal: LanguagePairDAL, mock_vocabulary: VocabularySet):
+    mock_lps = [
+        {"id": 1, "vocabulary_id": mock_vocabulary.id, "word": "hello", "translation": "hola"},
+        {"id": 2, "vocabulary_id": mock_vocabulary.id, "word": "world", "translation": "mundo"},
+    ]
+
+    await lp_dal.bulk_create(mock_lps)
+    created_lps = await session.scalars(select(LanguagePair).filter_by(vocabulary_id=mock_vocabulary.id).order_by(LanguagePair.id))
+
+    assert len(list(created_lps)) == len(mock_lps)
+
+    for created, mock in zip(created_lps, mock_lps):
+        assert created.id == mock["id"]
+        assert created.vocabulary_id == mock["vocabulary_id"]
+        assert created.word == mock["word"]
+        assert created.translation == mock["translation"]
+    
