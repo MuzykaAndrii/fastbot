@@ -65,6 +65,17 @@ async def test_bulk_create_language_pairs(session: AsyncSession, lp_dal: Languag
         assert created.translation == mock["translation"]
 
 
+async def test_bulk_create_with_partial_invalid_data(session: AsyncSession, lp_dal: LanguagePairDAL, mock_vocabulary: VocabularySet):
+    mock_lps = [
+        {"vocabulary_id": mock_vocabulary.id, "word": "hello", "translation": "hola"},
+        {"vocabulary_id": 9999, "word": "world", "translation": "mundo"},  # Invalid vocabulary_id
+    ]
+
+    with pytest.raises(IntegrityError):
+        stmt = insert(LanguagePair).values(mock_lps)
+        await session.execute(stmt)
+
+
 async def test_delete_by_id_language_pair(session: AsyncSession, lp_dal: LanguagePairDAL, mock_vocabulary: VocabularySet):
     mock_language_pair = {"vocabulary_id": mock_vocabulary.id, "word": "hello", "translation": "hola"}
     stmt = insert(LanguagePair).values(**mock_language_pair).returning(LanguagePair)
