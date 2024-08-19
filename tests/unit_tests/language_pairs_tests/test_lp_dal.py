@@ -1,5 +1,7 @@
+import pytest
 from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.exc import IntegrityError
 
 from app.backend.vocabulary.dal import LanguagePairDAL
 from app.backend.vocabulary.models import LanguagePair, VocabularySet
@@ -16,6 +18,13 @@ async def test_create_language_pair(lp_dal: LanguagePairDAL, mock_vocabulary: Vo
     assert language_pair.word == mock_lp["word"]
     assert language_pair.translation == mock_lp["translation"]
     assert language_pair.vocabulary_id == mock_vocabulary.id
+
+
+async def test_create_language_pair_with_invalid_data(session: AsyncSession, lp_dal: LanguagePairDAL):
+    mock_language_pair = {"vocabulary_id": 999, "word": "hello", "translation": "hola"}  # Non-existent vocabulary_id
+
+    with pytest.raises(IntegrityError):
+        await lp_dal.create(**mock_language_pair)
 
 
 async def test_get_by_id_language_pair(session: AsyncSession, lp_dal: LanguagePairDAL, mock_vocabulary: VocabularySet):
