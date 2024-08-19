@@ -41,6 +41,12 @@ async def test_get_by_id_language_pair(session: AsyncSession, lp_dal: LanguagePa
     assert fetched_pair.translation == mock_lp["translation"]
 
 
+async def test_get_non_existent_language_pair(lp_dal: LanguagePairDAL):
+    non_existent_id = 9999
+    fetched_pair = await lp_dal.get_by_id(non_existent_id)
+    assert fetched_pair is None
+
+
 async def test_bulk_create_language_pairs(session: AsyncSession, lp_dal: LanguagePairDAL, mock_vocabulary: VocabularySet):
     mock_lps = [
         {"id": 1, "vocabulary_id": mock_vocabulary.id, "word": "hello", "translation": "hola"},
