@@ -1,9 +1,9 @@
 from typing import Any
 
 import pytest
-import asyncio
 from sqlalchemy import insert
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql import text
 
 from app.backend.components.config import app_settings
 from app.backend.components.db import database
@@ -22,17 +22,21 @@ async def prepare_db():
         await conn.run_sync(Base.metadata.create_all)
 
 
-# @pytest.fixture(scope="session")
-# def event_loop(request):
-#     loop = asyncio.get_event_loop_policy().new_event_loop()
-#     yield loop
-#     loop.close()
-
-
 @pytest.fixture(scope="function")
 async def session():
     async with database.session_maker() as session:
         yield session
+
+
+@pytest.fixture(scope="function")
+async def clean_db(session: AsyncSession):
+    yield None
+
+    tables = reversed(Base.metadata.sorted_tables)
+    for table in tables:
+        await session.execute(text(f'TRUNCATE TABLE {table.name} RESTART IDENTITY CASCADE;'))
+
+    await session.commit()
 
 
 @pytest.fixture(scope="session")
