@@ -40,7 +40,7 @@ async def clean_db(session: AsyncSession):
 
 
 @pytest.fixture(scope="session")
-def mock_users_list() -> list[dict[str, Any]]:
+def mock_users_data() -> list[dict[str, Any]]:
     return [
         {"id": 1, "username": "test_user1", "email": "voca_test_user1@example.com", "password_hash": b"pwd1", "is_superuser": False},
         {"id": 2, "username": "test_user2", "email": "voca_test_user2@example.com", "password_hash": b"pwd2", "is_superuser": False},
@@ -55,16 +55,17 @@ def mock_user() -> dict[str, Any]:
 
 
 @pytest.fixture(scope="function")
-async def create_mock_users(session: AsyncSession, mock_users_list: list[dict[str, Any]]) -> None:
-    for mock_user in mock_users_list:
-        stmt = insert(User).values(**mock_user).returning(User)
-        await session.execute(stmt)
+async def session_mock_users(session: AsyncSession, mock_users_data: list[dict[str, Any]]) -> list[User]:
+    """Creates session-persisted mock users"""
+    stmt = insert(User).values(mock_users_data).returning(User)
+    users = await session.scalars(stmt)
+    return list(users.unique().all())
 
 
 @pytest.fixture(scope="function")
-async def mock_vocabulary(session: AsyncSession, create_mock_users, mock_users_list: list[dict[str, Any]]) -> VocabularySet:
-    owner = mock_users_list[2]
-    mock_vocabulary = {"owner_id": owner["id"], "name": "Test Vocabulary", "is_active": False}
+async def mock_vocabulary(session: AsyncSession, session_mock_users: list[User]) -> VocabularySet:
+    owner = session_mock_users[2]
+    mock_vocabulary = {"owner_id": owner.id, "name": "Test Vocabulary", "is_active": False}
     stmt = insert(VocabularySet).values(**mock_vocabulary).returning(VocabularySet)
     result = await session.execute(stmt)
     return result.scalar_one()
