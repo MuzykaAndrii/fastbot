@@ -1,10 +1,11 @@
 from typing import Any
 
-from sqlalchemy import insert
+from sqlalchemy import insert, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.backend.users.models import User
 from app.backend.users.services import UserService
+from app.backend.components.config import app_settings
 
 
 async def test_get_or_create_by_id(user_service: UserService, mock_user: dict[str, Any], clean_db):
@@ -34,3 +35,14 @@ async def test_get_by_email(user_service: UserService, db_mock_user: User, clean
     assert user is not None
     assert user.id == db_mock_user.id
     assert user.email == db_mock_user.email
+
+
+async def test_ensure_admin_exists_creates_admin_if_none_exists(session: AsyncSession, user_service: UserService, clean_db):
+    # Act
+    await user_service.ensure_admin_exists()
+    
+    # Assert
+    admin_users = await session.scalars(select(User).filter_by(is_superuser=True))
+    admin_users = list(admin_users)
+    assert len(admin_users) == 1
+    assert admin_users[0].email == app_settings.BASE_ADMIN_EMAIL
