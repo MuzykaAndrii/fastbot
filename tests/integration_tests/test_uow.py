@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from app.backend.components.unitofwork import UnitOfWork
+from app.backend.db.session import DataBase
 from app.backend.users.dal import UserDAL
 from app.backend.users.models import User
 from app.backend.vocabulary.dal import LanguagePairDAL, VocabularySetDAL
@@ -73,3 +74,17 @@ async def test_uow_double_save(uow: UnitOfWork, session: AsyncSession, mock_user
     saved_user = result.scalar_one()
     
     assert saved_user.username == "new_username"
+
+
+async def test_uow_nested_contexts(uow: UnitOfWork, session: AsyncSession, mock_user: dict[str, Any], clean_db):    
+    async with uow:
+        async with uow:  # Intentionally using the same UnitOfWork instance
+            user = await uow.users.create(**mock_user)
+            await uow.save()
+        
+        # Verify that nested context didn't cause issues
+        stmt = select(User).filter_by(id=user.id)
+        result = await session.execute(stmt)
+        saved_user = result.scalar_one()
+        
+        assert saved_user is not None
