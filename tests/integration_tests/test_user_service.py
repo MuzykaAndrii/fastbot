@@ -46,3 +46,23 @@ async def test_ensure_admin_exists_creates_admin_if_none_exists(session: AsyncSe
     admin_users = list(admin_users)
     assert len(admin_users) == 1
     assert admin_users[0].email == app_settings.BASE_ADMIN_EMAIL
+
+
+async def test_ensure_admin_exists_does_not_create_if_admin_exists(session: AsyncSession, user_service: UserService, clean_db):
+    # Arrange
+    base_admin_user = {
+        "email": app_settings.BASE_ADMIN_EMAIL,
+        "password_hash": b"somehash",
+        "is_superuser": True,
+    }
+    stmt = insert(User).values(**base_admin_user)
+    await session.execute(stmt)
+    await session.commit()
+
+    # Act
+    await user_service.ensure_admin_exists()
+    
+    # Assert
+    admin_users = await session.scalars(select(User).filter_by(is_superuser=True))
+    admin_users = list(admin_users)
+    assert len(admin_users) == 1  # Ensure only one admin created
