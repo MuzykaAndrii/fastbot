@@ -58,3 +58,18 @@ async def test_uow_rollback(
     assert non_existent_user is None
     assert non_existent_vocabulary is None
     assert non_existent_lp is None
+
+
+async def test_uow_double_save(uow: UnitOfWork, session: AsyncSession, mock_user: dict[str, Any], clean_db):
+    async with uow:
+        user = await uow.users.create(**mock_user)
+        await uow.save()
+
+        user.username = "new_username"
+        await uow.save()
+    
+    stmt = select(User).filter_by(id=user.id)
+    result = await session.execute(stmt)
+    saved_user = result.scalar_one()
+    
+    assert saved_user.username == "new_username"
