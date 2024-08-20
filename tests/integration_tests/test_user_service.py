@@ -28,3 +28,17 @@ async def test_get_by_id(session: AsyncSession, user_service: UserService, mock_
     assert user is not None
     assert user.id == mock_user["id"]
     assert user.email == mock_user["email"]
+
+
+async def test_get_by_email(session: AsyncSession, user_service: UserService, mock_user: dict[str, Any], clean_db):
+    # Arrange
+    await session.execute(insert(User).values(**mock_user))
+    await session.commit()
+    
+    # Act
+    user = await user_service.get_by_email(mock_user["email"])
+    
+    # Assert
+    assert user is not None
+    assert user.id == mock_user["id"]
+    assert user.email == mock_user["email"]
