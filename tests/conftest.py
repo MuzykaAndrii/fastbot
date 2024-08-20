@@ -51,7 +51,7 @@ def mock_users_list() -> list[dict[str, Any]]:
 
 @pytest.fixture(scope="session")
 def mock_user() -> dict[str, Any]:
-    return {"username": "lonely", "email": "someuser@example.com", "password_hash": b"pwd4", "is_superuser": False}
+    return {"id": 5, "username": "lonely", "email": "someuser@example.com", "password_hash": b"pwd4", "is_superuser": False}
 
 
 @pytest.fixture(scope="function")
