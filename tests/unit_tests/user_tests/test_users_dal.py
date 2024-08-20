@@ -77,17 +77,16 @@ async def test_create_user_with_wrong_field_type(user_dal: UserDAL, user_data: d
         await user_dal.create(**user_data)
 
 
-async def test_get_user_by_id(user_dal: UserDAL, session: AsyncSession, mock_user: dict[str, Any]):
-    stmt = insert(User).values(**mock_user).returning(User)
-    result = await session.execute(stmt)
-    user = result.scalar_one()
+async def test_get_user_by_id(user_dal: UserDAL, session_mock_users: list[User]):
+    """Test getting a user by ID."""
+    user = session_mock_users[0]  # Use an existing user from session_mock_users
 
     fetched_user = await user_dal.get_by_id(user.id)
     assert fetched_user is not None
     assert fetched_user.id == user.id
-    assert fetched_user.username == mock_user["username"]
-    assert fetched_user.email == mock_user["email"]
-    assert fetched_user.password_hash == mock_user["password_hash"]
+    assert fetched_user.username == user.username
+    assert fetched_user.email == user.email
+    assert fetched_user.password_hash == user.password_hash
 
 
 async def test_get_user_by_non_existent_id(user_dal: UserDAL):
@@ -98,16 +97,18 @@ async def test_get_user_by_non_existent_id(user_dal: UserDAL):
     assert user is None
 
 
-async def test_get_all_users(user_dal: UserDAL, session: AsyncSession, create_mock_users, mock_users_list: list[dict[str, Any]]):
+async def test_get_all_users(user_dal: UserDAL, session_mock_users: list[User]):
+    """Test retrieving all users and verify with mock data."""
+
     db_users = await user_dal.get_all()
 
-    assert len(db_users) == len(mock_users_list)
+    assert len(db_users) == len(session_mock_users)
 
-    for mock_user, db_user in zip(db_users, mock_users_list):
-        assert db_user.username == mock_user["username"]
-        assert db_user.email == mock_user["email"]
-        assert db_user.password_hash == mock_user["password_hash"]
-        assert db_user.is_superuser == mock_user["is_superuser"]
+    for db_user, session_user in zip(db_users, session_mock_users):
+        assert db_user.username == session_user.username
+        assert db_user.email == session_user.email
+        assert db_user.password_hash == session_user.password_hash
+        assert db_user.is_superuser == session_user.is_superuser
 
 
 async def test_delete_user_by_id(user_dal: UserDAL, session: AsyncSession, mock_user: dict[str, Any]):
@@ -132,10 +133,11 @@ async def test_delete_user_by_non_existent_id(user_dal: UserDAL):
         await user_dal.delete_by_id(non_existent_id)
 
 
-async def test_filter_users_by_criteria(user_dal: UserDAL, session: AsyncSession, create_mock_users, mock_users_list: list[dict[str, Any]]):
+async def test_filter_users_by_criteria(user_dal: UserDAL, session_mock_users: list[User]):
     """Test filtering users by criteria."""
+    user_to_search = session_mock_users[1]
 
-    found = await user_dal.filter_by(**mock_users_list[1])  # filter random user
+    found = await user_dal.filter_by(username=user_to_search.username, email=user_to_search.email)  # filter by criteria
     assert len(found) == 1
 
 
@@ -154,38 +156,38 @@ async def test_filter_users_by_wrong_filed(user_dal: UserDAL):
         await user_dal.filter_by(**user_with_wrong_field)
 
 
-async def test_get_admin_users(user_dal: UserDAL, session: AsyncSession, create_mock_users):
+async def test_get_admin_users(user_dal: UserDAL, session_mock_users: list[User]):
     """Test getting all admin users."""
-    stmt = select(User).where(User.is_superuser == True)
-    result = await session.execute(stmt)
-    admins = result.scalars().all()
-
     admins = await user_dal.get_admin_users()
-    assert len(admins) == len(admins)
+    expected_admins = [user for user in session_mock_users if user.is_superuser]
+    
+    assert len(admins) == len(expected_admins)
+    for admin in admins:
+        assert admin.is_superuser
 
 
-async def test_bulk_create_users(user_dal: UserDAL, session: AsyncSession, mock_users_list: list[dict[str, Any]]):
+async def test_bulk_create_users(user_dal: UserDAL, session: AsyncSession, mock_users_data: list[dict[str, Any]]):
     """Test bulk creating users and verify with a direct database query."""    
-    await user_dal.bulk_create(mock_users_list)
+    await user_dal.bulk_create(mock_users_data)
     
     stmt = select(User).order_by(User.id)
     result = await session.execute(stmt)
     db_users = result.scalars().all()
 
-    assert len(db_users) == len(mock_users_list)
-    for mock_user, db_user in zip(mock_users_list, db_users):
+    assert len(db_users) == len(mock_users_data)
+    for mock_user, db_user in zip(mock_users_data, db_users):
         assert mock_user["username"] == db_user.username
         assert mock_user["email"] == db_user.email
         assert mock_user["password_hash"] == db_user.password_hash
         assert mock_user["is_superuser"] == db_user.is_superuser
 
 
-async def test_get_all_users(user_dal: UserDAL, session: AsyncSession, create_mock_users, mock_users_list: list[dict[str, Any]]):
+async def test_get_all_users(user_dal: UserDAL, session: AsyncSession, session_mock_users: list[User]):
     """Test retrieving all users and verify with a direct database query."""
 
     db_users = await user_dal.get_all()
 
-    assert len(mock_users_list) == len(db_users)
+    assert len(session_mock_users) == len(db_users)
 
 
 async def test_get_or_create_user(user_dal: UserDAL, session: AsyncSession, mock_user: dict[str, Any]):
