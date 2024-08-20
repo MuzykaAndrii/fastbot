@@ -28,6 +28,8 @@ rapidfuzz = "^3.8.1"
 mypy = "^1.8.0"
 pytest = "^8.3.2"
 pytest-asyncio = "^0.23.8"
+coverage = "^7.6.1"
+pytest-cov = "^5.0.0"
 
 
 [tool.poetry.group.prod.dependencies]
