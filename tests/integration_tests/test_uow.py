@@ -5,7 +5,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from app.backend.components.unitofwork import UnitOfWork
-from app.backend.db.session import DataBase
 from app.backend.users.dal import UserDAL
 from app.backend.users.models import User
 from app.backend.vocabulary.dal import LanguagePairDAL, VocabularySetDAL
@@ -17,6 +16,19 @@ async def test_uow_initialization(uow: UnitOfWork):
         assert isinstance(uow.users, UserDAL)
         assert isinstance(uow.vocabularies, VocabularySetDAL)
         assert isinstance(uow.language_pairs, LanguagePairDAL)
+
+
+async def test_uow_no_session_leak(uow: UnitOfWork):
+    try:
+        async with uow:
+            raise Exception("Force exception to test session leak")
+    except Exception:
+        pass
+    
+    assert not uow.session.in_transaction()
+    
+    with pytest.raises(Exception):
+        await uow.session.execute("SELECT 1")
 
 
 async def test_uow_commit(
