@@ -136,3 +136,25 @@ async def test_disable_active_vocabulary_and_enable_given_already_active(
     # Act & Assert
     with pytest.raises(VocabularyIsAlreadyActive):
         await vocabulary_service.disable_active_vocabulary_and_enable_given(user.id, already_active_vocabulary.id)
+
+
+async def test_delete_vocabulary(
+    session: AsyncSession,
+    vocabulary_service: VocabularyService,
+    db_mock_vocabulary: VocabularySet,
+    clean_db,
+):
+    # Arrange
+    vocabulary_to_delete = db_mock_vocabulary
+    user = vocabulary_to_delete.owner
+
+    # Act
+    deleted_vocabulary = await vocabulary_service.delete_vocabulary(user.id, vocabulary_to_delete.id)
+
+    # Assert
+    assert deleted_vocabulary.id == vocabulary_to_delete.id
+    assert deleted_vocabulary.name == vocabulary_to_delete.name
+
+    query = select(VocabularySet).filter_by(id=vocabulary_to_delete.id)
+    result = await session.execute(query)
+    assert result.scalar_one_or_none() is None # Ensure it's deleted
