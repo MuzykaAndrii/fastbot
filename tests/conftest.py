@@ -1,7 +1,7 @@
 from typing import Any
 
 import pytest
-from sqlalchemy import insert
+from sqlalchemy import delete, insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import text
 
@@ -72,9 +72,46 @@ async def session_mock_users(session: AsyncSession, mock_users_data: list[dict[s
 
 
 @pytest.fixture(scope="function")
+async def db_mock_users(session: AsyncSession, mock_users_data: list[dict[str, Any]]) -> list[User]: # type: ignore
+    """Creates database-persistent mock users"""
+    # Setup
+    stmt = insert(User).values(mock_users_data).returning(User)
+    users = await session.scalars(stmt)
+    await session.commit()
+
+    users_list = list(users.unique().all())
+    yield users_list
+    
+    # Teardown
+    stmt1 = delete(User).where(User.id.in_([u.id for u in users_list]))
+    await session.execute(stmt1)
+    await session.commit()
+
+
+@pytest.fixture(scope="function")
 async def mock_vocabulary(session: AsyncSession, session_mock_users: list[User]) -> VocabularySet:
+    """
+    Creates and returns session-persistent mock vocabulary
+    """
     owner = session_mock_users[2]
-    mock_vocabulary = {"owner_id": owner.id, "name": "Test Vocabulary", "is_active": False}
+    mock_vocabulary = {"owner_id": owner.id, "name": "Session test Vocabulary", "is_active": False}
     stmt = insert(VocabularySet).values(**mock_vocabulary).returning(VocabularySet)
     result = await session.execute(stmt)
     return result.scalar_one()
+
+
+@pytest.fixture(scope="function")
+async def db_mock_vocabulary(session: AsyncSession, db_mock_users: list[User]) -> VocabularySet:  # type: ignore
+    """
+    Creates and returns database-persistent mock vocabulary
+    """
+    # Setup
+    owner = db_mock_users[2]
+    mock_vocabulary = {"owner_id": owner.id, "name": "Database test Vocabulary", "is_active": False}
+    stmt = insert(VocabularySet).values(**mock_vocabulary).returning(VocabularySet)
+    vocabulary = await session.scalar(stmt)
+
+    yield vocabulary
+    # Teardown
+    await session.execute(delete(VocabularySet).where(VocabularySet.id == vocabulary.id))
+    await session.commit()
