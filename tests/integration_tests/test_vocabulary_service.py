@@ -158,3 +158,35 @@ async def test_delete_vocabulary(
     query = select(VocabularySet).filter_by(id=vocabulary_to_delete.id)
     result = await session.execute(query)
     assert result.scalar_one_or_none() is None # Ensure it's deleted
+
+
+async def test_get_next_and_previous_vocabulary(
+    session: AsyncSession,
+    vocabulary_service: VocabularyService,
+    db_mock_user: User,
+    clean_db,
+):
+    # Arrange
+    owner = db_mock_user
+    vocabularies = [
+        {"id": 3, "owner_id": owner.id, "name": "First Vocabulary", "created_at": datetime.now() + timedelta(minutes=3)},
+        {"id": 2, "owner_id": owner.id, "name": "Second Vocabulary", "created_at": datetime.now() + timedelta(minutes=2)},
+        {"id": 1, "owner_id": owner.id, "name": "Third Vocabulary", "created_at": datetime.now() + timedelta(minutes=1)},
+    ]
+    current_vocabulary_id = vocabularies[1]["id"]
+    next_vocabulary = vocabularies[2]
+    previous_vocabulary = vocabularies[0]
+
+    await session.execute(insert(VocabularySet).values(vocabularies))
+    await session.commit()
+
+    # Act
+    next_vocabulary_result = await vocabulary_service.get_next_vocabulary(owner.id, current_vocabulary_id)
+    previous_vocabulary_result = await vocabulary_service.get_previous_vocabulary(owner.id, current_vocabulary_id)
+
+    # Assert
+    assert next_vocabulary_result.id == next_vocabulary["id"]
+    assert next_vocabulary_result.name == next_vocabulary["name"]
+
+    assert previous_vocabulary_result.id == previous_vocabulary["id"]
+    assert previous_vocabulary_result.name == previous_vocabulary["name"]
