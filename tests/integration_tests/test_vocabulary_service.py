@@ -1,10 +1,12 @@
 from datetime import datetime, timedelta
+import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import insert, select
 
 from app.backend.users.models import User
 from app.backend.vocabulary.models import LanguagePair, VocabularySet
 from app.backend.vocabulary.services import VocabularyService
+from app.shared.exceptions import NoVocabulariesFound
 from app.shared.schemas import LanguagePairSchema, LanguagePairsAppendSchema, VocabularyCreateSchema
 
 
@@ -81,3 +83,9 @@ async def test_get_recent_user_vocabulary(
     # Assert
     assert recent_vocabulary.id == newest_vocabulary["id"]
     assert recent_vocabulary.name == newest_vocabulary["name"]
+
+
+async def test_get_recent_user_vocabulary_no_vocabularies(vocabulary_service: VocabularyService, db_mock_user: User):
+    # Act & Assert
+    with pytest.raises(NoVocabulariesFound):
+        await vocabulary_service.get_recent_user_vocabulary(db_mock_user.id)
