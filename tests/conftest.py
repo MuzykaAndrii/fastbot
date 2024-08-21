@@ -110,6 +110,7 @@ async def db_mock_vocabulary(session: AsyncSession, db_mock_users: list[User]) -
     mock_vocabulary = {"owner_id": owner.id, "name": "Database test Vocabulary", "is_active": False}
     stmt = insert(VocabularySet).values(**mock_vocabulary).returning(VocabularySet)
     vocabulary = await session.scalar(stmt)
+    await session.commit()
 
     yield vocabulary
     # Teardown
