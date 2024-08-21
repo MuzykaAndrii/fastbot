@@ -1,5 +1,6 @@
+from datetime import datetime, timedelta
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import insert, select
 
 from app.backend.users.models import User
 from app.backend.vocabulary.models import LanguagePair, VocabularySet
@@ -55,3 +56,28 @@ async def test_append_language_pairs_to_vocabulary(
     for appended, fetched in zip(append_data.language_pairs, lang_pairs):
         assert appended.word == fetched.word
         assert appended.translation == fetched.translation
+
+
+async def test_get_recent_user_vocabulary(
+    session: AsyncSession,
+    vocabulary_service: VocabularyService,
+    db_mock_user: User,
+    clean_db
+):
+    # Arrange
+    owner = db_mock_user
+    vocabularies = [
+        {"id": 1, "owner_id": owner.id, "name": "First Vocabulary", "created_at": datetime.now()},
+        {"id": 2, "owner_id": owner.id, "name": "Second Vocabulary", "created_at": datetime.now() + timedelta(seconds=1)},
+        {"id": 3, "owner_id": owner.id, "name": "Third Vocabulary", "created_at": datetime.now() + timedelta(seconds=2)},
+    ]
+    newest_vocabulary = vocabularies[2]
+    await session.execute(insert(VocabularySet).values(vocabularies))
+    await session.commit()
+
+    # Act
+    recent_vocabulary = await vocabulary_service.get_recent_user_vocabulary(db_mock_user.id)
+
+    # Assert
+    assert recent_vocabulary.id == newest_vocabulary["id"]
+    assert recent_vocabulary.name == newest_vocabulary["name"]
