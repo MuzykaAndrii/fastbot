@@ -6,7 +6,7 @@ from sqlalchemy import func, insert, select
 from app.backend.users.models import User
 from app.backend.vocabulary.models import LanguagePair, VocabularySet
 from app.backend.vocabulary.services import VocabularyService
-from app.shared.exceptions import NoVocabulariesFound
+from app.shared.exceptions import NoVocabulariesFound, VocabularyIsAlreadyActive
 from app.shared.schemas import LanguagePairSchema, LanguagePairsAppendSchema, VocabularyCreateSchema
 
 
@@ -119,3 +119,20 @@ async def test_disable_active_vocabulary_and_enable_given(
     stmt = select(func.count()).select_from(VocabularySet).filter_by(owner_id=user.id, is_active=True)
     active_vocabularies_count = await session.scalar(stmt)
     assert active_vocabularies_count == 1  # Ensure that we have only one active vocabulary
+
+
+async def test_disable_active_vocabulary_and_enable_given_already_active(
+    session: AsyncSession,
+    vocabulary_service: VocabularyService,
+    db_mock_user: User,
+    clean_db,
+):
+    # Arrange
+    user = db_mock_user
+    stmt = insert(VocabularySet).values(owner_id=user.id, name="Test vocabulary", is_active=True).returning(VocabularySet)
+    already_active_vocabulary = await session.scalar(stmt)
+    await session.commit()
+
+    # Act & Assert
+    with pytest.raises(VocabularyIsAlreadyActive):
+        await vocabulary_service.disable_active_vocabulary_and_enable_given(user.id, already_active_vocabulary.id)
