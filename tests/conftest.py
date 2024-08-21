@@ -55,12 +55,16 @@ def mock_user() -> dict[str, Any]:
 
 
 @pytest.fixture(scope="function")
-async def db_mock_user(session: AsyncSession, mock_user: dict[str, Any]) -> User:
+async def db_mock_user(session: AsyncSession, mock_user: dict[str, Any]) -> User: # type: ignore
     """Creates db-persistent mock user"""
     stmt = insert(User).values(**mock_user).returning(User)
     mock_user = await session.scalar(stmt)
     await session.commit()
-    return mock_user
+
+    yield mock_user
+
+    await session.execute(delete(User).filter_by(id=mock_user.id))
+    await session.commit()
 
 
 @pytest.fixture(scope="function")
