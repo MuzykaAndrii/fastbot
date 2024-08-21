@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import insert, select
+from sqlalchemy import func, insert, select
 
 from app.backend.users.models import User
 from app.backend.vocabulary.models import LanguagePair, VocabularySet
@@ -89,3 +89,33 @@ async def test_get_recent_user_vocabulary_no_vocabularies(vocabulary_service: Vo
     # Act & Assert
     with pytest.raises(NoVocabulariesFound):
         await vocabulary_service.get_recent_user_vocabulary(db_mock_user.id)
+
+
+async def test_disable_active_vocabulary_and_enable_given(
+    session: AsyncSession,
+    vocabulary_service: VocabularyService,
+    db_mock_user: User,
+    clean_db,
+):
+    # Arrange
+    user = db_mock_user
+    vocabularies = [
+        {"id": 1, "owner_id": user.id, "name": "First Vocabulary", "is_active": False},
+        {"id": 2, "owner_id": user.id, "name": "Second Vocabulary", "is_active": True},
+        {"id": 3, "owner_id": user.id, "name": "Third Vocabulary", "is_active": False},
+    ]
+    vocabulary_to_activate = vocabularies[0]
+    stmt = insert(VocabularySet).values(vocabularies)
+    await session.execute(stmt)
+    await session.commit()
+
+    # Act
+    activated_vocabulary = await vocabulary_service.disable_active_vocabulary_and_enable_given(user.id, vocabulary_to_activate["id"])
+
+    # Assert
+    assert activated_vocabulary.id == vocabulary_to_activate["id"]
+    assert activated_vocabulary.name == vocabulary_to_activate["name"]
+
+    stmt = select(func.count()).select_from(VocabularySet).filter_by(owner_id=user.id, is_active=True)
+    active_vocabularies_count = await session.scalar(stmt)
+    assert active_vocabularies_count == 1  # Ensure that we have only one active vocabulary
