@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import APIRouter, HTTPException
 
 from app.backend.components.config import auth_settings
@@ -10,7 +11,7 @@ from app.bot.vocabulary.notifications import tasks  # emulation of api request t
 
 router = APIRouter()
 
-@router.post("/send_notifications", status_code=200)
+@router.get("/send_notifications", status_code=200)
 async def send_notifications(auth: AuthorizationSchema):
     if auth.api_key != auth_settings.API_KEY:
         raise HTTPException(403, detail="Invalid API key")
@@ -19,9 +20,12 @@ async def send_notifications(auth: AuthorizationSchema):
 
     if not lang_pairs_to_send:
         raise HTTPException(204, detail="No active vocabularies")
+    
+    calls = [generate_sentence_from_word(lang_pair.word) for lang_pair in lang_pairs_to_send]
+    sentences = await asyncio.gather(*calls)
 
-    for lang_pair in lang_pairs_to_send:
-        lang_pair.sentence_example = await generate_sentence_from_word(lang_pair.word)
+    for sentence, lp in zip(sentences, lang_pairs_to_send):
+        lp.sentence_example = sentence
 
     await tasks.send_notifications(lang_pairs_to_send)
     
