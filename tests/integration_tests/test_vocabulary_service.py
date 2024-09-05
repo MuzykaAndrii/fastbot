@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import func, insert, select
 
 from app.backend.users.models import User
+from app.backend.vocabulary.exceptions import NoActiveVocabulariesError
 from app.backend.vocabulary.models import LanguagePair, VocabularySet
 from app.backend.vocabulary.services import VocabularyService
 from app.shared.exceptions import NoVocabulariesFound, VocabularyDoesNotExist, VocabularyIsAlreadyActive
@@ -331,6 +332,14 @@ async def test_get_random_lang_pair_from_every_active_vocabulary(
     assert len(random_pairs) == active_vocabularies_count
     for pair in random_pairs:
         assert (pair.word, pair.translation) in language_pairs_from_active_vocabularies
+
+
+async def test_get_random_lang_pair_from_every_active_vocabulary_no_active_vocabularies(
+    vocabulary_service: VocabularyService,
+):
+    # Act & Assert
+    with pytest.raises(NoActiveVocabulariesError):
+        await vocabulary_service.get_random_lang_pair_from_every_active_vocabulary()
 
 
 async def test_disable_user_active_vocabulary(
