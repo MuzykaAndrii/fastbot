@@ -190,3 +190,29 @@ async def test_get_next_and_previous_vocabulary(
 
     assert previous_vocabulary_result.id == previous_vocabulary["id"]
     assert previous_vocabulary_result.name == previous_vocabulary["name"]
+
+
+async def test_get_all_user_vocabularies(
+    session: AsyncSession,
+    vocabulary_service: VocabularyService,
+    db_mock_user: User,
+    clean_db,
+):
+    # Arrange
+    owner = db_mock_user
+    vocabularies = [
+        {"id": 1, "owner_id": owner.id, "name": "First Vocabulary"},
+        {"id": 2, "owner_id": owner.id, "name": "Second Vocabulary"},
+        {"id": 3, "owner_id": owner.id, "name": "Third Vocabulary"},
+    ]
+    await session.execute(insert(VocabularySet).values(vocabularies))
+    await session.commit()
+
+    # Act
+    all_vocabularies = await vocabulary_service.get_all_user_vocabularies(owner.id)
+
+    # Assert
+    assert len(all_vocabularies) == len(vocabularies)
+    for vocab, expected_vocab in zip(all_vocabularies, vocabularies):
+        assert vocab.id == expected_vocab["id"]
+        assert vocab.name == expected_vocab["name"]
