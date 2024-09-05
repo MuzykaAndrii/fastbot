@@ -3,6 +3,7 @@ from fastapi import APIRouter, HTTPException
 
 from app.backend.components.config import auth_settings
 from app.backend.text_generator.text_generator import generate_sentence_from_word
+from app.backend.vocabulary.exceptions import NoActiveVocabulariesError
 from app.shared.schemas import ExtendedLanguagePairSchema
 from app.backend.vocabulary.schemas import AuthorizationSchema
 from app.backend.components import vocabularies_service
@@ -15,8 +16,11 @@ router = APIRouter()
 async def send_notifications(auth: AuthorizationSchema):
     if auth.api_key != auth_settings.API_KEY:
         raise HTTPException(403, detail="Invalid API key")
-    
-    lang_pairs_to_send: list[ExtendedLanguagePairSchema] = await vocabularies_service().get_random_lang_pair_from_every_active_vocabulary()
+    try:
+        lang_pairs_to_send: list[ExtendedLanguagePairSchema] = await vocabularies_service().get_random_lang_pair_from_every_active_vocabulary()
+    except NoActiveVocabulariesError:
+        # log this
+        return {"detail": "success"}
 
     if not lang_pairs_to_send:
         raise HTTPException(204, detail="No active vocabularies")

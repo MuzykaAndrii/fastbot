@@ -1,0 +1,3 @@
+
+class NoActiveVocabulariesError(Exception):
+    pass

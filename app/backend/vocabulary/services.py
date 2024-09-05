@@ -1,6 +1,7 @@
 import random
 
 from app.backend.components.unitofwork import UnitOfWork
+from app.backend.vocabulary.exceptions import NoActiveVocabulariesError
 from app.shared.exceptions import (
     NoVocabulariesFound,
     UserIsNotOwnerOfVocabulary,
@@ -80,6 +81,9 @@ class VocabularyService:
     async def get_random_lang_pair_from_every_active_vocabulary(self) -> list[ExtendedLanguagePairSchema]:
         async with self._uow as uow:
             active_vocabularies: list[VocabularySet] = await uow.vocabularies.filter_by(is_active=True)
+        
+        if not active_vocabularies:
+            raise NoActiveVocabulariesError
 
         random_lang_pairs: list[ExtendedLanguagePairSchema] = []
         for vocabulary in active_vocabularies:
