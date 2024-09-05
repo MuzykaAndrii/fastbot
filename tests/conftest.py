@@ -69,7 +69,7 @@ async def db_mock_user(session: AsyncSession, mock_user: dict[str, Any]) -> User
 
 @pytest.fixture(scope="function")
 async def session_mock_users(session: AsyncSession, mock_users_data: list[dict[str, Any]]) -> list[User]:
-    """Creates session-persistent mock users"""
+    """Creates session-persistent 4 mock users"""
     stmt = insert(User).values(mock_users_data).returning(User)
     users = await session.scalars(stmt)
     return list(users.unique().all())
@@ -77,7 +77,7 @@ async def session_mock_users(session: AsyncSession, mock_users_data: list[dict[s
 
 @pytest.fixture(scope="function")
 async def db_mock_users(session: AsyncSession, mock_users_data: list[dict[str, Any]]) -> list[User]: # type: ignore
-    """Creates database-persistent mock users"""
+    """Creates database-persistent 4 mock users"""
     # Setup
     stmt = insert(User).values(mock_users_data).returning(User)
     users = await session.scalars(stmt)

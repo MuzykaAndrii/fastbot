@@ -243,3 +243,63 @@ async def test_get_vocabulary(
     assert vocabulary_result.id == expected_vocabulary["id"]
     assert vocabulary_result.name == expected_vocabulary["name"]
 
+
+async def test_get_random_lang_pair_from_every_active_vocabulary(
+    session: AsyncSession,
+    vocabulary_service: VocabularyService,
+    db_mock_users: list[User],
+    clean_db,
+):
+    # Arrange
+    users = db_mock_users
+    vocabularies = [
+        {"id": 1, "owner_id": users[0].id, "name": "U1 First Vocabulary", "is_active": True},
+        {"id": 2, "owner_id": users[0].id, "name": "U1 Second Vocabulary", "is_active": False},
+        {"id": 3, "owner_id": users[1].id, "name": "U2 First Vocabulary", "is_active": True},
+        {"id": 4, "owner_id": users[1].id, "name": "U2 Second Vocabulary", "is_active": False},
+        {"id": 5, "owner_id": users[2].id, "name": "U3 First Vocabulary", "is_active": True},
+        {"id": 6, "owner_id": users[2].id, "name": "U3 Second Vocabulary", "is_active": False},
+        {"id": 7, "owner_id": users[3].id, "name": "U4 First Vocabulary", "is_active": True},
+        {"id": 8, "owner_id": users[3].id, "name": "U5 Second Vocabulary", "is_active": False},
+    ]
+
+    language_pairs = [
+        {"word": "hello", "translation": "hola", "vocabulary_id": vocabularies[0]["id"]},
+        {"word": "goodbye", "translation": "adiós", "vocabulary_id": vocabularies[0]["id"]},
+        {"word": "world", "translation": "mundo", "vocabulary_id": vocabularies[1]["id"]},
+        {"word": "peace", "translation": "paz", "vocabulary_id": vocabularies[1]["id"]},
+        {"word": "apple", "translation": "manzana", "vocabulary_id": vocabularies[2]["id"]},
+        {"word": "banana", "translation": "plátano", "vocabulary_id": vocabularies[2]["id"]},
+        {"word": "dog", "translation": "perro", "vocabulary_id": vocabularies[3]["id"]},
+        {"word": "cat", "translation": "gato", "vocabulary_id": vocabularies[3]["id"]},
+        {"word": "water", "translation": "agua", "vocabulary_id": vocabularies[4]["id"]},
+        {"word": "fire", "translation": "fuego", "vocabulary_id": vocabularies[4]["id"]},
+        {"word": "sky", "translation": "cielo", "vocabulary_id": vocabularies[5]["id"]},
+        {"word": "earth", "translation": "tierra", "vocabulary_id": vocabularies[5]["id"]},
+        {"word": "sun", "translation": "sol", "vocabulary_id": vocabularies[6]["id"]},
+        {"word": "moon", "translation": "luna", "vocabulary_id": vocabularies[6]["id"]},
+        {"word": "star", "translation": "estrella", "vocabulary_id": vocabularies[7]["id"]},
+        {"word": "cloud", "translation": "nube", "vocabulary_id": vocabularies[7]["id"]},
+    ]
+
+    vocabularies_by_id = {v["id"]: v for v in vocabularies}
+
+    active_vocabularies_count = len([v for v in vocabularies if v["is_active"]])
+
+    language_pairs_from_active_vocabularies = [
+        (lp["word"], lp["translation"])
+        for lp in language_pairs if vocabularies_by_id[lp["vocabulary_id"]]["is_active"]
+    ]
+
+    await session.execute(insert(VocabularySet).values(vocabularies))
+    await session.execute(insert(LanguagePair).values(language_pairs))
+    await session.commit()
+
+    # Act
+    random_pairs = await vocabulary_service.get_random_lang_pair_from_every_active_vocabulary()
+
+    # Assert
+    assert len(random_pairs) == active_vocabularies_count
+    for pair in random_pairs:
+        assert (pair.word, pair.translation) in language_pairs_from_active_vocabularies
+
