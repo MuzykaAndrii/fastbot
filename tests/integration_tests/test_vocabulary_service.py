@@ -303,3 +303,26 @@ async def test_get_random_lang_pair_from_every_active_vocabulary(
     for pair in random_pairs:
         assert (pair.word, pair.translation) in language_pairs_from_active_vocabularies
 
+
+async def test_disable_user_active_vocabulary(
+    session: AsyncSession,
+    vocabulary_service: VocabularyService,
+    db_mock_user: User,
+    clean_db,
+):
+    # Arrange
+    owner = db_mock_user
+    vocabularies = [
+        {"id": 1, "owner_id": owner.id, "name": "First Vocabulary", "is_active": True},
+        {"id": 2, "owner_id": owner.id, "name": "Second Vocabulary", "is_active": False},
+    ]
+    await session.execute(insert(VocabularySet).values(vocabularies))
+    await session.commit()
+
+    # Act
+    await vocabulary_service.disable_user_active_vocabulary(owner.id)
+
+    # Assert
+    stmt = select(func.count()).select_from(VocabularySet).filter_by(owner_id=owner.id, is_active=True)
+    active_vocabularies_count = await session.scalar(stmt)
+    assert active_vocabularies_count == 0
