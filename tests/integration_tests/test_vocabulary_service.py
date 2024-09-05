@@ -192,6 +192,28 @@ async def test_get_next_and_previous_vocabulary(
     assert previous_vocabulary_result.name == previous_vocabulary["name"]
 
 
+async def test_get_next_and_previous_vocabulary_not_exists(
+    session: AsyncSession,
+    vocabulary_service: VocabularyService,
+    db_mock_user: User,
+    clean_db,
+):
+    # Arrange
+    owner = db_mock_user
+    vocabularies = [
+        {"id": 1, "owner_id": owner.id, "name": "Only Vocabulary", "created_at": datetime.now()},
+    ]
+    await session.execute(insert(VocabularySet).values(vocabularies))
+    await session.commit()
+
+    # Act & Assert
+    with pytest.raises(VocabularyDoesNotExist):
+        await vocabulary_service.get_next_vocabulary(owner.id, vocabularies[0]["id"])
+    
+    with pytest.raises(VocabularyDoesNotExist):
+        await vocabulary_service.get_previous_vocabulary(owner.id, vocabularies[0]["id"])
+
+
 async def test_get_all_user_vocabularies(
     session: AsyncSession,
     vocabulary_service: VocabularyService,
