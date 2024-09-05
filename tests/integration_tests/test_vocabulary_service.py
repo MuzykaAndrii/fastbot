@@ -326,3 +326,27 @@ async def test_disable_user_active_vocabulary(
     stmt = select(func.count()).select_from(VocabularySet).filter_by(owner_id=owner.id, is_active=True)
     active_vocabularies_count = await session.scalar(stmt)
     assert active_vocabularies_count == 0
+
+
+async def test_disable_vocabulary(
+    session: AsyncSession,
+    vocabulary_service: VocabularyService,
+    db_mock_user: User,
+    clean_db,
+):
+    # Arrange
+    owner = db_mock_user
+    vocabularies = [
+        {"id": 1, "owner_id": owner.id, "name": "First Vocabulary", "is_active": True},
+        {"id": 2, "owner_id": owner.id, "name": "Second Vocabulary", "is_active": False},
+    ]
+    vocabulary_id_to_disable = 1
+    await session.execute(insert(VocabularySet).values(vocabularies))
+    await session.commit()
+
+    # Act
+    await vocabulary_service.disable_vocabulary(vocabulary_id_to_disable)
+
+    # Assert
+    vocabulary_result = await session.get(VocabularySet, vocabulary_id_to_disable)
+    assert vocabulary_result.is_active is False
