@@ -6,7 +6,7 @@ from sqlalchemy import func, insert, select
 from app.backend.users.models import User
 from app.backend.vocabulary.models import LanguagePair, VocabularySet
 from app.backend.vocabulary.services import VocabularyService
-from app.shared.exceptions import NoVocabulariesFound, VocabularyIsAlreadyActive
+from app.shared.exceptions import NoVocabulariesFound, VocabularyDoesNotExist, VocabularyIsAlreadyActive
 from app.shared.schemas import LanguagePairSchema, LanguagePairsAppendSchema, VocabularyCreateSchema
 
 
@@ -242,6 +242,19 @@ async def test_get_vocabulary(
     # Assert
     assert vocabulary_result.id == expected_vocabulary["id"]
     assert vocabulary_result.name == expected_vocabulary["name"]
+
+
+async def test_get_non_existent_vocabulary(
+    vocabulary_service: VocabularyService,
+    db_mock_user: User,
+    clean_db,
+):
+    # Arrange
+    non_existent_vocabulary_id = 99999
+
+    # Act & Assert
+    with pytest.raises(VocabularyDoesNotExist):
+        await vocabulary_service.get_vocabulary(db_mock_user.id, non_existent_vocabulary_id)
 
 
 async def test_get_random_lang_pair_from_every_active_vocabulary(
