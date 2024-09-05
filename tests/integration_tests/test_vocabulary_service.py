@@ -216,3 +216,30 @@ async def test_get_all_user_vocabularies(
     for vocab, expected_vocab in zip(all_vocabularies, vocabularies):
         assert vocab.id == expected_vocab["id"]
         assert vocab.name == expected_vocab["name"]
+
+
+async def test_get_vocabulary(
+    session: AsyncSession,
+    vocabulary_service: VocabularyService,
+    db_mock_user: User,
+    clean_db,
+):
+    # Arrange
+    owner = db_mock_user
+    vocabularies = [
+        {"id": 1, "owner_id": owner.id, "name": "First Vocabulary"},
+        {"id": 2, "owner_id": owner.id, "name": "Second Vocabulary"},
+        {"id": 3, "owner_id": owner.id, "name": "Third Vocabulary"},
+    ]
+    vocabulary_id_to_get = 2
+    expected_vocabulary = vocabularies[1]
+    await session.execute(insert(VocabularySet).values(vocabularies))
+    await session.commit()
+
+    # Act
+    vocabulary_result = await vocabulary_service.get_vocabulary(owner.id, vocabulary_id_to_get)
+
+    # Assert
+    assert vocabulary_result.id == expected_vocabulary["id"]
+    assert vocabulary_result.name == expected_vocabulary["name"]
+
