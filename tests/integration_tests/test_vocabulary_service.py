@@ -379,3 +379,19 @@ async def test_disable_vocabulary(
     # Assert
     vocabulary_result = await session.get(VocabularySet, vocabulary_id_to_disable)
     assert vocabulary_result.is_active is False
+
+
+async def test_disable_vocabulary_not_active(
+    session: AsyncSession,
+    vocabulary_service: VocabularyService,
+    db_mock_vocabulary: VocabularySet,
+):
+    # Arrange
+    inactive_vocabulary = db_mock_vocabulary
+
+    # Act
+    await vocabulary_service.disable_vocabulary(inactive_vocabulary.id)
+
+    # Assert
+    vocabulary_result = await session.get(VocabularySet, inactive_vocabulary.id)
+    assert vocabulary_result.is_active is False
