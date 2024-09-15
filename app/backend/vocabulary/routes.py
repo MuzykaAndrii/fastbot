@@ -12,7 +12,7 @@ from app.bot.vocabulary.notifications import tasks  # emulation of api request t
 
 router = APIRouter()
 
-@router.get("/send_notifications", status_code=200)
+@router.post("/send_notifications", status_code=200)
 async def send_notifications(auth: AuthorizationSchema):
     if auth.api_key != auth_settings.API_KEY:
         raise HTTPException(403, detail="Invalid API key")
