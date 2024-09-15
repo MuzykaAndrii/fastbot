@@ -12,7 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
 TEMPLATES_DIR = BASE_DIR / "app/backend/pages/templates"
 
 ENV_DIR = BASE_DIR / "secrets" / "environment"
-PROD_ENV_FILE_PATH = BASE_DIR / '.prod.env'
+PROD_ENV_FILE_PATH = 'etc' / 'secrets' / '.prod.env'
 DEV_ENV_FILE_PATH = ENV_DIR / '.dev.env'
 TEST_ENV_FILE_PATH = ENV_DIR / '.test.env'
 
