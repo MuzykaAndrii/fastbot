@@ -161,6 +161,17 @@ async def test_delete_vocabulary(
     assert result.scalar_one_or_none() is None # Ensure it's deleted
 
 
+async def test_delete_non_existent_vocabulary(
+    vocabulary_service: VocabularyService,
+    db_mock_user: User,
+    clean_db,
+):
+    # Act & Assert
+    non_existent_vocabulary_id = 99999
+    with pytest.raises(VocabularyDoesNotExist):
+        await vocabulary_service.delete_vocabulary(db_mock_user.id, non_existent_vocabulary_id)
+
+
 async def test_get_next_and_previous_vocabulary(
     session: AsyncSession,
     vocabulary_service: VocabularyService,
