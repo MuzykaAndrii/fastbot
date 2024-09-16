@@ -2,7 +2,7 @@ import re
 
 
 class VocabularyValidator:
-    line_vocabulary_pattern = re.compile(r'^\s*([^-\n]+)\s*-\s*([^-\n]+[^\s])\s*$', re.I|re.X|re.S|re.U)
+    line_vocabulary_pattern = re.compile(r'^\s*([^\s-]+)\s*-\s*([^\s-]+)\s*$', re.I|re.X|re.S|re.U)
 
     def __init__(
             self,
