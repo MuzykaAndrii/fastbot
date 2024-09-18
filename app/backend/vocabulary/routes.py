@@ -20,9 +20,6 @@ async def send_notifications(auth: AuthorizationSchema):
         lang_pairs_to_send: list[ExtendedLanguagePairSchema] = await vocabularies_service().get_random_lang_pair_from_every_active_vocabulary()
     except NoActiveVocabulariesError:
         # log this
-        return {"detail": "success"}
-
-    if not lang_pairs_to_send:
         raise HTTPException(204, detail="No active vocabularies")
     
     calls = [generate_sentence_from_word(lang_pair.word) for lang_pair in lang_pairs_to_send]
