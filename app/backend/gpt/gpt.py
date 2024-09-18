@@ -1,9 +1,10 @@
-import asyncio
-from contextlib import suppress
 import random
 
-from g4f import ChatCompletion, debug, models
+import asyncio
+
+from g4f import debug, models
 from g4f.Provider import BaseProvider
+from g4f.client import AsyncClient
 
 
 debug.logging = False
@@ -19,13 +20,15 @@ class GPT:
         from .providers import providers
         return cls(providers)
 
-    async def manual_ask(self, provider, prompt: str) -> str | None:
-        with suppress(Exception):
-            return await ChatCompletion.create_async(
+    async def manual_ask(self, provider: BaseProvider, prompt: str) -> str | None:
+        try:
+            response = await AsyncClient(provider).chat.completions.create(
                 model=models.default,
                 messages=[{"role": "user", "content": prompt}],
-                provider=provider,
             )
+            return response.choices[0].message.content
+        except Exception as error:
+            print(f"Error during gpt request: {provider=}, exception: {error=}")
         
         return None
     
