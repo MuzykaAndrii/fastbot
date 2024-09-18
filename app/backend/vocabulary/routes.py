@@ -1,11 +1,10 @@
 import asyncio
-from fastapi import APIRouter, HTTPException
+from typing import Annotated
+from fastapi import APIRouter, HTTPException, Depends
 
-from app.backend.components.config import auth_settings
+from app.backend.auth.dependencies import api_key_auth
 from app.backend.text_generator.text_generator import generate_sentence_from_word
 from app.backend.vocabulary.exceptions import NoActiveVocabulariesError
-from app.shared.schemas import ExtendedLanguagePairSchema
-from app.backend.vocabulary.schemas import AuthorizationSchema
 from app.backend.components import vocabularies_service
 from app.bot.vocabulary.notifications import tasks  # emulation of api request to bot service
 
@@ -13,11 +12,9 @@ from app.bot.vocabulary.notifications import tasks  # emulation of api request t
 router = APIRouter()
 
 @router.post("/send_notifications", status_code=200)
-async def send_notifications(auth: AuthorizationSchema):
-    if auth.api_key != auth_settings.API_KEY:
-        raise HTTPException(403, detail="Invalid API key")
+async def send_notifications(auth = Depends(api_key_auth)):
     try:
-        lang_pairs_to_send: list[ExtendedLanguagePairSchema] = await vocabularies_service().get_random_lang_pair_from_every_active_vocabulary()
+        lang_pairs_to_send = await vocabularies_service().get_random_lang_pair_from_every_active_vocabulary()
     except NoActiveVocabulariesError:
         # log this
         raise HTTPException(204, detail="No active vocabularies")

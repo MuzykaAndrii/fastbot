@@ -1,11 +1,18 @@
 from fastapi import Depends, HTTPException, Request
 
+from app.backend.auth.schemas import ApiKeyAuthorizationSchema
 from app.backend.jwt.exceptions import MyJwtError
 from app.backend.users.models import User
 from .auth import AuthService
 from app.backend.components import auth_cookie_manager
 from .exceptions import InvalidUserIdError, UserNotFoundError
+from app.backend.components.config import auth_settings
 
+
+def api_key_auth(auth: ApiKeyAuthorizationSchema):
+    if auth.api_key != auth_settings.API_KEY:
+        raise HTTPException(401, detail="Invalid API key")
+    
 # FIX: NEED TO BE FIXED
 
 def get_auth_token(request: Request) -> str:
