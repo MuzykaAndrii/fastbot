@@ -2,14 +2,13 @@ import random
 import logging
 
 import asyncio
-
-from g4f import debug, models
+from g4f import models, debug
 from g4f.Provider import BaseProvider
 from g4f.client import AsyncClient
 
 
 debug.logging = False
-debug.version_check = False
+debug.version_check = False 
 log = logging.getLogger("backend.gpt")
 
 
