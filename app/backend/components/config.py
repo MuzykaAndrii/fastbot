@@ -4,7 +4,7 @@ from pathlib import Path
 from app.backend.db.config import DbSettings
 from app.backend.auth.config import AuthSettings
 from app.backend.sentry.config import SentrySettings
-from app.config import AppSettings, AppModes
+from app.backend.config import AppSettings, AppModes
 from app.bot.config import BotSettings
 
 

@@ -7,7 +7,7 @@ from sqlalchemy.sql import text
 
 from app.backend.components.config import app_settings
 from app.backend.components.db import database
-from app.config import AppModes
+from app.backend.config import AppModes
 from app.backend.db.base import Base
 from app.backend.users.models import User  # noqa
 from app.backend.vocabulary.models import VocabularySet, LanguagePair  # noqa
