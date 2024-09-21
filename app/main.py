@@ -1,29 +1,33 @@
 from contextlib import asynccontextmanager
+import logging
 
 from aiogram import types
 from fastapi import FastAPI
 
+from app.backend.logger import init_logger
 from app.backend.components.config import app_settings, sentry_settings, bot_settings
 from app.bot.main import bot
 from app.backend.components.db import database
 from app.backend.components import users_service
 from app.backend.vocabulary.routes import router as vocabulary_router
-from app.backend.logger import logger
 from app.backend.components.admin import admin
+
+
+log = logging.getLogger("backend")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # on startup
+    init_logger()
     await users_service().ensure_admin_exists()
-
     await bot.start_bot(drop_pending_updates=app_settings.DEBUG)
-    logger.info("App started")
+    log.info("App started")
 
     yield
     # on shutdown
     await bot.stop_bot()
-    logger.info("App stopped")
+    log.info("App stopped")
 
 
 if not app_settings.DEBUG:
