@@ -43,7 +43,7 @@ providers = [
     # Provider.PerplexityLabs,
     # Provider.Pi,
     Provider.Pizzagpt,
-    Provider.Prodia,
+    # Provider.Prodia,
     # Provider.Reka,
     # Provider.Snova,
     # Provider.Replicate,
