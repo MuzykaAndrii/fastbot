@@ -1,4 +1,5 @@
 import random
+import logging
 
 import asyncio
 
@@ -9,6 +10,7 @@ from g4f.client import AsyncClient
 
 debug.logging = False
 debug.version_check = False
+log = logging.getLogger("backend.gpt")
 
 
 class GPT:
@@ -26,9 +28,11 @@ class GPT:
                 model=models.default,
                 messages=[{"role": "user", "content": prompt}],
             )
-            return response.choices[0].message.content
-        except Exception as error:
-            print(f"Error during gpt request: {provider=}, exception: {error=}")
+            answer = response.choices[0].message.content
+            log.info(f"{provider=} answer: {answer}")
+            return answer
+        except Exception:
+            log.warning(f"{provider=} does not responded")
         
         return None
     
