@@ -3,7 +3,6 @@ name = "fastbot"
 version = "0.1.0"
 description = ""
 authors = ["MuzykaAndrii <andrymyzik@gmail.com>"]
-readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -21,7 +20,8 @@ starlette-admin = "^0.12.2"
 python-jose = "^3.3.0"
 pydantic = {extras = ["email"], version = "^2.5.3"}
 rapidfuzz = "^3.8.1"
-g4f = {extras = ["all"], version = "^0.3.2.7"}
+g4f = {extras = ["curl-cffi"], version = "^0.3.2.8"}
+itsdangerous = "^2.2.0"
 
 
 [tool.poetry.group.dev.dependencies]
