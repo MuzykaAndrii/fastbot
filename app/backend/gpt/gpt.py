@@ -28,10 +28,10 @@ class GPT:
                 messages=[{"role": "user", "content": prompt}],
             )
             answer = response.choices[0].message.content
-            log.info(f"{provider=} answer: {answer}")
+            log.debug(f"{provider.__name__} answer: {answer}")
             return answer
         except Exception:
-            log.warning(f"{provider=} does not responded")
+            log.debug(f"{provider.__name__} does not responded")
         
         return None
     
@@ -54,7 +54,9 @@ class GPT:
         try:
             answer = random.choice(answers)
         except IndexError:
+            log.warning("No one gpt provider not responded.")
             return None
         else:
+            log.info(f"GPT responded: {answer}")
             return answer
 
