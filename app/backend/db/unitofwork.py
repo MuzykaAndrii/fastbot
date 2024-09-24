@@ -1,11 +1,15 @@
+import logging
 from abc import ABC, abstractmethod
-import asyncio
 from types import TracebackType
 from typing import Callable, Self, TypeVar
 
+import asyncio
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .dal import BaseDAL
+
+
+log = logging.getLogger("backend.db.uow")
 
 
 class UnitOfWorkInterface(ABC):
@@ -34,8 +38,10 @@ R = TypeVar("R", bound=BaseDAL)
 class BaseUnitOfWork(UnitOfWorkInterface):
     def __init__(self, session_factory: Callable[[], AsyncSession]) -> None:
         self._session_factory = session_factory
+        log.debug("UOW initialized")
 
     async def __aenter__(self) -> Self:
+        log.debug("UOW transaction begin")
         self.session = self._session_factory()
         self._init_repos()
 
@@ -58,6 +64,7 @@ class BaseUnitOfWork(UnitOfWorkInterface):
         pass
 
     def _register_repo(self, repo: type[R]) -> R:
+        log.debug(f"Repo: {repo.__name__} initialized")
         return repo(self.session)
         
     async def __aexit__(
@@ -68,8 +75,10 @@ class BaseUnitOfWork(UnitOfWorkInterface):
     ) -> None:
         if exception:
             await self.session.rollback()
+            log.warning("UOW transaction failed")
         else:
             await self.session.commit()
+            log.debug("UOW transaction end")
 
         await asyncio.shield(self.session.close())
 
