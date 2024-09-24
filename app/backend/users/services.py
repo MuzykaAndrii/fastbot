@@ -1,7 +1,12 @@
+import logging
+
 from app.backend.auth.protocols import PasswordServiceProtocol
 from app.backend.components.unitofwork import UnitOfWork
 from app.backend.components.config import app_settings
 from app.backend.users.models import User
+
+
+log = logging.getLogger("backend.users")
 
 
 class UserService:
@@ -34,6 +39,9 @@ class UserService:
 
             if not admin_users:
                 await self._create_base_admin_user(uow)
+                log.info("Base admin user created")
+            else:
+                log.info("Admin user found, base admin creating skipped")
     
     @staticmethod
     def user_is_admin(user: User) -> bool:
