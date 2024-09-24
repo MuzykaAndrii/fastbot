@@ -30,6 +30,11 @@ logger_config = {
             'level': 'DEBUG',
             'handlers': ['console'],
             'propagate': False
+        },
+        'sentry': {
+            'level': 'INFO',
+            'handlers': ['console'],
+            'propagate': False,
         }
     },
 
