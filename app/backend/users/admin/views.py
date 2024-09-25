@@ -6,7 +6,7 @@ from starlette_admin.contrib.sqla.ext.pydantic import ModelView
 
 from app.backend.users.admin.schemas import UserAdminSchema
 from app.backend.users.models import User
-from app.backend.pwd import PWDService
+from app.backend.components import pwd_service
 
 
 class UserAdminView(ModelView):
@@ -36,4 +36,4 @@ class UserAdminView(ModelView):
 
     async def before_create(self, request: Request, data: dict[str, Any], user: User) -> None:
         raw_password = data.get("password")
-        user.password_hash = PWDService.get_password_hash(raw_password)
+        user.password_hash = pwd_service.get_hash(raw_password)
