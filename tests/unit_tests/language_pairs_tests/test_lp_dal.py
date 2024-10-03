@@ -112,3 +112,9 @@ async def test_get_random_language_pair_from_vocabulary(lp_dal: LanguagePairDAL,
     assert random_language_pair is not None
     assert random_language_pair.vocabulary_id == mock_vocabulary.id
     assert random_language_pair.word in [lp["word"] for lp in mock_lps]
+
+
+async def test_get_random_language_pair_with_empty_vocabulary(lp_dal: LanguagePairDAL, mock_vocabulary: VocabularySet):
+    # Act & Assert
+    random_language_pair = await lp_dal.get_random_language_pair_from_vocabulary(mock_vocabulary.id)
+    assert random_language_pair is None
