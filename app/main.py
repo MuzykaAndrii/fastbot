@@ -20,7 +20,7 @@ log = logging.getLogger("backend")
 async def lifespan(app: FastAPI):
     # on startup
     init_logger()
-    await users_service().ensure_admin_exists()
+    await users_service.ensure_admin_exists()
     await bot.start_bot(drop_pending_updates=app_settings.DEBUG)
     log.info("App started")
 

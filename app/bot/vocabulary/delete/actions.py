@@ -12,10 +12,10 @@ async def delete_vocabulary(
     target_vocabulary_id: int,
     query: CallbackQuery,
 ):
-    await vocabularies_service().delete_vocabulary(from_user, target_vocabulary_id)
+    await vocabularies_service.delete_vocabulary(from_user, target_vocabulary_id)
 
     try:
-        latest_vocabulary = await vocabularies_service().get_recent_user_vocabulary(from_user)
+        latest_vocabulary = await vocabularies_service.get_recent_user_vocabulary(from_user)
     
     except NoVocabulariesFound:
         await query.message.edit_text(VocabularyMessages.user_havent_any_vocabularies)

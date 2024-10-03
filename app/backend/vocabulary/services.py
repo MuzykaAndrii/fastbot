@@ -36,7 +36,7 @@ class VocabularyService:
 
     
     async def get_recent_user_vocabulary(self, user_id: int) -> VocabularySet:
-        async with self._uow as uow:
+        async with self._uow(persistent=False) as uow:
             latest_vocabulary = await uow.vocabularies.get_latest_user_vocabulary(user_id)
 
         if not latest_vocabulary:
@@ -46,7 +46,7 @@ class VocabularyService:
     
     
     async def get_next_vocabulary(self, user_id: int, vocabulary_id: int) -> VocabularySet:
-        async with self._uow as uow:
+        async with self._uow(persistent=False) as uow:
             next_vocabulary = await uow.vocabularies.get_vocabulary_that_latest_than_given(user_id, vocabulary_id)
 
         self._validate_user_vocabulary(user_id, next_vocabulary)
@@ -54,7 +54,7 @@ class VocabularyService:
     
     
     async def get_previous_vocabulary(self, user_id: int, vocabulary_id: int) -> VocabularySet | None:
-        async with self._uow as uow:
+        async with self._uow(persistent=False) as uow:
             previous_vocabulary = await uow.vocabularies.get_vocabulary_that_earliest_than_given(user_id, vocabulary_id)
 
         self._validate_user_vocabulary(user_id, previous_vocabulary)
@@ -62,7 +62,7 @@ class VocabularyService:
 
     
     async def get_all_user_vocabularies(self, user_id: int) -> list[VocabularySet]:
-        async with self._uow as uow:
+        async with self._uow(persistent=False) as uow:
             vocabularies = await uow.vocabularies.filter_by(owner_id=user_id)
 
         if not vocabularies:
@@ -71,7 +71,7 @@ class VocabularyService:
 
     
     async def get_vocabulary(self, user_id: int, vocabulary_id: int) -> VocabularySet:
-        async with self._uow as uow:
+        async with self._uow(persistent=False) as uow:
             vocabulary = await uow.vocabularies.get_by_id(vocabulary_id)
 
         self._validate_user_vocabulary(user_id, vocabulary)
@@ -79,7 +79,7 @@ class VocabularyService:
     
     
     async def get_random_lang_pair_from_every_active_vocabulary(self) -> list[ExtendedLanguagePairSchema]:
-        async with self._uow as uow:
+        async with self._uow(persistent=False) as uow:
             active_vocabularies: list[VocabularySet] = await uow.vocabularies.filter_by(is_active=True)
         
         if not active_vocabularies:

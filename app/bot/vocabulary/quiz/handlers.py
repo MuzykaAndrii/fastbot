@@ -35,7 +35,7 @@ async def show_quiz_types(query: CallbackQuery, callback_data: VocabularyCallbac
 class QuizScene(Scene, state="quiz"):
     @on.message.enter()
     async def init_global_quiz(self, message: Message, state: FSMContext):
-        vocabularies = await vocabularies_service().get_all_user_vocabularies(message.from_user.id)
+        vocabularies = await vocabularies_service.get_all_user_vocabularies(message.from_user.id)
 
         language_pairs: list[LanguagePairSchema] = list(chain(*(v.language_pairs for v in vocabularies)))
         language_pairs: list[LanguagePairSchema] = sample(language_pairs, len(language_pairs) // len(vocabularies))
@@ -53,7 +53,7 @@ class QuizScene(Scene, state="quiz"):
     @on.callback_query.enter(VocabularyQuizCallbackData)
     async def init_vocabulary_quiz(self, query: CallbackQuery, state: FSMContext):
         callback_data = VocabularyQuizCallbackData.unpack(query.data)
-        vocabulary = await vocabularies_service().get_vocabulary(query.from_user.id, callback_data.vocabulary_id)
+        vocabulary = await vocabularies_service.get_vocabulary(query.from_user.id, callback_data.vocabulary_id)
 
         vocabulary_question_manager = VocabularyQuestionManager(vocabulary.language_pairs, callback_data.quiz_strategy)
         quiz = Quiz(vocabulary_question_manager)

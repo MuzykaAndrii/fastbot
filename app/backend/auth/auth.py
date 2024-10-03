@@ -23,7 +23,7 @@ class AuthService:
         self.cookie_manager = cookie_manager
 
     async def authenticate_user(self, user_in: UserLogin) -> User:
-        user = await self.users_service().get_by_email(user_in.email)
+        user = await self.users_service.get_by_email(user_in.email)
 
         if not user:
             raise UserNotFoundError
@@ -49,7 +49,7 @@ class AuthService:
         except ValueError:
             raise InvalidUserIdError
 
-        user = await self.users_service().get_by_id(user_id)
+        user = await self.users_service.get_by_id(user_id)
         if not user:
             raise UserNotFoundError
 

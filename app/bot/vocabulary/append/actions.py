@@ -11,4 +11,4 @@ async def append_lang_pairs_to_vocabulary(user_id: int, vocabulary_id: int, raw_
         vocabulary_id=vocabulary_id,
         language_pairs=language_pairs,
     )
-    await vocabularies_service().append_language_pairs_to_vocabulary(append_lp_data)
+    await vocabularies_service.append_language_pairs_to_vocabulary(append_lp_data)

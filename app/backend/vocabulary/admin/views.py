@@ -35,7 +35,7 @@ class VocabularyAdminView(ModelView):
 
     async def _disable_user_active_vocabulary_if_given_ought_be_enabled(self, vocabulary: VocabularySet) -> None:
         if vocabulary.is_active:
-            await vocabularies_service().disable_user_active_vocabulary(vocabulary.owner_id)
+            await vocabularies_service.disable_user_active_vocabulary(vocabulary.owner_id)
 
 
 class LanguagePairAdminView(ModelView):

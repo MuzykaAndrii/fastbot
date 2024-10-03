@@ -21,13 +21,13 @@ class UserService:
         return user
     
     async def get_by_id(self, id: int) -> User | None:
-        async with self._uow as uow:
+        async with self._uow(persistent=False) as uow:
             user = await uow.users.get_by_id(id)
 
         return user
     
     async def get_by_email(self, email: str) -> User | None:
-        async with self._uow as uow:
+        async with self._uow(persistent=False) as uow:
             return await uow.users.get_one(email=email)
 
     async def ensure_admin_exists(self) -> None:

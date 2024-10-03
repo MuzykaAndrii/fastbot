@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
     async_sessionmaker,
     AsyncSession,
+    AsyncEngine,
 )
 
 from .config import DbSettings
@@ -30,5 +31,5 @@ class DataBase:
             await session.execute(select(1))
     
     @property
-    def engine(self):
+    def engine(self) -> AsyncEngine:
         return self._engine

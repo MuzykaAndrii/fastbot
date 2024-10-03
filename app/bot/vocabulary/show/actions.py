@@ -28,15 +28,15 @@ async def show_vocabulary_in_existing_msg(vocabulary: VocabularySchema, message:
 
 
 async def show_recent_vocabulary(message: types.Message):
-    recent_vocabulary = await vocabularies_service().get_recent_user_vocabulary(message.from_user.id)
+    recent_vocabulary = await vocabularies_service.get_recent_user_vocabulary(message.from_user.id)
     await show_vocabulary(recent_vocabulary, message.bot)
 
 
 async def show_next_vocabulary(message: types.Message, user_id: int, vocabulary_id: int):
-    next_vocabulary = await vocabularies_service().get_next_vocabulary(user_id, vocabulary_id)
+    next_vocabulary = await vocabularies_service.get_next_vocabulary(user_id, vocabulary_id)
     await show_vocabulary_in_existing_msg(next_vocabulary, message)
 
 
 async def show_previous_vocabulary(message: types.Message, user_id: int, vocabulary_id: int):
-    previous_vocabulary = await vocabularies_service().get_previous_vocabulary(user_id, vocabulary_id)
+    previous_vocabulary = await vocabularies_service.get_previous_vocabulary(user_id, vocabulary_id)
     await show_vocabulary_in_existing_msg(previous_vocabulary, message)

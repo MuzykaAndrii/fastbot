@@ -21,11 +21,8 @@ access_jwt_manager = Jwt(
 
 pwd_service = PWDService()
 
-def users_service():
-    return UserService(UnitOfWork(database.session_maker), pwd_service)
-
-def vocabularies_service():
-    return VocabularyService(UnitOfWork(database.session_maker))
+users_service =  UserService(UnitOfWork(database.session_maker), pwd_service)
+vocabularies_service = VocabularyService(UnitOfWork(database.session_maker))
 
 auth_cookie_manager = FastAPICookieManager(auth_settings.TOKEN_NAME)
 

@@ -11,7 +11,7 @@ router = Router()
 @router.message(CommandStart())
 @router.message(Command("about"))
 async def start_handler(message: types.Message):
-    await users_service().get_or_create_by_id(message.from_user.id)
+    await users_service.get_or_create_by_id(message.from_user.id)
 
     await message.answer(BaseMessages.about)
 

@@ -38,32 +38,45 @@ R = TypeVar("R", bound=BaseDAL)
 class BaseUnitOfWork(UnitOfWorkInterface):
     def __init__(self, session_factory: Callable[[], AsyncSession]) -> None:
         self._session_factory = session_factory
+        self.session: AsyncSession | None = None
+        self._repos_initialized = False
+        self.persistent = True
+
         log.debug("UOW initialized")
 
     async def __aenter__(self) -> Self:
         log.debug("UOW transaction begin")
-        self.session = self._session_factory()
-        self._init_repos()
 
+        if self.session is None:
+            self.session = self._session_factory()
+
+        if not self._repos_initialized:
+            self.init_repos()
+            self._repos_initialized = True
+
+        return self
+    
+    def __call__(self, persistent: bool) -> Self:
+        self.persistent = persistent
         return self
 
     @abstractmethod
-    def _init_repos(self) -> None:
+    def init_repos(self) -> None:
         """
         Usage:
             - Inherit BaseUnitOfWork and define this method
-            - use method _register_repo to attach db session to you're repositories
+            - use method register_repo to attach db session to you're repositories
         Example:
             from your_repositories import User, Profile
 
             class MyUnitOfWork(BaseUnitOfWork):
-                def _init_repos(self):
-                    self.users = self._register_repo(UserRepository)
-                    self.profiles = self._register_repo(ProfileRepository)
+                def init_repos(self):
+                    self.users = self.register_repo(UserRepository)
+                    self.profiles = self.register_repo(ProfileRepository)
         """
         pass
 
-    def _register_repo(self, repo: type[R]) -> R:
+    def register_repo(self, repo: type[R]) -> R:
         log.debug(f"Repo: {repo.__name__} initialized")
         return repo(self.session)
         
@@ -73,14 +86,17 @@ class BaseUnitOfWork(UnitOfWorkInterface):
         value: BaseException | None,
         traceback: TracebackType | None,
     ) -> None:
-        if exception:
-            await self.session.rollback()
-            log.warning("UOW transaction failed")
-        else:
-            await self.session.commit()
-            log.debug("UOW transaction end")
+        if self.persistent:
+            if exception:
+                await self.undo()
+                log.warning("UOW transaction failed")
+            else:
+                await self.save()
+                log.debug("UOW transaction succeed")
 
+        self.persistent = True
         await asyncio.shield(self.session.close())
+        log.debug("UOW transaction end")
 
     async def save(self):
         await self.session.commit()

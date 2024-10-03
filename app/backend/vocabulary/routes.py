@@ -17,7 +17,7 @@ router = APIRouter()
 @router.post("/send_notifications", status_code=200)
 async def send_notifications(auth = Depends(api_key_auth)):
     try:
-        lang_pairs_to_send = await vocabularies_service().get_random_lang_pair_from_every_active_vocabulary()
+        lang_pairs_to_send = await vocabularies_service.get_random_lang_pair_from_every_active_vocabulary()
     except NoActiveVocabulariesError:
         log.info("No active vocabularies found, skipping notifications sending")
         raise HTTPException(204, detail="No active vocabularies")
