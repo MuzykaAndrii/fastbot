@@ -94,3 +94,21 @@ async def test_delete_non_existent_language_pair(lp_dal: LanguagePairDAL):
     non_existent_id = 9999
     with pytest.raises(NoResultFound):
         await lp_dal.delete_by_id(non_existent_id)
+
+
+async def test_get_random_language_pair_from_vocabulary(lp_dal: LanguagePairDAL, session: AsyncSession, mock_vocabulary: VocabularySet):
+    # Arrange
+    mock_lps = [
+        {"vocabulary_id": mock_vocabulary.id, "word": "hello", "translation": "hola"},
+        {"vocabulary_id": mock_vocabulary.id, "word": "world", "translation": "mundo"},
+        {"vocabulary_id": mock_vocabulary.id, "word": "apple", "translation": "manzana"},
+    ]
+    await session.execute(insert(LanguagePair).values(mock_lps))
+
+    # Act
+    random_language_pair = await lp_dal.get_random_language_pair_from_vocabulary(mock_vocabulary.id)
+
+    # Assert
+    assert random_language_pair is not None
+    assert random_language_pair.vocabulary_id == mock_vocabulary.id
+    assert random_language_pair.word in [lp["word"] for lp in mock_lps]

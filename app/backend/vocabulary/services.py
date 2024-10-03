@@ -1,5 +1,7 @@
 import random
 
+from sqlalchemy import func
+
 from app.backend.components.unitofwork import UnitOfWork
 from app.backend.vocabulary.exceptions import NoActiveVocabulariesError
 from app.shared.exceptions import (
@@ -76,26 +78,26 @@ class VocabularyService:
 
         self._validate_user_vocabulary(user_id, vocabulary)
         return vocabulary
-    
-    
+
+
     async def get_random_lang_pair_from_every_active_vocabulary(self) -> list[ExtendedLanguagePairSchema]:
         async with self._uow(persistent=False) as uow:
             active_vocabularies: list[VocabularySet] = await uow.vocabularies.filter_by(is_active=True)
-        
-        if not active_vocabularies:
-            raise NoActiveVocabulariesError
-
-        random_lang_pairs: list[ExtendedLanguagePairSchema] = []
-        for vocabulary in active_vocabularies:
-            random_lang_pair = random.choice(vocabulary.language_pairs)
             
-            random_lang_pairs.append(ExtendedLanguagePairSchema(
-                word=random_lang_pair.word,
-                translation=random_lang_pair.translation,
-                owner_id=vocabulary.owner_id,
-            ))
+            if not active_vocabularies:
+                raise NoActiveVocabulariesError
 
-        return random_lang_pairs
+            random_lang_pairs = []
+            for vocabulary in active_vocabularies:
+                random_lang_pair = await uow.language_pairs.get_random_language_pair_from_vocabulary(vocabulary.id)
+
+                random_lang_pairs.append(ExtendedLanguagePairSchema(
+                    word=random_lang_pair.word,
+                    translation=random_lang_pair.translation,
+                    owner_id=vocabulary.owner_id,
+                ))
+
+            return random_lang_pairs
 
     
     async def delete_vocabulary(self, user_id: int, vocabulary_id: int) -> VocabularySet:
