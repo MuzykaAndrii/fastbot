@@ -1,6 +1,4 @@
-import random
-
-from sqlalchemy import func
+import logging
 
 from app.backend.components.unitofwork import UnitOfWork
 from app.backend.vocabulary.exceptions import NoActiveVocabulariesError
@@ -12,6 +10,9 @@ from app.shared.exceptions import (
 )
 from app.shared.schemas import ExtendedLanguagePairSchema, LanguagePairsAppendSchema, VocabularyCreateSchema
 from app.backend.vocabulary.models import VocabularySet, LanguagePair
+
+
+log = logging.getLogger("backend.vocabulary")
 
 
 class VocabularyService:
@@ -91,6 +92,10 @@ class VocabularyService:
             for vocabulary in active_vocabularies:
                 random_lang_pair = await uow.language_pairs.get_random_language_pair_from_vocabulary(vocabulary.id)
 
+                if not random_lang_pair:
+                    log.warning(f"Detected empty vocabulary: {vocabulary}")
+                    continue
+
                 random_lang_pairs.append(ExtendedLanguagePairSchema(
                     word=random_lang_pair.word,
                     translation=random_lang_pair.translation,
@@ -140,9 +145,11 @@ class VocabularyService:
         check_active: bool = False,
     ):
         if not vocabulary:
+            log.info("Attempt to access non-existent vocabulary")
             raise VocabularyDoesNotExist
 
         if user_id != vocabulary.owner_id:
+            log.warning(f"Attempt to access to not own vocabulary, user id: {user_id}")
             raise UserIsNotOwnerOfVocabulary
         
         if check_active and vocabulary.is_active:
