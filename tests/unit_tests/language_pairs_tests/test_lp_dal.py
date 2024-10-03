@@ -118,3 +118,10 @@ async def test_get_random_language_pair_with_empty_vocabulary(lp_dal: LanguagePa
     # Act & Assert
     random_language_pair = await lp_dal.get_random_language_pair_from_vocabulary(mock_vocabulary.id)
     assert random_language_pair is None
+
+
+async def test_get_random_language_pair_invalid_vocabulary_id(lp_dal: LanguagePairDAL):
+    # Act & Assert
+    non_existent_vocabulary_id = 9999
+    random_language_pair = await lp_dal.get_random_language_pair_from_vocabulary(non_existent_vocabulary_id)
+    assert random_language_pair is None
