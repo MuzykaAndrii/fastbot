@@ -125,3 +125,18 @@ async def test_get_random_language_pair_invalid_vocabulary_id(lp_dal: LanguagePa
     non_existent_vocabulary_id = 9999
     random_language_pair = await lp_dal.get_random_language_pair_from_vocabulary(non_existent_vocabulary_id)
     assert random_language_pair is None
+
+
+async def test_get_random_language_pair_single_entry(lp_dal: LanguagePairDAL, session: AsyncSession, mock_vocabulary: VocabularySet):
+    # Arrange
+    mock_lp = {"vocabulary_id": mock_vocabulary.id, "word": "hello", "translation": "hola"}
+    await session.execute(insert(LanguagePair).values(**mock_lp))
+
+    # Act
+    random_language_pair = await lp_dal.get_random_language_pair_from_vocabulary(mock_vocabulary.id)
+
+    # Assert
+    assert random_language_pair is not None
+    assert random_language_pair.word == mock_lp["word"]
+    assert random_language_pair.translation == mock_lp["translation"]
+    assert random_language_pair.vocabulary_id == mock_vocabulary.id
