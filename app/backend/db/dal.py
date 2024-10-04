@@ -7,7 +7,7 @@ from typing import (
     TypeVar,
 )
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -76,3 +76,14 @@ class BaseDAL(Generic[T], ABC):
             instance = await self.create(**filter_criteria)
         
         return instance
+    
+
+    async def get_random_with_criteria(self, **filter_criteria: Any) -> T | None:
+        query = (
+            select(self.model)
+            .filter_by(**filter_criteria)
+            .order_by(func.random())
+            .limit(1)
+        )
+
+        return await self.session.scalar(query)

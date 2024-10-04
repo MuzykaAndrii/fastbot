@@ -86,13 +86,3 @@ class VocabularySetDAL(BaseDAL[VocabularySet]):
 
 class LanguagePairDAL(BaseDAL[LanguagePair]):
     model = LanguagePair
-
-    async def get_random_language_pair_from_vocabulary(self, vocabulary_id: int) -> LanguagePair:
-        query = (
-            select(LanguagePair)
-            .filter_by(vocabulary_id=vocabulary_id)
-            .order_by(func.random())
-            .limit(1)
-        )
-
-        return await self.session.scalar(query)

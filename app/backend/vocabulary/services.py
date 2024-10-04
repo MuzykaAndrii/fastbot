@@ -90,7 +90,7 @@ class VocabularyService:
 
             random_lang_pairs = []
             for vocabulary in active_vocabularies:
-                random_lang_pair = await uow.language_pairs.get_random_language_pair_from_vocabulary(vocabulary.id)
+                random_lang_pair = await uow.language_pairs.get_random_with_criteria(vocabulary_id=vocabulary.id)
 
                 if not random_lang_pair:
                     log.warning(f"Detected empty vocabulary: {vocabulary}")
