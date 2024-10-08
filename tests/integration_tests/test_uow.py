@@ -92,7 +92,6 @@ async def test_uow_nested_contexts(uow: UnitOfWork, session: AsyncSession, mock_
     async with uow:
         async with uow:  # Intentionally using the same UnitOfWork instance
             user = await uow.users.create(**mock_user)
-            await uow.save()
         
         # Verify that nested context didn't cause issues
         stmt = select(User).filter_by(id=user.id)
@@ -100,6 +99,21 @@ async def test_uow_nested_contexts(uow: UnitOfWork, session: AsyncSession, mock_
         saved_user = result.scalar_one()
         
         assert saved_user is not None
+
+
+async def test_uow_nested_contexts_inner_raises(uow: UnitOfWork, session: AsyncSession, mock_user: dict[str, Any], clean_db):
+    with pytest.raises(Exception):
+        async with uow:
+            user = await uow.users.create(**mock_user)
+            async with uow:
+                raise Exception
+            
+        # Verify that inner exception rollbacks outer changes
+        stmt = select(User).filter_by(id=user.id)
+        result = await session.execute(stmt)
+        unsaved_user = result.scalar_one()
+        
+        assert unsaved_user is None
 
 
 async def test_uow_persistent_false_mode(
