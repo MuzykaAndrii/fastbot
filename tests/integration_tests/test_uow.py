@@ -117,3 +117,27 @@ async def test_uow_persistent_false_mode(
 
     assert non_existent_user is None
     assert non_existent_vocabulary is None
+
+
+async def test_uow_persistent_reset(uow: UnitOfWork, session: AsyncSession, mock_user: dict[str, Any], clean_db):
+    # First transaction with persistent=False
+    async with uow(persistent=False):
+        await uow.users.create(**mock_user)
+        await uow.save()
+    
+    # Verify that the user was not saved
+    stmt = select(User).filter_by(email=mock_user['email'])
+    result = await session.execute(stmt)
+    user_in_db = result.scalar_one_or_none()
+    assert user_in_db is None
+
+    # Second transaction with default persistent=True
+    async with uow:
+        await uow.users.create(**mock_user)
+        await uow.save()
+    
+    # Verify that the user was saved this time
+    stmt = select(User).filter_by(email=mock_user['email'])
+    result = await session.execute(stmt)
+    user_in_db = result.scalar_one_or_none()
+    assert user_in_db is not None
