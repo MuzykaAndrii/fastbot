@@ -39,7 +39,7 @@ class BaseUnitOfWork(UnitOfWorkInterface):
     def __init__(self, session_factory: Callable[[], AsyncSession]) -> None:
         self._session_factory = session_factory
         self.session: AsyncSession | None = None
-        self._repos_initialized = False
+        self._repos_registry: list[R] = []
         self.persistent = True
 
         log.debug("UOW initialized")
@@ -47,12 +47,11 @@ class BaseUnitOfWork(UnitOfWorkInterface):
     async def __aenter__(self) -> Self:
         log.debug("UOW transaction begin")
 
-        if self.session is None:
+        if not self.session:
             self.session = self._session_factory()
-
-        if not self._repos_initialized:
             self.init_repos()
-            self._repos_initialized = True
+        else:
+            self._renew_repos()
 
         return self
     
@@ -77,8 +76,19 @@ class BaseUnitOfWork(UnitOfWorkInterface):
         pass
 
     def register_repo(self, repo: type[R]) -> R:
+        repo_instance = repo(self.session)
         log.debug(f"Repo: {repo.__name__} initialized")
-        return repo(self.session)
+        self._repos_registry.append(repo_instance)
+        return repo_instance
+
+    def _renew_repos(self) -> None:
+        if self.session.is_active:
+            return
+        
+        self.session = self._session_factory()
+        for repo in self._repos_registry:
+            repo.session = self.session
+
         
     async def __aexit__(
         self,
