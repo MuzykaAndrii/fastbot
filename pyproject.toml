@@ -16,7 +16,7 @@ asyncpg = "^0.29.0"
 alembic = "^1.12.1"
 magic-filter = "^1.0.12"
 bcrypt = "^4.1.2"
-starlette-admin = "^0.12.2"
+starlette-admin = "^0.14.1"
 python-jose = "^3.3.0"
 pydantic = {extras = ["email"], version = "^2.5.3"}
 rapidfuzz = "^3.8.1"
