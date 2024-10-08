@@ -40,7 +40,7 @@ class BaseUnitOfWork(UnitOfWorkInterface):
         self._session_factory = session_factory
         self.session: AsyncSession | None = None
         self._repos_registry: list[R] = []
-        self.persistent = True
+        self._persistent = True
 
         log.debug("UOW initialized")
 
@@ -56,7 +56,7 @@ class BaseUnitOfWork(UnitOfWorkInterface):
         return self
     
     def __call__(self, persistent: bool) -> Self:
-        self.persistent = persistent
+        self._persistent = persistent
         return self
 
     @abstractmethod
@@ -96,7 +96,7 @@ class BaseUnitOfWork(UnitOfWorkInterface):
         value: BaseException | None,
         traceback: TracebackType | None,
     ) -> None:
-        if self.persistent:
+        if self._persistent:
             if exception:
                 await self.undo()
                 log.warning("UOW transaction failed")
@@ -104,12 +104,15 @@ class BaseUnitOfWork(UnitOfWorkInterface):
                 await self.save()
                 log.debug("UOW transaction succeed")
 
-        self.persistent = True
+        self._persistent = True
         await asyncio.shield(self.session.close())
         log.debug("UOW transaction end")
 
-    async def save(self):
-        await self.session.commit()
+    async def save(self) -> None:
+        if self._persistent:
+            await self.session.commit()
+        else:
+            log.warning("Intercepted 'save()' operation during non-persistent transaction")
 
-    async def undo(self):
+    async def undo(self) -> None:
         await self.session.rollback()
