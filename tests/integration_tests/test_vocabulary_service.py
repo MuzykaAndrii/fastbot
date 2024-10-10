@@ -415,3 +415,65 @@ async def test_disable_vocabulary_not_active(
     # Assert
     vocabulary_result = await session.get(VocabularySet, inactive_vocabulary.id)
     assert vocabulary_result.is_active is False
+
+
+async def test_get_random_lang_pair_from_random_inactive_users_vocabulary(
+        session: AsyncSession,
+        vocabulary_service: VocabularyService,
+        db_mock_users: list[User],
+        clean_db,
+    ):
+    # Set up vocabularies and language pairs for specific users
+    target_users_ids = [db_mock_users[0].id, db_mock_users[1].id, db_mock_users[2].id]
+
+    # Insert inactive vocabularies for the selected users
+    mock_vocabularies = [
+        {"owner_id": target_users_ids[0], "name": "U1 Vocabulary 1", "is_active": False},
+        {"owner_id": target_users_ids[1], "name": "U2 Vocabulary 1", "is_active": False},
+        {"owner_id": target_users_ids[1], "name": "U2 Vocabulary 2", "is_active": False},
+        {"owner_id": target_users_ids[2], "name": "U3 Vocabulary 1", "is_active": False},
+        {"owner_id": target_users_ids[2], "name": "U3 Vocabulary 2", "is_active": False},
+        {"owner_id": target_users_ids[2], "name": "U3 Vocabulary 3", "is_active": True},
+    ]
+
+    stmt = insert(VocabularySet).values(mock_vocabularies).returning(VocabularySet.id)
+    vocas_ids = await session.scalars(stmt)
+    await session.commit()
+    vocas_ids = vocas_ids.all()
+
+    # Insert language pairs for the vocabularies
+    mock_lps = [
+        # U1 Vocabulary 1
+        {"vocabulary_id": vocas_ids[0], "word": "user", "translation": "користувач"},
+        {"vocabulary_id": vocas_ids[0], "word": "system", "translation": "система"},
+
+        # U2 Vocabulary 1
+        {"vocabulary_id": vocas_ids[1], "word": "hello", "translation": "привіт"},
+        {"vocabulary_id": vocas_ids[1], "word": "world", "translation": "світ"},
+
+        # U2 Vocabulary 2
+        {"vocabulary_id": vocas_ids[2], "word": "car", "translation": "машина"},
+        {"vocabulary_id": vocas_ids[2], "word": "road", "translation": "дорога"},
+
+        # U3 Vocabulary 1
+        {"vocabulary_id": vocas_ids[3], "word": "house", "translation": "будинок"},
+        {"vocabulary_id": vocas_ids[3], "word": "window", "translation": "вікно"},
+
+        # U3 Vocabulary 2
+        {"vocabulary_id": vocas_ids[4], "word": "book", "translation": "книга"},
+        {"vocabulary_id": vocas_ids[4], "word": "pen", "translation": "ручка"},
+
+        # Active vocabulary (should not be selected)
+        {"vocabulary_id": vocas_ids[5], "word": "active", "translation": "активний"},
+        {"vocabulary_id": vocas_ids[5], "word": "test", "translation": "тест"},
+    ]
+
+    stmt = insert(LanguagePair).values(mock_lps)
+    await session.execute(stmt)
+    await session.commit()
+
+    # Call the method and verify results
+    result = await vocabulary_service.get_random_lang_pair_from_random_inactive_users_vocabulary(target_users_ids)
+
+    # Assert we only get one random pair per user
+    assert len(result) == len(set(v["owner_id"] for v in mock_vocabularies if v["is_active"] == False))  # We expect one result per inactive user

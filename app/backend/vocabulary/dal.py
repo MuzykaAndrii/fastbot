@@ -1,6 +1,6 @@
 from typing import Callable
 
-from sqlalchemy import UnaryExpression, and_, func, select, update
+from sqlalchemy import UnaryExpression, and_, select, update
 
 from app.backend.db.dal import BaseDAL
 from app.backend.vocabulary.models import VocabularySet, LanguagePair
