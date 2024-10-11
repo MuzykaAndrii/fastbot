@@ -23,7 +23,7 @@ class TextGenerator:
         secondary_word: str,
         format: bool = True
     ) -> str | None:
-        prompt = prompts.sentence_from_word.format(primary_word=primary_word, secondary_word=secondary_word)
+        prompt = prompts.sentence_from_two_words.format(primary_word=primary_word, secondary_word=secondary_word)
         sentence = await self.gpt.get_answer(prompt)
         
         if format and sentence is not None:
