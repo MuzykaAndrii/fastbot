@@ -1,9 +1,14 @@
+import logging
+
 from aiogram import Bot, types
 
 from app.shared.schemas import NotificationSchema, VocabularySchema
-
-from . import messages
 from app.backend.components import vocabularies_service
+from . import messages
+
+
+log = logging.getLogger(__name__)
+
 
 
 async def enable_vocabulary(message: types.Message, user_id: int, vocabulary_id: int) -> VocabularySchema:
@@ -35,10 +40,18 @@ async def disable_user_active_vocabulary(message: types.Message):
     await vocabulary_disabled_message.pin(disable_notification=True)
 
 
-async def send_notification(bot: Bot, notification: NotificationSchema) -> types.Message | None:
-    message = await bot.send_message(
-        notification.receiver_id,
-        messages.get_language_pair_notification(notification),
-    )
-
-    return message
+async def send_notification(bot: Bot, notification: NotificationSchema) -> None:
+    try:
+        await bot.send_message(
+            notification.receiver_id,
+            messages.get_language_pair_notification(notification),
+        )
+    except Exception:
+        log.warning(f"Sending notification to {notification.receiver_id} failed")
+    else:
+        log.info(f"Sent notification to {notification.receiver_id}")
+        log.debug(f"Sent notification to {notification.receiver_id}\n"
+                  "primary lp: {notification.primary_lp}\n"
+                  "secondary lp: {notification.secondary_lp}\n"
+                  "sentence: {notification.sentence_example}"
+        )

@@ -1,25 +1,27 @@
+import asyncio
 import logging
+from typing import Awaitable
 
-from app.bot.user.services import UserService
 from app.bot.main import bot
 from app.bot.vocabulary.notifications.actions import send_notification
 from app.shared.schemas import NotificationSchema
+from app.bot.user.services import UserService
 
-logger = logging.getLogger(__name__)
+
+log = logging.getLogger(__name__)
 
 
 async def send_notifications(notifications: list[NotificationSchema]) -> None:
+    calls: list[Awaitable] = []
     for notification in notifications:
         us = UserService(notification.receiver_id)
         state = await us.user_has_active_state()
 
         if state:
-            logger.info(f"Notification to {notification.receiver_id} skipped, user busy")
-            continue
+            log.info(f"Notification to {notification.receiver_id} skipped, user busy")
+            return
         
-        message = await send_notification(bot.bot, notification)
+        calls.append(send_notification(bot.bot, notification))
+    
+    await asyncio.gather(*calls)
         
-        if message:
-            logger.info(f"Sended notification to {notification.receiver_id}")
-        else:
-            logger.warning(f"Sending notification to {notification.receiver_id} failed")
