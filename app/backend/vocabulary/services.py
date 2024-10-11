@@ -83,26 +83,20 @@ class VocabularyService:
 
     async def get_random_lang_pair_from_every_active_vocabulary(self) -> list[ExtendedLanguagePairSchema]:
         async with self._uow(persistent=False) as uow:
-            active_vocabularies: list[VocabularySet] = await uow.vocabularies.filter_by(is_active=True)
-            
-            if not active_vocabularies:
-                raise NoActiveVocabulariesError
+            random_lang_pairs = await uow.language_pairs.get_one_random_language_pair_from_each_active_vocabulary()
 
-            random_lang_pairs = []
-            for vocabulary in active_vocabularies:
-                random_lang_pair = await uow.language_pairs.get_random_with_criteria(vocabulary_id=vocabulary.id)
+        if not random_lang_pairs:
+            raise NoActiveVocabulariesError
 
-                if not random_lang_pair:
-                    log.warning(f"Detected empty vocabulary: {vocabulary}")
-                    continue
+        res = []
+        for random_lp in random_lang_pairs:
+            res.append(ExtendedLanguagePairSchema(
+                word=random_lp.word,
+                translation=random_lp.translation,
+                owner_id=random_lp.vocabulary.owner_id,
+            ))
 
-                random_lang_pairs.append(ExtendedLanguagePairSchema(
-                    word=random_lang_pair.word,
-                    translation=random_lang_pair.translation,
-                    owner_id=vocabulary.owner_id,
-                ))
-
-            return random_lang_pairs
+        return res
     
     async def get_random_lang_pair_from_random_inactive_users_vocabulary(self, users_ids: list[int]):
         async with self._uow(persistent=False) as uow:

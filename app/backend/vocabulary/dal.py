@@ -1,6 +1,6 @@
 from typing import Callable
 
-from sqlalchemy import UnaryExpression, and_, select, update
+from sqlalchemy import UnaryExpression, and_, func, select, update
 
 from app.backend.db.dal import BaseDAL
 from app.backend.vocabulary.models import VocabularySet, LanguagePair
@@ -86,3 +86,26 @@ class VocabularySetDAL(BaseDAL[VocabularySet]):
 
 class LanguagePairDAL(BaseDAL[LanguagePair]):
     model = LanguagePair
+
+    async def get_one_random_language_pair_from_each_active_vocabulary(self) -> list[LanguagePair]:
+        subquery = (
+            select(
+                LanguagePair,
+                func.row_number()
+                .over(partition_by=VocabularySet.owner_id, order_by=func.random())
+                .label("seed")
+            )
+            .join(VocabularySet, VocabularySet.id == LanguagePair.vocabulary_id)
+            .where(VocabularySet.is_active == True)
+            .subquery()
+        )
+
+        query = (
+            select(LanguagePair)
+            .from_statement(  # this needs for retrieving LanguagePair instances instead of raw fields
+                select(subquery).where(subquery.c.seed == 1)
+            )
+        )
+
+        res = await self.session.scalars(query)
+        return res.all()
