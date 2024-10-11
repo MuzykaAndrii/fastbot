@@ -1,4 +1,4 @@
-from app.shared.schemas import ExtendedLanguagePairSchema
+from app.shared.schemas import NotificationSchema
 
 
 vocabulary_already_active = "Notifications for this vocabulary already active 😉"
@@ -8,7 +8,7 @@ no_active_vocabulary = "📵 Alerts is turned off"
 _notification_text = "<b>{word}</b> - {translation}"
 _sentence_example_text = "📖 {sentence}"
 
-def get_language_pair_notification(lang_pair: ExtendedLanguagePairSchema) -> str:
+def get_language_pair_notification(lang_pair: NotificationSchema) -> str:
     notification = _notification_text.format(
         word=lang_pair.word,
         translation=lang_pair.translation

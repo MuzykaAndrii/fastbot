@@ -10,7 +10,7 @@ class LanguagePairSchema(BaseModel):
     translation: str
 
 
-class ExtendedLanguagePairSchema(BaseModel):
+class NotificationSchema(BaseModel):
     word: str
     translation: str
     owner_id: int
