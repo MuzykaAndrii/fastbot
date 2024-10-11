@@ -16,9 +16,6 @@ class NotificationSchema(BaseModel):
     receiver_id: int
     sentence_example: str | None = None
 
-    def __hash__(self):
-        return hash(self.receiver_id)
-
 
 class VocabularySchema(BaseModel):
     id: int

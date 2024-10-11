@@ -1,4 +1,6 @@
+import asyncio
 import logging
+from typing import Awaitable
 
 from app.backend.components.unitofwork import UnitOfWork
 from app.backend.vocabulary.exceptions import NoActiveVocabulariesError
@@ -8,8 +10,9 @@ from app.shared.exceptions import (
     VocabularyDoesNotExist,
     VocabularyIsAlreadyActive
 )
-from app.shared.schemas import NotificationSchema, LanguagePairsAppendSchema, VocabularyCreateSchema
+from app.shared.schemas import LanguagePairSchema, NotificationSchema, LanguagePairsAppendSchema, VocabularyCreateSchema
 from app.backend.vocabulary.models import VocabularySet, LanguagePair
+from app.backend.text_generator.text_generator import generate_sentence_from_word, generate_sentence_from_two_words
 
 
 log = logging.getLogger("backend.vocabulary")
@@ -104,7 +107,41 @@ class VocabularyService:
         2. fetch secondary language pairs
         3. generate sentences
         """
-        pass
+
+        primary_lps = await self.get_random_lang_pair_from_every_active_vocabulary()
+        secondary_lps = await self.get_random_lang_pair_from_random_inactive_users_vocabulary([lp.vocabulary.owner_id for lp in primary_lps])
+        
+        owners_notifications: dict[int, NotificationSchema] = {}
+        
+        for primary_lp in primary_lps:
+            owner_id = primary_lp.vocabulary.owner_id
+            owners_notifications[owner_id] = NotificationSchema(
+                primary_lp={"word": primary_lp.word, "translation": primary_lp.translation},
+                receiver_id=owner_id,
+            )
+        
+        for secondary_lp in secondary_lps:
+            owners_notifications[secondary_lp.vocabulary.owner_id].secondary_lp = LanguagePairSchema(
+                word=secondary_lp.word,
+                translation=secondary_lp.translation,
+            )
+        
+        notifications = owners_notifications.values()
+        calls: list[Awaitable] = []
+
+        for notification in notifications:
+            if notification.secondary_lp:
+                calls.append(generate_sentence_from_two_words(notification.primary_lp.word, notification.secondary_lp.word))
+            else:
+                calls.append(generate_sentence_from_word(notification.primary_lp.word))
+        
+        sentences = await asyncio.gather(*calls)
+
+        for notification, sentence in zip(notifications, sentences):
+            notification.sentence_example = sentence
+
+        return notifications
+
 
     
     async def delete_vocabulary(self, user_id: int, vocabulary_id: int) -> VocabularySet:

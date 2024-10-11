@@ -21,13 +21,6 @@ async def send_notifications(auth = Depends(api_key_auth)):
         log.info("No active vocabularies found, skipping notifications sending")
         raise HTTPException(204, detail="No active vocabularies")
 
-    # sentence generating move to service layer    
-    # calls = [generate_sentence_from_word(lang_pair.word) for lang_pair in lang_pairs_to_send]
-    # sentences = await asyncio.gather(*calls)
-
-    # for sentence, lp in zip(sentences, lang_pairs_to_send):
-    #     lp.sentence_example = sentence
-
     await tasks.send_notifications(notifications)
     
     return {"detail": "success"}
