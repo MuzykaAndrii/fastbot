@@ -11,8 +11,8 @@ class LanguagePairSchema(BaseModel):
 
 
 class NotificationSchema(BaseModel):
-    word: str
-    translation: str
+    primary_lp: LanguagePairSchema
+    secondary_lp: LanguagePairSchema | None = None
     owner_id: int
     sentence_example: str | None = None
 

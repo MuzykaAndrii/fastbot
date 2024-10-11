@@ -81,36 +81,20 @@ class VocabularyService:
         return vocabulary
 
 
-    async def get_random_lang_pair_from_every_active_vocabulary(self) -> list[NotificationSchema]:
+    async def get_random_lang_pair_from_every_active_vocabulary(self) -> list[LanguagePair]:
         async with self._uow(persistent=False) as uow:
             random_lang_pairs = await uow.language_pairs.get_one_random_language_pair_from_each_active_vocabulary()
 
         if not random_lang_pairs:
             raise NoActiveVocabulariesError
 
-        res = []
-        for random_lp in random_lang_pairs:
-            res.append(NotificationSchema(
-                word=random_lp.word,
-                translation=random_lp.translation,
-                owner_id=random_lp.vocabulary.owner_id,
-            ))
-
-        return res
+        return random_lang_pairs
     
-    async def get_random_lang_pair_from_random_inactive_users_vocabulary(self, users_ids: list[int]):
+    async def get_random_lang_pair_from_random_inactive_users_vocabulary(self, users_ids: list[int]) -> list[LanguagePair]:
         async with self._uow(persistent=False) as uow:
             random_lang_pairs = await uow.language_pairs.get_one_random_language_pairs_from_random_inactive_users_vocabulary(users_ids)
 
-        result = []
-        for rand_lp in random_lang_pairs:
-            result.append(NotificationSchema(
-                word=rand_lp.word,
-                translation=rand_lp.translation,
-                owner_id=rand_lp.vocabulary.owner_id,
-            ))
-
-        return result
+        return random_lang_pairs
             
 
     
