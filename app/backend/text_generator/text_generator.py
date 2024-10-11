@@ -47,6 +47,14 @@ class TextGenerator:
         return sentence
 
 
+async def generate_sentence_from_two_words(primary_word: str, secondary_word: str) -> str | None:
+    gpt = GPT.from_base_providers()
+    tg = TextGenerator(gpt)
+    sentence = await tg.get_sentence_from_two_keywords(primary_word, secondary_word)
+
+    return sentence
+
+
 async def generate_sentence_from_word(word: str) -> str | None:
     gpt = GPT.from_base_providers()
     tg = TextGenerator(gpt)
