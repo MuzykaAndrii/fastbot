@@ -35,10 +35,10 @@ async def disable_user_active_vocabulary(message: types.Message):
     await vocabulary_disabled_message.pin(disable_notification=True)
 
 
-async def send_notification(bot: Bot, language_pair: NotificationSchema) -> types.Message | None:
-    notification = await bot.send_message(
-        language_pair.owner_id,
-        messages.get_language_pair_notification(language_pair),
+async def send_notification(bot: Bot, notification: NotificationSchema) -> types.Message | None:
+    message = await bot.send_message(
+        notification.receiver_id,
+        messages.get_language_pair_notification(notification),
     )
 
-    return notification
+    return message

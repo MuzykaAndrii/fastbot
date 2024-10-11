@@ -90,12 +90,21 @@ class VocabularyService:
 
         return random_lang_pairs
     
+
     async def get_random_lang_pair_from_random_inactive_users_vocabulary(self, users_ids: list[int]) -> list[LanguagePair]:
         async with self._uow(persistent=False) as uow:
             random_lang_pairs = await uow.language_pairs.get_one_random_language_pairs_from_random_inactive_users_vocabulary(users_ids)
 
         return random_lang_pairs
             
+
+    async def get_notifications(self) -> list[NotificationSchema]:
+        """
+        1. fetch primary language pairs
+        2. fetch secondary language pairs
+        3. generate sentences
+        """
+        pass
 
     
     async def delete_vocabulary(self, user_id: int, vocabulary_id: int) -> VocabularySet:

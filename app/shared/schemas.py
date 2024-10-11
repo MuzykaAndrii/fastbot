@@ -13,8 +13,11 @@ class LanguagePairSchema(BaseModel):
 class NotificationSchema(BaseModel):
     primary_lp: LanguagePairSchema
     secondary_lp: LanguagePairSchema | None = None
-    owner_id: int
+    receiver_id: int
     sentence_example: str | None = None
+
+    def __hash__(self):
+        return hash(self.receiver_id)
 
 
 class VocabularySchema(BaseModel):

@@ -8,18 +8,18 @@ from app.shared.schemas import NotificationSchema
 logger = logging.getLogger(__name__)
 
 
-async def send_notifications(language_pairs: list[NotificationSchema]) -> None:
-    for lang_pair in language_pairs:
-        us = UserService(lang_pair.owner_id)
+async def send_notifications(notifications: list[NotificationSchema]) -> None:
+    for notification in notifications:
+        us = UserService(notification.receiver_id)
         state = await us.user_has_active_state()
 
         if state:
-            logger.info(f"Notification to {lang_pair.owner_id} skipped")
+            logger.info(f"Notification to {notification.receiver_id} skipped, user busy")
             continue
         
-        notification = await send_notification(bot.bot, lang_pair)
+        notification = await send_notification(bot.bot, notification)
         
         if notification:
-            logger.info(f"Sended notification to {lang_pair.owner_id}")
+            logger.info(f"Sended notification to {notification.receiver_id}")
         else:
-            logger.warn(f"Sending notification to {lang_pair.owner_id} failed")
+            logger.warn(f"Sending notification to {notification.receiver_id} failed")
