@@ -1,6 +1,7 @@
 from typing import Callable
 
 from sqlalchemy import UnaryExpression, and_, func, select, update
+from sqlalchemy.orm import aliased
 
 from app.backend.db.dal import BaseDAL
 from app.backend.vocabulary.models import VocabularySet, LanguagePair
@@ -109,3 +110,61 @@ class LanguagePairDAL(BaseDAL[LanguagePair]):
 
         res = await self.session.scalars(query)
         return res.all()
+    
+    async def get_one_random_language_pairs_from_random_inactive_users_vocabulary(self, users_ids: list[int]) -> list[LanguagePair]:
+        vocab_subquery = aliased(VocabularySet)
+        language_pair_subquery = aliased(LanguagePair)
+        
+        vocab_query = (
+            select(
+                vocab_subquery.id.label("random_vocabulary_id"),
+                vocab_subquery.owner_id,
+            )
+            .add_columns(
+                func.row_number().over(
+                    partition_by=vocab_subquery.owner_id,
+                    order_by=func.random()
+                ).label("seed")
+            )
+            .where(
+                vocab_subquery.is_active == False,
+                vocab_subquery.owner_id.in_(users_ids)
+            )
+            .subquery()
+        )
+        
+        filtered_vocab_query = (
+            select(vocab_query.c.random_vocabulary_id, vocab_query.c.owner_id)
+            .where(vocab_query.c.seed == 1)
+            .subquery()
+        )
+        
+        language_pair_query = (
+            select(
+                language_pair_subquery.id,
+                language_pair_subquery.word,
+                language_pair_subquery.translation,
+                filtered_vocab_query.c.random_vocabulary_id.label("vocabulary_id"),
+            )
+            .add_columns(
+                func.row_number().over(
+                    partition_by=language_pair_subquery.vocabulary_id,
+                    order_by=func.random()
+                ).label("lp_seed")
+            )
+            .join(
+                filtered_vocab_query,
+                language_pair_subquery.vocabulary_id == filtered_vocab_query.c.random_vocabulary_id
+            )
+            .subquery()
+        )
+        
+        final_query = (
+            select(LanguagePair)
+            .from_statement(  # this need to retrieve the LanguagePair instance
+                select(language_pair_query).where(language_pair_query.c.lp_seed == 1)
+            )
+        )
+
+        result = await self.session.scalars(final_query)
+        return result.all()

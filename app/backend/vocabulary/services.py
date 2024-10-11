@@ -100,21 +100,15 @@ class VocabularyService:
     
     async def get_random_lang_pair_from_random_inactive_users_vocabulary(self, users_ids: list[int]):
         async with self._uow(persistent=False) as uow:
-            result = []
+            random_lang_pairs = await uow.language_pairs.get_one_random_language_pairs_from_random_inactive_users_vocabulary(users_ids)
 
-            for uid in users_ids:
-                inactive_vocabulary = await uow.vocabularies.get_random_with_criteria(owner_id=uid, is_active=False)
-
-                if not inactive_vocabulary:
-                    continue
-
-                rand_lang_pair = await uow.language_pairs.get_random_with_criteria(vocabulary_id=inactive_vocabulary.id)
-
-                result.append(ExtendedLanguagePairSchema(
-                    word=rand_lang_pair.word,
-                    translation=rand_lang_pair.translation,
-                    owner_id=uid,
-                ))
+        result = []
+        for rand_lp in random_lang_pairs:
+            result.append(ExtendedLanguagePairSchema(
+                word=rand_lp.word,
+                translation=rand_lp.translation,
+                owner_id=rand_lp.vocabulary.owner_id,
+            ))
 
         return result
             
