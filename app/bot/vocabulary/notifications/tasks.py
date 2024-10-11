@@ -17,9 +17,9 @@ async def send_notifications(notifications: list[NotificationSchema]) -> None:
             logger.info(f"Notification to {notification.receiver_id} skipped, user busy")
             continue
         
-        notification = await send_notification(bot.bot, notification)
+        message = await send_notification(bot.bot, notification)
         
-        if notification:
+        if message:
             logger.info(f"Sended notification to {notification.receiver_id}")
         else:
-            logger.warn(f"Sending notification to {notification.receiver_id} failed")
+            logger.warning(f"Sending notification to {notification.receiver_id} failed")
