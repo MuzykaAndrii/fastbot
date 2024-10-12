@@ -2,7 +2,10 @@ import re
 
 
 class VocabularyValidator:
-    line_vocabulary_pattern = re.compile(r'^\s*([^\s-]+)\s*-\s*([^\s-]+)\s*$', re.I|re.X|re.S|re.U)
+    line_vocabulary_pattern = re.compile(
+        r'^\s*[a-zA-ZÀ-ÿА-Яа-я,() ]+(?:\([a-zA-ZÀ-ÿА-Яа-я, ]+\))?\s*-\s*[a-zA-ZÀ-ÿА-Яа-я,() ]+(?:\([a-zA-ZÀ-ÿА-Яа-я, ]+\))?\s*$',
+        re.I | re.X | re.S | re.U
+    )
 
     def __init__(
             self,
@@ -25,7 +28,7 @@ class VocabularyValidator:
         return is_all_lines_valid
     
     def validate_line(self, raw_lang_pair: str):
-        if self.line_vocabulary_pattern.match(raw_lang_pair) is None:
+        if self.line_vocabulary_pattern.match(raw_lang_pair.strip()) is None:
             return False
         else:
             return True
