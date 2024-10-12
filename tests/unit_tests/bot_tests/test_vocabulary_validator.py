@@ -39,3 +39,18 @@ def validator():
 ])
 def test_vocabulary_validator(bulk_vocabulary, expected, validator: VocabularyValidator):
     assert validator.validate(bulk_vocabulary) == expected
+
+
+@pytest.mark.parametrize("line, expected", [
+    ("sophisticated, subtle - витончений", True),  # cyrillic symbols allowed
+    ("one, another - third", True),  # divided by coma in left
+    ("one - third, another", True),  # divided by comma in right
+    ("one (someone) - another", True),  # parenthesis in left
+    ("one - another (third)", True),  # parenthesis in right
+    ("one - another, third (extra)", True),  # parenthesis and divided by comma in right
+    ("one, second (third) - another", True),  # parenthesis and divided by comma in left
+    ("one, two (third) - another, second (extra)", True),  # parenthesis and divided by coma in both sides
+    ("one, two, extraf, extras (comment in left) - another, second, extrat (comment in right)", True),  # parenthesis and multiply divided by coma in both sides
+])
+def test_vocabulary_validator_comments_and_commas(line, expected, validator):
+    assert validator.validate_line(line) == expected
