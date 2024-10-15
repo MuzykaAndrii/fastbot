@@ -3,16 +3,16 @@ import re
 
 class VocabularyValidator:
     line_vocabulary_pattern = re.compile(
-        r'^\s*[a-zA-ZÀ-ÿА-Яа-я,() ]+(?:\([a-zA-ZÀ-ÿА-Яа-я, ]+\))?\s*-\s*[a-zA-ZÀ-ÿА-Яа-я,() ]+(?:\([a-zA-ZÀ-ÿА-Яа-я, ]+\))?\s*$',
+        r'^\s*[a-zA-ZÀ-ÿА-Яа-яЁёІіЇїЄєҐґ,() ]+(?:\([a-zA-ZÀ-ÿА-Яа-яЁёІіЇїЄєҐґ, ]+\))?\s*-\s*[a-zA-ZÀ-ÿА-Яа-яЁёІіЇїЄєҐґ,() ]+(?:\([a-zA-ZÀ-ÿА-Яа-яЁёІіЇїЄєҐґ, ]+\))?\s*$',
         re.I | re.X | re.S | re.U
     )
 
     def __init__(
-            self,
-            min_lines: int = 2,
-            max_lines: int = 30,
-            split_rule: str = "\n"
-        ) -> None:
+        self,
+        min_lines: int = 2,
+        max_lines: int = 30,
+        split_rule: str = "\n"
+    ) -> None:
         self._min_lines = min_lines
         self._max_lines = max_lines
         self._split_rule = split_rule
@@ -27,8 +27,5 @@ class VocabularyValidator:
         is_all_lines_valid = all(self.validate_line(lang_pair) for lang_pair in raw_language_pairs)
         return is_all_lines_valid
     
-    def validate_line(self, raw_lang_pair: str):
-        if self.line_vocabulary_pattern.match(raw_lang_pair.strip()) is None:
-            return False
-        else:
-            return True
+    def validate_line(self, raw_lang_pair: str) -> bool:
+        return bool(self.line_vocabulary_pattern.match(raw_lang_pair.strip()))
