@@ -2,8 +2,10 @@ import re
 
 
 class VocabularyValidator:
+    term_pattern = r'[a-zA-ZÀ-ÿА-Яа-яЁёІіЇїЄєҐґ,() ]+(?:\([a-zA-ZÀ-ÿА-Яа-яЁёІіЇїЄєҐґ, ]+\))?'
+
     line_vocabulary_pattern = re.compile(
-        r'^\s*[a-zA-ZÀ-ÿА-Яа-яЁёІіЇїЄєҐґ,() ]+(?:\([a-zA-ZÀ-ÿА-Яа-яЁёІіЇїЄєҐґ, ]+\))?\s*-\s*[a-zA-ZÀ-ÿА-Яа-яЁёІіЇїЄєҐґ,() ]+(?:\([a-zA-ZÀ-ÿА-Яа-яЁёІіЇїЄєҐґ, ]+\))?\s*$',
+        rf'^\s*(?P<word>{term_pattern})\s*-\s*(?P<translation>{term_pattern})\s*$',
         re.I | re.X | re.S | re.U
     )
 
