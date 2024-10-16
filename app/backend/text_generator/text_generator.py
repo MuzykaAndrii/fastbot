@@ -1,3 +1,5 @@
+from typing import Iterable
+
 from . import prompts
 from app.backend.gpt import GPT
 
@@ -29,7 +31,7 @@ class TextGenerator:
         else:
             return sentence
     
-    async def get_text_from_keywords(self, *keywords) -> str | None:
+    async def get_text_from_keywords(self, keywords: Iterable[str]) -> str | None:
         # TODO: add randomness to text length calculating
         prompt = prompts.text_from_words.format(
             text_length=len(keywords) // 4,
