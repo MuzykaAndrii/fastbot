@@ -4,7 +4,7 @@ from app.backend.auth.protocols import PasswordServiceProtocol
 from app.backend.components.db import database
 from app.backend.components import UnitOfWork
 from app.backend.users.services import UserService
-from app.backend.vocabulary.services import VocabularyService
+from app.backend.vocabulary.services import LanguagePairService, VocabularyService
 
 
 
@@ -30,3 +30,8 @@ def user_service(uow: UnitOfWork):
 @pytest.fixture(scope="function")
 async def vocabulary_service(uow: UnitOfWork) -> VocabularyService:
     return VocabularyService(uow)
+
+
+@pytest.fixture(scope="function")
+async def lp_service(uow: UnitOfWork) -> LanguagePairService:
+    return LanguagePairService(uow)
