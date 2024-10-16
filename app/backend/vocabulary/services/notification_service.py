@@ -2,14 +2,19 @@ from typing import Awaitable
 
 import asyncio
 
-from app.backend.text_generator.text_generator import generate_sentence_from_two_words, generate_sentence_from_word
+from app.backend.vocabulary.protocols import TextGeneratorProtocol
 from app.backend.vocabulary.services.lp_service import LanguagePairService
 from app.shared.schemas import LanguagePairSchema, NotificationSchema
 
 
 class NotificationService:
-    def __init__(self, lp_service: LanguagePairService):  # TODO: change type hint to protocol
+    def __init__(
+        self,
+        lp_service: LanguagePairService,
+        text_generator: TextGeneratorProtocol,  # TODO: change type hint to protocol to prevent direct import
+    ) -> None:
         self.lp_service = lp_service
+        self.text_gen = text_generator
     
     async def get_notifications(self) -> list[NotificationSchema]:
         """
@@ -40,9 +45,9 @@ class NotificationService:
 
         for notification in notifications:
             if notification.secondary_lp:
-                calls.append(generate_sentence_from_two_words(notification.primary_lp.word, notification.secondary_lp.word))
+                calls.append(self.text_gen.get_sentence_from_two_keywords(notification.primary_lp.word, notification.secondary_lp.word))
             else:
-                calls.append(generate_sentence_from_word(notification.primary_lp.word))
+                calls.append(self.text_gen.get_sentence_from_keyword(notification.primary_lp.word))
         
         sentences = await asyncio.gather(*calls)
 

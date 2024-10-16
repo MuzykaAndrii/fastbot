@@ -1,6 +1,8 @@
 from app.backend.components.unitofwork import UnitOfWork
 from app.backend.components.db import database
 from app.backend.cookie.cookie import FastAPICookieManager
+from app.backend.gpt.gpt import GPT
+from app.backend.text_generator.text_generator import TextGenerator
 from app.backend.users.services import UserService
 from app.backend.vocabulary.services.lp_service import LanguagePairService
 from app.backend.vocabulary.services.notification_service import NotificationService
@@ -23,10 +25,13 @@ access_jwt_manager = Jwt(
 
 pwd_service = PWDService()
 
+gpt = GPT.from_base_providers()
+text_generator = TextGenerator(gpt)
+
 users_service =  UserService(UnitOfWork(database.session_maker), pwd_service)
 vocabularies_service = VocabularyService(UnitOfWork(database.session_maker))
 lp_service = LanguagePairService(UnitOfWork(database.session_maker))
-notification_service = NotificationService(lp_service)
+notification_service = NotificationService(lp_service, text_generator)
 
 auth_cookie_manager = FastAPICookieManager(auth_settings.TOKEN_NAME)
 
