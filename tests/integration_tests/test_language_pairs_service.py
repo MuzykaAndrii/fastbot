@@ -5,7 +5,7 @@ from sqlalchemy import insert
 from app.backend.users.models import User
 from app.backend.vocabulary.exceptions import NoActiveVocabulariesError
 from app.backend.vocabulary.models import LanguagePair, VocabularySet
-from app.backend.vocabulary.services import LanguagePairService
+from app.backend.vocabulary.services.lp_service import LanguagePairService
 
 
 async def test_get_random_lang_pair_from_every_active_vocabulary(

@@ -5,7 +5,7 @@ from sqlalchemy import func, insert, select
 
 from app.backend.users.models import User
 from app.backend.vocabulary.models import LanguagePair, VocabularySet
-from app.backend.vocabulary.services import VocabularyService
+from app.backend.vocabulary.services.vocabulary_service import VocabularyService
 from app.shared.exceptions import NoVocabulariesFound, VocabularyDoesNotExist, VocabularyIsAlreadyActive
 from app.shared.schemas import LanguagePairSchema, LanguagePairsAppendSchema, VocabularyCreateSchema
 

@@ -2,7 +2,7 @@ from app.backend.components.unitofwork import UnitOfWork
 from app.backend.components.db import database
 from app.backend.cookie.cookie import FastAPICookieManager
 from app.backend.users.services import UserService
-from app.backend.vocabulary.services import VocabularyService
+from app.backend.vocabulary.services.vocabulary_service import VocabularyService
 from app.backend.auth import AuthService
 from app.backend.admin.auth import AdminAuthProvider
 from app.backend.jwt.jwt import JoseEncoder, Jwt

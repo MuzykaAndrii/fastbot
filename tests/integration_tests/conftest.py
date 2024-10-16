@@ -4,7 +4,8 @@ from app.backend.auth.protocols import PasswordServiceProtocol
 from app.backend.components.db import database
 from app.backend.components import UnitOfWork
 from app.backend.users.services import UserService
-from app.backend.vocabulary.services import LanguagePairService, VocabularyService
+from app.backend.vocabulary.services.vocabulary_service import VocabularyService
+from app.backend.vocabulary.services.lp_service import LanguagePairService
 
 
 
