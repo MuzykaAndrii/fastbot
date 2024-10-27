@@ -10,7 +10,7 @@ providers = [
     # Provider.Aura,
     # Provider.Bing,
     # Provider.BingCreateImages,
-    Provider.Binjie,
+    # Provider.Binjie,
     Provider.Bixin123,
     Provider.Blackbox,
     Provider.ChatGot,
