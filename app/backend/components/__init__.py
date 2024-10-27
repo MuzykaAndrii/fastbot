@@ -14,10 +14,7 @@ from app.backend.pwd.pwd import PWDService
 from .config import auth_settings
 
 
-jose_jwt_encoder = JoseEncoder(
-    key=auth_settings.TOKEN_KEY,
-    alg="HS256"
-)
+jose_jwt_encoder = JoseEncoder(key=auth_settings.TOKEN_KEY, alg="HS256")
 access_jwt_manager = Jwt(
     encoder=jose_jwt_encoder,
     lifetime_minutes=auth_settings.ACCESS_TOKEN_LIFETIME_MINUTES,
@@ -26,9 +23,9 @@ access_jwt_manager = Jwt(
 pwd_service = PWDService()
 
 gpt = GPT.from_base_providers()
-text_generator = TextGenerator(gpt)
+text_generator = TextGenerator(gpt, clean_answers=True)
 
-users_service =  UserService(UnitOfWork(database.session_maker), pwd_service)
+users_service = UserService(UnitOfWork(database.session_maker), pwd_service)
 vocabularies_service = VocabularyService(UnitOfWork(database.session_maker))
 lp_service = LanguagePairService(UnitOfWork(database.session_maker))
 notification_service = NotificationService(lp_service, text_generator)
