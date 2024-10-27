@@ -11,7 +11,8 @@ class TextGenerator:
 
     async def get_sentence_from_keyword(self, keyword: str) -> str | None:
         prompt = prompts.sentence_from_word.format(word=keyword)
-        return await self.gpt.get_answer(prompt)
+        answer = await self.gpt.get_answer(prompt)
+        return self._clean_answer(answer)
 
     async def get_sentence_from_two_keywords(
         self,
@@ -22,7 +23,7 @@ class TextGenerator:
             primary_word=primary_word, secondary_word=secondary_word
         )
         answer = await self.gpt.get_answer(prompt)
-        return answer
+        return self._clean_answer(answer)
 
     async def get_text_from_keywords(self, keywords: Iterable[str]) -> str | None:
         # TODO: add randomness to text length calculating
@@ -31,8 +32,7 @@ class TextGenerator:
             keywords=", ".join(keywords),
         )
 
-        answer = await self.gpt.get_answer(prompt)
-        return answer
+        return await self.gpt.get_answer(prompt)
 
     def _clean_answer(self, answer: str) -> str | None:
         if not answer:
